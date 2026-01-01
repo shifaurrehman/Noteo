@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useAppSelector } from "../../store/hooks";
+import { useAppSelector } from "../../store/hooks"; 
 import { selectColors } from "../../store/selectors";
-import { Category } from "../../types";
+import { CARD_HEIGHT,  CARD_WIDTH, CARD_MARGIN } from "@/constants/categories";
+import { Category } from "@/types/category";
 
 interface CategoryCardProps {
   category: Category;
@@ -11,8 +12,8 @@ interface CategoryCardProps {
   onEdit?: () => void;
   onDelete?: () => void;
   onFavorite?: () => void;
-  width?: number;
-  height?: number;
+  isMenuVisible?: boolean;
+  onToggleMenu?: () => void;
 }
 
 export const CategoryCard: React.FC<CategoryCardProps> = ({
@@ -21,13 +22,11 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
   onEdit,
   onDelete,
   onFavorite,
-  width,
-  height,
+  isMenuVisible,
+  onToggleMenu,
 }) => {
   const colors = useAppSelector(selectColors);
-  const [menuVisible, setMenuVisible] = useState(false);
 
-  const toggleMenu = () => setMenuVisible(!menuVisible);
 
   const styles = StyleSheet.create({
     card: {
@@ -40,9 +39,9 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
       shadowRadius: 4,
       shadowOffset: { width: 0, height: 2 },
       elevation: 3,
-      margin: 12,
-      width: width || 150,
-      height: height || 150,
+      margin: CARD_MARGIN,
+      width: CARD_WIDTH,
+      height: CARD_HEIGHT,
       position: "relative",
       overflow: "visible", // IMPORTANT
     },
@@ -93,7 +92,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
         {/* 3-dot Menu Button */}
         <TouchableOpacity
           style={styles.menuIconContainer}
-          onPress={toggleMenu}
+          onPress={onToggleMenu}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
         >
           <Ionicons name="ellipsis-vertical" size={20} color={colors.text} />
@@ -103,13 +102,13 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
       </TouchableOpacity>
 
       {/* Popup Menu — Now Attached to Card Itself */}
-      {menuVisible && (
+      {isMenuVisible && (
         <View style={styles.popupContainer}>
           {onEdit && (
             <TouchableOpacity
               style={styles.menuItem}
               onPress={() => {
-                setMenuVisible(false);
+                onToggleMenu?.();
                 onEdit();
               }}
             >
@@ -122,7 +121,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
             <TouchableOpacity
               style={styles.menuItem}
               onPress={() => {
-                setMenuVisible(false);
+                onToggleMenu?.();
                 onFavorite();
               }}
             >
@@ -135,7 +134,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
             <TouchableOpacity
               style={styles.menuItem}
               onPress={() => {
-                setMenuVisible(false);
+                onToggleMenu?.();
                 onDelete();
               }}
             >

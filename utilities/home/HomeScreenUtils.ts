@@ -1,5 +1,4 @@
-import { Category } from "@/types";
-import { v4 as uuidv4 } from "uuid";
+import { Category } from "@/types/category";
 
 interface FilterCategoriesOptions {
   searchText?: string;
@@ -25,12 +24,4 @@ export const filterCategories = (
   return filtered;
 };
 
-export const CreateNewCategory = (name: string, userId: string): Category => {
-  return {
-    id: uuidv4(),
-    userId,
-    name,
-    createdAt: new Date().toISOString(),
-    isFavorite: false,
-  };
-};
+

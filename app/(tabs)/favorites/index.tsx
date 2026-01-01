@@ -1,8 +1,8 @@
-import { CategoryScreen } from '@/screens/CategoryScreen'
+import FavoriteScreen from '@/screens/FavoriteScreen'
 import React from 'react'
 
 export default function Favorites() {
   return (
-    <CategoryScreen showFavoritesOnly={true} />
+    <FavoriteScreen />
   )
 }

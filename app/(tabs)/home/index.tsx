@@ -1,7 +1,7 @@
 
-import { CategoryScreen } from "@/screens/CategoryScreen";
+import HomeScreen from "@/screens/HomeScreen";
 import React from "react";
 
 export default function Home() {
-  return <CategoryScreen />;
+  return <HomeScreen />;
 }

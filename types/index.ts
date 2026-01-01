@@ -8,16 +8,6 @@ export interface Note {
   updatedAt: string;
 }
 
-export interface Category {
-  id: string;
-  userId: string;
-  name: string;
-  createdAt: string;
-  color?: string;
-  icon?: string;
-  isFavorite?: boolean,
-}
-
 export type ThemeMode = 'light' | 'dark';
 
 export interface AppSettings {

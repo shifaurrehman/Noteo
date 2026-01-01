@@ -2,7 +2,7 @@ import React from "react";
 import { FlatList, View, Text, Dimensions, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { CategoryCard } from "./CategoryCard";
-import { Category } from "@/types";
+import { Category } from "@/types/category";
 
 const { width } = Dimensions.get("window");
 const CARD_MARGIN = 10;
@@ -29,15 +29,19 @@ export const CategoryGrid: React.FC<Props> = ({
   colors,
   emptyText,
 }) => {
+  const [activeMenuId, setActiveMenuId] = React.useState<string | null>(null);
   const renderItem = ({ item }: { item: Category }) => (
     <CategoryCard
       category={item}
-      onPress={() => onPress(item)}
+      onPress={() => {
+        setActiveMenuId(null);
+        onPress(item);
+      }}
       onEdit={() => onEdit(item)}
       onDelete={() => onDelete(item.id)}
       onFavorite={() => onFavorite(item)}
-      width={CARD_WIDTH}
-      height={CARD_HEIGHT}
+      isMenuVisible={activeMenuId === item.id}
+      onToggleMenu={() => setActiveMenuId(activeMenuId === item.id ? null : item.id)}
     />
   );
 

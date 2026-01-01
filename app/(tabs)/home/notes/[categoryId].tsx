@@ -1,7 +1,7 @@
 import { Header } from "@/components/header/Header";
 import { AddNoteModal } from "@/components/notes/AddNoteModal";
 import { NoteCard } from "@/components/notes/NoteCard";
-import { createCategoryStyles } from "@/types/category/Category.styles";
+import { createCategoryStyles } from "@/styles/category/Category.styles";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
