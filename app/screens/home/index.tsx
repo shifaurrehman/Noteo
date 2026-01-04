@@ -1,3 +1,4 @@
+import { AddButton } from "@/components/button/AddButton";
 import { AddCategoryModal } from "@/components/category/AddCategoryModal";
 import { CategoryCard } from "@/components/category/CategoryCard";
 import { Header } from "@/components/header/Header";
@@ -5,20 +6,21 @@ import { SearchBar } from "@/components/searchbar/SearchBar";
 import { CARD_HEIGHT, EmptyCategoryText, NUM_COLUMNS } from "@/constants/categories";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectCategories, selectColors } from "@/store/selectors";
-import { deleteCategory, fetchCategories, updateCategory } from "@/store/slices/categoriesSlice";
+import { addCategory, deleteCategory, fetchCategories, updateCategory } from "@/store/slices/categoriesSlice";
 import { deleteNotesByCategory } from "@/store/slices/notesSlice";
 import { createHomeScreenStyles } from "@/styles/home/HomeScreen.styles";
 import { Category } from "@/types/category";
+import { CreateNewCategory } from "@/utilities/category/CategoryUtils";
 import { filterCategories } from "@/utilities/home/HomeScreenUtils";
-import { openNotes } from "@/utilities/routes/Routes";
+import { useNavigation } from "@/utilities/routes/Routes";
 import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-
-const FavoriteScreen: React.FC = () => {
+const HomeScreen: React.FC = () => {
+    const { viewCategoryNotes } = useNavigation();
     const dispatch = useAppDispatch();
     const categories = useAppSelector(selectCategories);
     const colors = useAppSelector(selectColors);
@@ -32,12 +34,22 @@ const FavoriteScreen: React.FC = () => {
     const styles = createHomeScreenStyles(colors);
 
     const filteredCategories = useMemo(() => {
-        return filterCategories(categories, { searchText, favoritesOnly: true });
+        return filterCategories(categories, { searchText });
     }, [categories, searchText]);
 
     useEffect(() => {
         dispatch(fetchCategories());
     }, [dispatch]);
+
+    const handleAddCategory = useCallback(
+        (name: string) => {
+            if (!user?.id) return;
+            const newCategory: Category = CreateNewCategory(name, user.id);
+            dispatch(addCategory(newCategory));
+            setShowAddModal(false);
+        },
+        [dispatch, user?.id]
+    );
 
     const handleEditCategory = useCallback((category: Category) => {
         setEditCategory(category);
@@ -81,7 +93,7 @@ const FavoriteScreen: React.FC = () => {
     );
 
     const handleOpenNotes = useCallback((category: Category) => {
-        openNotes(category.id, category.name);
+        viewCategoryNotes({categoryId: category.id, categoryName: category.name});
     }, []);
 
     const handleCloseModal = () => {
@@ -128,7 +140,7 @@ const FavoriteScreen: React.FC = () => {
                     value={searchText}
                     onChangeText={setSearchText}
                     onClear={() => setSearchText("")}
-                    placeholder={"Search favorites..."}
+                    placeholder={"Search categories..."}
                     colors={{
                         surface: colors.surface,
                         text: colors.text,
@@ -153,12 +165,20 @@ const FavoriteScreen: React.FC = () => {
                     />
                 </View>
 
+                {/* Add Category Button */}
+                <AddButton
+                    onPress={() => setShowAddModal(true)}
+                    colors={{
+                        primary: colors.primary,
+                        shadow: colors.shadow,
+                    }}
+                />
                 {/* Add Category Modal */}
                 {showAddModal && (
                     <AddCategoryModal
                         visible={showAddModal}
                         onClose={handleCloseModal}
-                        onSave={handleSaveEditedCategory}
+                        onSave={editCategory ? handleSaveEditedCategory : handleAddCategory}
                         initialValue={editCategory?.name}
                     />
                 )}
@@ -167,4 +187,4 @@ const FavoriteScreen: React.FC = () => {
     );
 };
 
-export default FavoriteScreen;
+export default HomeScreen;

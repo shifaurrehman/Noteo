@@ -1,18 +1,20 @@
+import { SettingsButton } from "@/components/button/SettingsButton";
+import { Header } from "@/components/header/Header";
+import { getCurrentYear } from "@/constants/dateTime";
+import { logout } from "@/store/slices/authSlice";
+import { createSettingsScreenStyles } from "@/styles/settings/Settings.styles";
 import { router } from "expo-router";
 import React from "react";
 import { ScrollView, Text, View } from "react-native";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { selectColors, selectTheme, selectThemeSettings } from "../store/selectors";
-import { setTheme, updateSettings } from "../store/slices/themeSlice";
-import { Header } from "@/components/header/Header";
-import { createSettingsScreenStyles } from "@/styles/settings/Settings.styles";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getCurrentYear } from "@/constants/dateTime";
-import { SettingsButton } from "@/components/button/SettingsButton";
-import { logout } from "@/store/slices/authSlice";
-import { RedirectLogin } from "@/utilities/routes/Routes";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import { selectColors, selectTheme, selectThemeSettings } from "../../../store/selectors";
+import { setTheme, updateSettings } from "../../../store/slices/themeSlice";
+import { useNavigation } from "@/utilities/routes/Routes";
+
 
 export default function SettingsScreen() {
+  const { redirectLogin } = useNavigation();
   const dispatch = useAppDispatch();
   const theme = useAppSelector(selectTheme);
   const settings = useAppSelector(selectThemeSettings);
@@ -26,10 +28,10 @@ export default function SettingsScreen() {
   const handleSettingsUpdate = (newSettings: Partial<typeof settings>) => {
     dispatch(updateSettings(newSettings));
   };
-    const handleLogout = async() => {
-      dispatch(logout());
-      RedirectLogin();
-    }
+  const handleLogout = async () => {
+    dispatch(logout());
+    redirectLogin();
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>

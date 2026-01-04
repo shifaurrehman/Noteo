@@ -6,7 +6,6 @@ import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
 import { useAppSelector } from "@/store/hooks";
 import { selectColors, selectIsAuthenticated, selectUser } from "@/store/selectors";
-import { RedirectHome } from "@/utilities/routes/Routes";
 
 const { width } = Dimensions.get("window");
 

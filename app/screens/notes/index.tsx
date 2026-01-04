@@ -1,12 +1,11 @@
 import { Header } from "@/components/header/Header";
-import { AddNoteModal } from "@/components/notes/AddNoteModal";
 import { NoteCard } from "@/components/notes/NoteCard";
 import { createCategoryStyles } from "@/styles/category/Category.styles";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Alert, FlatList, Text, TouchableOpacity, View } from "react-native";
-import { useAppDispatch, useAppSelector } from "../../../../store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 import {
   selectCategoryById,
@@ -15,15 +14,15 @@ import {
   selectNotesError,
   selectNotesLoading,
   selectUser,
-} from "../../../../store/selectors";
-import { addNote, deleteNote, loadNotes, updateNote } from "../../../../store/slices/notesSlice";
-import { Note } from "../../../../types";
+} from "@/store/selectors";
+import { addNote, deleteNote, loadNotes, updateNote } from "@/store/slices/notesSlice";
+import { Note } from "@/types";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { createNewNote } from "@/utilities/notes";
 import { ShimmerNotesGrid } from "@/components/shimmer/notes/ShimmerNoteGrid";
 
-export default function NotesScreen() {
-  const { categoryId, name } = useLocalSearchParams<{ categoryId: string; name?: string }>();
+const NotesScreen = () => {
+  const { categoryId, name, isFavorite } = useLocalSearchParams<{ categoryId: string; name?: string; isFavorite?: string }>();
   // selectors
   const category = useAppSelector((state) => (categoryId ? selectCategoryById(state, categoryId) : null));
   const notes = useAppSelector((state) => (categoryId ? selectNotesByCategory(state, categoryId) : []));
@@ -31,7 +30,7 @@ export default function NotesScreen() {
   const error = useAppSelector(selectNotesError);
   const colors = useAppSelector(selectColors);
   const user = useAppSelector(selectUser);
-  console.log("error: ", error, "loading: ", loading, "user: ", user);
+  console.log("isFavorite note or not..... ", isFavorite);
 
   // useStates
   const [showAddModal, setShowAddModal] = useState(false);
@@ -75,6 +74,14 @@ export default function NotesScreen() {
     setSelectedNote(note);
     setShowAddModal(true);
   };
+  const handleOpenAddNote = (categoryId: string) => {
+    router.push(`/home/notes/${categoryId}/addNote`);
+  };
+  const handleEditNote = (note: Note) => {
+    router.push(`/home/notes/${categoryId}/addNote?noteId=${note.id}`);
+  };
+
+
 
   const handleSaveNote = async (title: string, content: string) => {
     if (selectedNote) {
@@ -141,20 +148,13 @@ export default function NotesScreen() {
         </View>
 
         {/* Floating Add Button */}
-        <TouchableOpacity style={styles.floatingButton} onPress={handleOpenModal} activeOpacity={0.8}>
+        {isFavorite === "true" ? null : (
+        <TouchableOpacity style={styles.floatingButton} onPress={() => handleOpenAddNote(categoryId)} activeOpacity={0.8}>
           <Text style={styles.floatingButtonText}>+</Text>
         </TouchableOpacity>
-
-        {/* Add/Edit Note Modal */}
-        <AddNoteModal
-          visible={showAddModal}
-          onClose={() => handleCloseModal()}
-          onSave={(title, content) => handleSaveNote(title, content)} // Pass correct function
-          initialTitle={selectedNote?.title || ""}
-          initialContent={selectedNote?.content || ""}
-          isEdit={!!selectedNote}
-        />
+        )}
       </View>
     </SafeAreaView>
   );
 }
+export default NotesScreen;

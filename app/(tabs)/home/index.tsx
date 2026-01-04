@@ -1,5 +1,5 @@
 
-import HomeScreen from "@/screens/HomeScreen";
+import HomeScreen from "@/app/screens/home";
 import React from "react";
 
 export default function Home() {
