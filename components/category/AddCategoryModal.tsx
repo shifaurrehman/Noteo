@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, memo } from "react";
 import {
   View,
   Text,
@@ -8,10 +8,14 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useAppSelector } from "@/store/hooks";
 import { selectColors } from "@/store/selectors";
+import { IconPressable } from "../button/IconPressable";
+import { Colors } from "@/constants/theme";
 
 interface AddCategoryModalProps {
   visible: boolean;
@@ -20,16 +24,20 @@ interface AddCategoryModalProps {
   initialValue?: string;
 }
 
-export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
+export const AddCategoryModal: React.FC<AddCategoryModalProps> = memo(({
   visible,
   onClose,
   onSave,
   initialValue,
 }) => {
-  console.log("initialvaalue: ", initialValue);
-
   const colors = useAppSelector(selectColors);
   const [name, setName] = useState("");
+
+  useEffect(() => {
+    if (visible) {
+      setName(initialValue || "");
+    }
+  }, [visible, initialValue]);
 
   const handleSave = () => {
     const trimmedName = name.trim();
@@ -40,119 +48,161 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
     }
   };
 
-  useEffect(() => {
-    if (visible) {
-      setName(initialValue || "");
-    }
-  }, [visible, initialValue]);
-
-  const handleCancel = () => {
-    setName("");
-    onClose();
-  };
-
-  const styles = StyleSheet.create({
-    modalOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.21)",
-      justifyContent: "center",
-      alignItems: "center",
-      width: "100%",
-    },
-    modalContent: {
-      backgroundColor: colors.surface,
-      borderRadius: 20,
-      width: "85%",
-      padding: 24,
-    },
-    header: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 20,
-    },
-    headerTitle: {
-      fontSize: 20,
-      fontWeight: "600",
-      color: colors.text,
-    },
-    closeButton: {
-      padding: 4,
-    },
-    input: {
-      backgroundColor: colors.background,
-      borderRadius: 8,
-      padding: 12,
-      fontSize: 16,
-      color: colors.text,
-      marginBottom: 20,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    buttonContainer: {
-      flexDirection: "row",
-      justifyContent: "flex-end",
-      gap: 12,
-    },
-    button: {
-      paddingHorizontal: 24,
-      paddingVertical: 12,
-      borderRadius: 8,
-    },
-    cancelButton: {
-      backgroundColor: colors.border,
-    },
-    saveButton: {
-      backgroundColor: colors.primary,
-    },
-    buttonText: {
-      fontSize: 16,
-      fontWeight: "600",
-    },
-    cancelButtonText: {
-      color: colors.text,
-    },
-    saveButtonText: {
-      color: "#FFFFFF",
-    },
-  });
+  const isInvalid = name.trim().length === 0;
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={handleCancel}>
-      <KeyboardAvoidingView
-        style={styles.modalOverlay}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-      >
-        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={handleCancel}>
-          <TouchableOpacity activeOpacity={1} onPress={(e) => e.stopPropagation()}>
-            <View style={styles.modalContent}>
-              <View style={styles.header}>
-                <Text style={styles.headerTitle}>New Category</Text>
-                <TouchableOpacity style={styles.closeButton} onPress={handleCancel}>
-                  <Ionicons name="close" size={28} color={colors.text} />
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide" // Slide feels more "native" for bottom sheets
+      onRequestClose={onClose}
+    >
+      <TouchableWithoutFeedback onPress={onClose}>
+        <View style={styles.overlay}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={styles.keyboardView}
+          >
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <View style={[styles.sheet, { backgroundColor: colors.cardBg }]}>
+                {/* Handle Bar for Visual Polish */}
+                <View style={[styles.handle, { backgroundColor: colors.border }]} />
+
+                <View style={styles.header}>
+                  <Text style={[styles.title, { color: colors.text }]}>
+                    {initialValue ? "Edit Category" : "New Category"}
+                  </Text>
+                  <IconPressable
+                    onPress={onClose}
+                    size={25}
+                    haptic="heavy"
+                    pressedColor={colors.iconBgPressed}
+                    backgroundColor={colors.iconBg}
+                  >
+                    <Ionicons name="close" size={25} color={colors.textSecondary} />
+                  </IconPressable>
+                </View>
+
+                <View style={styles.inputContainer}>
+                  <Text style={[styles.label, { color: colors.textSecondary }]}>NAME</Text>
+                  <TextInput
+                    style={[
+                      styles.input,
+                      {
+                        color: colors.text,
+                        backgroundColor: colors.background,
+                        borderColor: name.length > 0 ? colors.primary : colors.border
+                      }
+                    ]}
+                    placeholder="e.g. Personal, Work, Ideas..."
+                    placeholderTextColor={colors.textSecondary + '70'}
+                    value={name}
+                    onChangeText={setName}
+                    autoFocus
+                    maxLength={25}
+                    onSubmitEditing={handleSave}
+                  />
+                  <Text style={[styles.charCount, { color: colors.textSecondary }]}>
+                    {name.length}/25
+                  </Text>
+                </View>
+
+                <TouchableOpacity
+                  style={[
+                    styles.saveButton,
+                    { backgroundColor: isInvalid ? colors.border : colors.primary }
+                  ]}
+                  onPress={handleSave}
+                  disabled={isInvalid}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.saveButtonText}>
+                    {initialValue ? "Update Category" : "Create Category"}
+                  </Text>
                 </TouchableOpacity>
               </View>
-              <TextInput
-                style={styles.input}
-                placeholder="Category name..."
-                placeholderTextColor={colors.textSecondary}
-                value={name}
-                onChangeText={setName}
-                autoFocus
-                onSubmitEditing={handleSave}
-              />
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={handleCancel}>
-                  <Text style={[styles.buttonText, styles.cancelButtonText]}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.button, styles.saveButton]} onPress={handleSave}>
-                  <Text style={[styles.buttonText, styles.saveButtonText]}>Add</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </TouchableOpacity>
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
+            </TouchableWithoutFeedback>
+          </KeyboardAvoidingView>
+        </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
-};
+});
+
+const styles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.4)", // Darker for better focus
+    justifyContent: "flex-end",
+  },
+  keyboardView: {
+    width: "100%",
+  },
+  sheet: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 24,
+    paddingTop: 12,
+    paddingBottom: Platform.OS === 'ios' ? 40 : 24, // Extra padding for iOS home indicator
+    width: "100%",
+  },
+  handle: {
+    width: 40,
+    height: 5,
+    borderRadius: 3,
+    alignSelf: 'center',
+    // marginBottom: 20,
+    opacity: 0.5,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 24,
+    // backgroundColor: "red",
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "800",
+    letterSpacing: -0.5,
+  },
+  inputContainer: {
+    marginBottom: 24,
+  },
+  label: {
+    fontSize: 10,
+    fontWeight: "700",
+    marginBottom: 8,
+    marginLeft: 4,
+    letterSpacing: 1,
+  },
+  input: {
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    borderWidth: 1,
+    fontWeight: '500',
+  },
+  charCount: {
+    fontSize: 11,
+    textAlign: 'right',
+    marginTop: 6,
+    marginRight: 4,
+  },
+  saveButton: {
+    height: 56,
+    borderRadius: 56 / 2,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  saveButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+});

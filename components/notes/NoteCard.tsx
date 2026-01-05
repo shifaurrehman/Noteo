@@ -1,21 +1,22 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { memo } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Note } from '@/types';
 import { useAppSelector } from '@/store/hooks';
 import { selectColors } from '@/store/selectors';
+import { IconPressable } from '../button/IconPressable';
 
 interface NoteCardProps {
   note: Note;
   onPress: () => void;
   onDelete?: () => void;
+  onToggleFavorite?: () => void;
 }
 
-export const NoteCard: React.FC<NoteCardProps> = ({
-  note,
-  onPress,
-  onDelete,
-}) => {
+const { width } = Dimensions.get('window');
+
+// Memoizing prevents unnecessary re-renders in long lists
+export const NoteCard: React.FC<NoteCardProps> = memo(({ note, onPress, onDelete, onToggleFavorite }) => {
   const colors = useAppSelector(selectColors);
 
   const formatDate = (dateString: string) => {
@@ -23,111 +24,154 @@ export const NoteCard: React.FC<NoteCardProps> = ({
     return date.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
-      year: 'numeric',
     });
   };
 
-  const styles = StyleSheet.create({
-    card: {
-      width:"100%",
-      height:170,
-      justifyContent:"center",
-      alignItems:"center",
-      backgroundColor: colors.cardBg,
-      borderRadius: 8,
-      overflow:"hidden",
-      paddingHorizontal: 12,
-      paddingVertical: 10,
-      marginBottom: 12,
-      shadowColor: colors.shadow,
-      shadowOpacity: 0.1,
-      shadowRadius: 3,
-      shadowOffset: { width: 0, height: 2 },
-      elevation: 3,
-      borderLeftWidth: 4,
-      borderLeftColor: colors.primary,
-    },
-    header: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'flex-start',
-      marginBottom: 8,
-    },
-    title: {
-      fontSize: 18,
-      fontWeight: '600',
-      color: colors.text,
-      flex: 1,
-    },
-    deleteButton: {
-      padding: 5,
-      marginLeft: 8,
-      backgroundColor:"#9694942e",
-      borderRadius: 24,
-    },
-    content: {
-      fontSize: 14,
-      color: colors.textSecondary,
-      lineHeight: 20,
-      marginBottom: 8,
-    },
-    dateContainer:{
-      width: "100%",
-      flexDirection:"row",
-      justifyContent:"space-between",
-    },
-    dateItem:{
-      backgroundColor:"#96949458",
-      paddingHorizontal: 8,
-      paddingVertical:2,
-      borderRadius: 18,
-    },
-    date: {
-      fontSize: 12,
-      color: colors.textSecondary,
-    },
-    dummyIndicator: {
-      fontSize: 12,
-      color: colors.warning,
-      fontStyle: 'italic',
-      marginTop: 4,
-    },
-  });
-
   return (
     <TouchableOpacity
-      style={styles.card}
+      style={[styles.card, { backgroundColor: colors.cardBg, shadowColor: colors.shadow }]}
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <View style={styles.header}>
-        <Text style={styles.title} numberOfLines={1}>
-          {note.title}
-        </Text>
-        {onDelete && (
-          <TouchableOpacity
-            style={styles.deleteButton}
-            onPress={(e) => {
-              e.stopPropagation();
-              onDelete();
-            }}
+      <View style={[styles.accentBar, { backgroundColor: colors.primary }]} />
+
+      <View style={styles.cardContent}>
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
+            {note.title || 'Untitled Note'}
+          </Text>
+          
+          {/* Favorite Toggle in the Top Right */}
+          <IconPressable
+            onPress={onToggleFavorite || (() => {})}
+            size={20}
+            haptic="medium"
+            backgroundColor="transparent"
+            pressedColor={colors.iconBgPressed}
           >
-            <Ionicons name="trash-outline" size={18} color={colors.error} />
-          </TouchableOpacity>
-        )}
-      </View>
-      <Text style={styles.content} numberOfLines={4}>
-        {note.content}
-      </Text>
-      <View style={styles.dateContainer}>
-        <View style={styles.dateItem}>
-        <Text style={styles.date}>{formatDate(note.updatedAt)}</Text>
+            <Ionicons 
+              name={note.isFavorite ? "star" : "star-outline"} 
+              size={20} 
+              color={note.isFavorite ? colors.favoriteNote : colors.textSecondary} 
+            />
+          </IconPressable>
         </View>
-        <View style={styles.dateItem}>
-        <Text style={styles.date}>{`Updated at : `+formatDate(note.updatedAt)}</Text>
+
+        <Text style={[styles.content, { color: colors.textSecondary }]} numberOfLines={3}>
+          {note.content || 'No additional text...'}
+        </Text>
+
+        <View style={styles.footer}>
+          <View style={styles.metadata}>
+            <Ionicons name="time-outline" size={12} color={colors.textSecondary} style={styles.metaIcon} />
+            <Text style={[styles.date, { color: colors.textSecondary }]}>
+              {`${note.updatedAt ? "Edited " : "Created "}${formatDate(note.updatedAt ?? note.createdAt)}`}
+            </Text>
+          </View>
+          
+          <View style={styles.footerActions}>
+            {/* Delete Icon moved to footer for a cleaner look */}
+            {onDelete && (
+              <IconPressable
+                onPress={onDelete}
+                size={16}
+                haptic="heavy"
+                backgroundColor={colors.iconBg}
+                pressedColor={colors.iconBgPressed}
+                style={{ marginRight: 15 }}
+              >
+                <Ionicons name="trash-outline" size={16} color={colors.error} />
+              </IconPressable>
+            )}
+
+            <View style={[styles.tag, { backgroundColor: colors.primary + '15' }]}>
+               <Text style={[styles.tagText, { color: colors.primary }]}>Note</Text>
+            </View>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
   );
-};
+});
 
+const styles = StyleSheet.create({
+  card: {
+    width: width - 32,
+    alignSelf: 'center',
+    borderRadius: 16,
+    marginBottom: 16,
+    overflow: 'hidden',
+    ...Platform.select({
+      ios: {
+        shadowOpacity: 0.08,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 4 },
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+  accentBar: {
+    height: 4,
+    width: '100%',
+  },
+  cardContent: {
+    padding: 16,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '700',
+    flex: 1,
+    marginRight: 8,
+    letterSpacing: -0.5,
+  },
+  content: {
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 16,
+    opacity: 0.7,
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(150,150,150,0.08)',
+    paddingTop: 5,
+  },
+  footerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  deleteButton: {
+    marginRight: 10,
+  },
+  metadata: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  metaIcon: {
+    marginRight: 4,
+  },
+  date: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  tag: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  tagText: {
+    fontSize: 10,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+  },
+});

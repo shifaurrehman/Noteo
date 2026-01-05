@@ -4,8 +4,12 @@ export interface Note {
   userId: string;
   title: string;
   content: string;
+  isFavorite: boolean;
   createdAt: string;
-  updatedAt: string;
+  updatedAt: string | null;
+  isDeleted: boolean;
+  syncStatus: string;
+  version: number;
 }
 
 export type ThemeMode = 'light' | 'dark';

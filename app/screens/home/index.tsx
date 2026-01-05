@@ -1,4 +1,5 @@
 import { AddButton } from "@/components/button/AddButton";
+import { IconPressable } from "@/components/button/IconPressable";
 import { AddCategoryModal } from "@/components/category/AddCategoryModal";
 import { CategoryCard } from "@/components/category/CategoryCard";
 import { Header } from "@/components/header/Header";
@@ -8,6 +9,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectCategories, selectColors } from "@/store/selectors";
 import { addCategory, deleteCategory, fetchCategories, updateCategory } from "@/store/slices/categoriesSlice";
 import { deleteNotesByCategory } from "@/store/slices/notesSlice";
+import { commonStyles } from "@/styles/global";
 import { createHomeScreenStyles } from "@/styles/home/HomeScreen.styles";
 import { Category } from "@/types/category";
 import { CreateNewCategory } from "@/utilities/category/CategoryUtils";
@@ -93,7 +95,7 @@ const HomeScreen: React.FC = () => {
     );
 
     const handleOpenNotes = useCallback((category: Category) => {
-        viewCategoryNotes({categoryId: category.id, categoryName: category.name});
+        viewCategoryNotes({ categoryId: category.id, categoryName: category.name });
     }, []);
 
     const handleCloseModal = () => {
@@ -165,14 +167,16 @@ const HomeScreen: React.FC = () => {
                     />
                 </View>
 
-                {/* Add Category Button */}
-                <AddButton
+                <IconPressable
                     onPress={() => setShowAddModal(true)}
-                    colors={{
-                        primary: colors.primary,
-                        shadow: colors.shadow,
-                    }}
-                />
+                    size={60}
+                    haptic="heavy"
+                    pressedColor={colors.primaryPressed}
+                    backgroundColor={colors.primary}
+                    style={commonStyles.floatingButton}
+                >
+                    <Text style={commonStyles.floatingButtonText}>+</Text>
+                </IconPressable>
                 {/* Add Category Modal */}
                 {showAddModal && (
                     <AddCategoryModal

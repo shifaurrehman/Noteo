@@ -16,7 +16,7 @@ export const useNavigation = () => {
     });
   };
 
-  const openAddNote = (categoryId: string) => {
+  const addUpdateNote = (categoryId: string) => {
     router.push({
       pathname: "/(tabs)/home/notes/[categoryId]/addNote",
       params: {
@@ -47,5 +47,5 @@ export const useNavigation = () => {
     router.push("/screens/settings");
   };
 
-  return { viewCategoryNotes, openFavoriteNotes, redirectLogin, redirectHome, openSettings };
+  return { viewCategoryNotes, addUpdateNote, openFavoriteNotes, redirectLogin, redirectHome, openSettings, };
 };

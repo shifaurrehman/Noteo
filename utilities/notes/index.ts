@@ -5,7 +5,8 @@ export const createNewNote = (
   title: string,
   content: string,
   categoryId: string,
-  userId: string
+  userId: string,
+  isFavorite?: boolean
 ): Note => {
   
   return {
@@ -14,7 +15,11 @@ export const createNewNote = (
     userId,
     title: title.trim() || "Untitled Note",
     content: content.trim(),
+    isFavorite: isFavorite ?? false,
     createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    updatedAt: null,
+    isDeleted: false,
+    syncStatus: "pending",
+    version: 0,
   };
 };

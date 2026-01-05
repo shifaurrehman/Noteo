@@ -8,7 +8,7 @@ export const CreateNewCategory = (name: string, userId: string, isFavorite?: boo
     name: name,
     isFavorite: isFavorite ?? false,
     createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    updatedAt: null,
     isDeleted: false,
     syncStatus: "pending",
     version: 0,
