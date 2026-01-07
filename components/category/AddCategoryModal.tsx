@@ -54,7 +54,7 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = memo(({
     <Modal
       visible={visible}
       transparent
-      animationType="slide" // Slide feels more "native" for bottom sheets
+      animationType="slide"
       onRequestClose={onClose}
     >
       <TouchableWithoutFeedback onPress={onClose}>

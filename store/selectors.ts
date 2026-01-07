@@ -1,5 +1,4 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { Note } from "../types";
 import { RootState } from "./store";
 
 // Theme selectors

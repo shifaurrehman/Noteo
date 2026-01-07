@@ -16,7 +16,8 @@
       "title": "Test fitness note edited",
       "content": "Do some exercise Do some exercise Do some exercise Do some exercise Do some exercise Do some exercise Do some exercise Do some exercise Do some exercise Do some exercise Do some exercise Do some exerciseDo some exercise Do some exercise Do some exercise Do some exercise Do some exercise Do some exercise Do some exercise Do some exercise Do some exercise Do some exercise Do some exercise Do some exercise",
       "createdAt": "2025-12-03T20:03:08.330Z",
-      "updatedAt": "2025-12-03T20:03:08.330Z"
+      "updatedAt": "2025-12-03T20:03:08.330Z",
+      "isFavorite": false
     },
     {
       "id": "3c371379-bee3-4732-ba6e-70792a30f7ab",
@@ -91,6 +92,17 @@
       "name": "new",
       "createdAt": "2025-12-06T13:09:07.111Z",
       "isFavorite": false
+    },
+    {
+      "id": "456f2320-d343-4908-a8c6-7dad3a75b300",
+      "userId": "1764618104642",
+      "name": "nzndjxhhxhdbdbbsjsj",
+      "isFavorite": false,
+      "createdAt": "2026-01-06T13:33:06.686Z",
+      "updatedAt": null,
+      "isDeleted": false,
+      "syncStatus": "pending",
+      "version": 0
     }
   ],
   "users": [

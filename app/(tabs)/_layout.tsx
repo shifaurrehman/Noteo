@@ -1,3 +1,4 @@
+import { NetworkStatusBar } from "@/components/network/networkBar";
 import { useAppSelector } from "@/store/hooks";
 import { selectColors } from "@/store/selectors";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -6,6 +7,8 @@ import { Tabs } from "expo-router";
 export default function TabLayout() {
   const colors = useAppSelector(selectColors);
   return (
+    <>
+    <NetworkStatusBar/>
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -33,5 +36,6 @@ export default function TabLayout() {
         }}
       />
     </Tabs>
+    </>
   );
 }

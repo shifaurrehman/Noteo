@@ -17,6 +17,7 @@ import categoriesReducer from "./slices/categoriesSlice";
 import notesReducer from "./slices/notesSlice";
 import themeReducer from "./slices/themeSlice";
 import authReducer from "./slices/authSlice";
+import networkReducer from "./slices/networkSlice";
 
 // Create saga middleware
 const sagaMiddleware = createSagaMiddleware();
@@ -28,6 +29,7 @@ const appReducer = combineReducers({
   notes: notesReducer,
   theme: themeReducer,
   auth: authReducer,
+  network: networkReducer,
 });
 
 // Root reducer wrapper to handle global reset on logout
@@ -43,8 +45,8 @@ const persistConfig = {
   key: "root",
   version: 1,
   storage: AsyncStorage,
-  whitelist: ["auth", "theme", "categories", "notes"], // Only persist these slices
-  blacklist: [apiSlice.reducerPath], // Don't persist API cache
+  whitelist: ["auth", "theme", "categories", "notes"],
+  blacklist: [apiSlice.reducerPath, "network"],
 };
 
 // Create persisted reducer
