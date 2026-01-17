@@ -8,7 +8,7 @@ import { selectCategories, selectColors } from "@/store/selectors";
 import { deleteCategory, fetchCategories, updateCategory } from "@/store/slices/categoriesSlice";
 import { deleteNotesByCategory } from "@/store/slices/notesSlice";
 import { createHomeScreenStyles } from "@/styles/home/HomeScreen.styles";
-import { Category } from "@/types/category";
+import { Category } from "@/types/category/category.types";
 import { filterCategories } from "@/utilities/home/HomeScreenUtils";
 import { useNavigation } from "@/utilities/routes/Routes";
 import { Ionicons } from "@expo/vector-icons";
@@ -24,8 +24,6 @@ const FavoriteScreen: React.FC = () => {
     const categories = useAppSelector(selectCategories);
     const colors = useAppSelector(selectColors);
     const user = useAppSelector((state) => state.auth.user);
-    console.log("categories length..", categories.length, " User: ", user);
-
     const [editCategory, setEditCategory] = useState<Category | null>(null);
     const [searchText, setSearchText] = useState("");
     const [showAddModal, setShowAddModal] = useState(false);

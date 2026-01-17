@@ -1,4 +1,4 @@
-  import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,17 +7,15 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Alert,
+  Keyboard,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import GradientButton from "@/components/auth/CustomButton";
 import AuthInput from "@/components/auth/AuthEmail";
-import { useDispatch } from "react-redux";
-import { loginUser, logout } from "@/store/slices/authSlice";
-import { useAppSelector } from "@/store/hooks";
 import { validateEmail } from "@/utilities/auth";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Login() {
   const router = useRouter();
@@ -25,15 +23,8 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loginAttempted, setLoginAttempted] = useState(false);
 
-  const [errors, setErrors] = useState({
-    email: "",
-    password: "",
-  });
-  const isLoading = useAppSelector((state) => state.auth.loading);
-  const user = useAppSelector((state) => state.auth.user);
-  const error = useAppSelector((state) => state.auth.error);
-    console.log("loading: ", isLoading, "user: ", user, "error: ", error);
-  const dispatch = useDispatch();
+  const [errors, setErrors] = useState({ email: "", password: "", });
+  const { loading, login, isAuthenticated } = useAuth();
 
   const validateInputFields = () => {
     const newErrors = { email: "", password: "" };
@@ -61,24 +52,19 @@ export default function Login() {
     setErrors({ ...errors, [field]: "" });
   };
 
-  const handleLogin = async () => {
+  const handleLogin = useCallback(() => {
     const isValid = validateInputFields();
     if (!isValid) return;
-    setLoginAttempted(true); // mark that user clicked login
-    dispatch(loginUser({ email, password }));
-  };
+    Keyboard.dismiss();
+    setLoginAttempted(true)
+    login({ email, password });
+  }, [email, password, login]);
 
   useEffect(() => {
-    if (loginAttempted && error) {
-      Alert.alert("Login Failed", error);
+    if (loginAttempted && isAuthenticated) {
+      router.replace("/home");
     }
-  }, [error, loginAttempted]);
-
-  useEffect(() => {
-    if (loginAttempted && user) {
-      router.replace("/home"); // or wherever you want
-    }
-  }, [user, loginAttempted, router]);
+  }, [isAuthenticated, loginAttempted, router]);
 
   const handleGuest = async () => {};
 
@@ -129,7 +115,7 @@ export default function Login() {
             </TouchableOpacity>
 
             {/* Login Button */}
-            <GradientButton title="Sign In" loading={isLoading} onPress={handleLogin} />
+            <GradientButton title="Sign In" loading={loading} onPress={handleLogin} />
 
             {/* Divider */}
             <View style={styles.dividerContainer}>
@@ -142,7 +128,7 @@ export default function Login() {
             <TouchableOpacity
               onPress={handleGuest}
               style={styles.guestButton}
-              disabled={isLoading}
+              disabled={loading}
               activeOpacity={0.8}
             >
               <Ionicons name="person-outline" size={20} color="#667eea" />

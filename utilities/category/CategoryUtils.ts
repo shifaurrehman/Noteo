@@ -1,4 +1,4 @@
-import { Category } from "@/types/category";
+import { Category } from "@/types/category/category.types";
 import { v4 as uuidv4 } from "uuid";
 
 export const CreateNewCategory = (name: string, userId: string, isFavorite?: boolean): Category => {

@@ -1,4 +1,4 @@
-import { Note } from "@/types";
+import { Note } from "@/types/notes/notes.types";
 import { BASE_URL } from "@/utilities";
 
 export const fetchNotesApi = async (): Promise<Note[]> => {

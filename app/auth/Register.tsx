@@ -39,7 +39,7 @@ export default function Register() {
   const isLoadingUser = useAppSelector((state) => state.auth.loading);
   const user = useAppSelector((state) => state.auth.user);
   const error = useAppSelector((state) => state.auth.error);
-  console.log("loading: ", isLoadingUser, "user: ", user, "error: ", error);
+  console.log("REGISTER SCREEN: ","loading: ", isLoadingUser, "user: ", user, "error: ", error);
 
   const dispatch = useDispatch();
 

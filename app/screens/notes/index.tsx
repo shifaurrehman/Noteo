@@ -4,7 +4,7 @@ import { createCategoryStyles } from "@/styles/category/Category.styles";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect } from "react";
-import { Alert, FlatList, Text, TouchableOpacity, View } from "react-native";
+import { Alert, FlatList, Text, View } from "react-native";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 import {
@@ -13,7 +13,7 @@ import {
   selectNotesByCategory,
 } from "@/store/selectors";
 import { deleteNote, loadNotes, updateNote } from "@/store/slices/notesSlice";
-import { Note } from "@/types";
+import { Note } from "@/types/notes/notes.types";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { IconPressable } from "@/components/button/IconPressable";
 
@@ -23,7 +23,7 @@ const NotesScreen = () => {
   const category = useAppSelector((state) => (categoryId ? selectCategoryById(state, categoryId) : null));
   const notes = useAppSelector((state) => (categoryId ? selectNotesByCategory(state, categoryId) : []));
   const colors = useAppSelector(selectColors);
-  console.log("isFavorite note or not..... ", isFavorite);
+  console.log("NOTES SCREEN: ","isFavorite note or not..... ", isFavorite);
 
   // dispatcher and styles
   const dispatch = useAppDispatch();

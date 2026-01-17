@@ -3,9 +3,10 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider, useDispatch } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { persistor, store } from "../store/store";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import NetInfo from '@react-native-community/netinfo';
 import { setNetworkState } from "@/store/slices/networkSlice";
+import Toast from "react-native-toast-message";
 
 function AppContent() {
   const dispatch = useDispatch();
@@ -20,6 +21,7 @@ function AppContent() {
   return (
     <SafeAreaProvider style={{ flex: 1 }}>
       <Slot />
+      <Toast />
     </SafeAreaProvider>
   );
 }

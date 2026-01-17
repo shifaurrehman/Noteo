@@ -1,30 +1,28 @@
-import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import createSagaMiddleware, { AnyAction } from "redux-saga";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import {
-  persistStore,
-  persistReducer,
   FLUSH,
-  REHYDRATE,
   PAUSE,
   PERSIST,
+  persistReducer,
+  persistStore,
   PURGE,
   REGISTER,
+  REHYDRATE,
 } from "redux-persist";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import createSagaMiddleware, { AnyAction } from "redux-saga";
 import { rootSaga } from "./sagas/rootSaga";
-import { apiSlice } from "./api/apiSlice";
+import authReducer from "./slices/authSlice";
 import categoriesReducer from "./slices/categoriesSlice";
+import networkReducer from "./slices/networkSlice";
 import notesReducer from "./slices/notesSlice";
 import themeReducer from "./slices/themeSlice";
-import authReducer from "./slices/authSlice";
-import networkReducer from "./slices/networkSlice";
 
 // Create saga middleware
 const sagaMiddleware = createSagaMiddleware();
 
 // Combine reducers
 const appReducer = combineReducers({
-  [apiSlice.reducerPath]: apiSlice.reducer,
   categories: categoriesReducer,
   notes: notesReducer,
   theme: themeReducer,
@@ -46,7 +44,7 @@ const persistConfig = {
   version: 1,
   storage: AsyncStorage,
   whitelist: ["auth", "theme", "categories", "notes"],
-  blacklist: [apiSlice.reducerPath, "network"],
+  blacklist: ["network"],
 };
 
 // Create persisted reducer
@@ -59,10 +57,17 @@ export const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        warnAfter: 100,
+      },
+      immutableCheck: {
+        warnAfter: 100,
       },
     })
-      .concat(apiSlice.middleware)
-      .concat(sagaMiddleware),
+      .concat(sagaMiddleware)
+      .concat((store: any) => (next: any) => (action: any) => {
+        const result = next(action);
+        return result;
+      }),
   devTools: __DEV__, // Enable Redux DevTools in development
 });
 

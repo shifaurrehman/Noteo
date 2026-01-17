@@ -1,4 +1,3 @@
-import { AddButton } from "@/components/button/AddButton";
 import { IconPressable } from "@/components/button/IconPressable";
 import { AddCategoryModal } from "@/components/category/AddCategoryModal";
 import { CategoryCard } from "@/components/category/CategoryCard";
@@ -7,17 +6,17 @@ import { SearchBar } from "@/components/searchbar/SearchBar";
 import { CARD_HEIGHT, EmptyCategoryText, NUM_COLUMNS } from "@/constants/categories";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectCategories, selectColors } from "@/store/selectors";
-import { addCategory, deleteCategory, fetchCategories, updateCategory } from "@/store/slices/categoriesSlice";
+import { addCategory, deleteCategory, updateCategory } from "@/store/slices/categoriesSlice";
 import { deleteNotesByCategory } from "@/store/slices/notesSlice";
 import { commonStyles } from "@/styles/global";
 import { createHomeScreenStyles } from "@/styles/home/HomeScreen.styles";
-import { Category } from "@/types/category";
+import { Category } from "@/types/category/category.types";
 import { CreateNewCategory } from "@/utilities/category/CategoryUtils";
 import { filterCategories } from "@/utilities/home/HomeScreenUtils";
 import { useNavigation } from "@/utilities/routes/Routes";
 import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -26,8 +25,8 @@ const HomeScreen: React.FC = () => {
     const dispatch = useAppDispatch();
     const categories = useAppSelector(selectCategories);
     const colors = useAppSelector(selectColors);
-    const user = useAppSelector((state) => state.auth.user);
-    console.log("categories length..", categories.length, " User: ", user);
+    const user = useAppSelector((state) => state?.auth?.user);
+    console.log("HOME SCREEN: ","user in homeScreen: ", user);
 
     const [editCategory, setEditCategory] = useState<Category | null>(null);
     const [searchText, setSearchText] = useState("");
@@ -38,10 +37,6 @@ const HomeScreen: React.FC = () => {
     const filteredCategories = useMemo(() => {
         return filterCategories(categories, { searchText });
     }, [categories, searchText]);
-
-    useEffect(() => {
-        dispatch(fetchCategories());
-    }, [dispatch]);
 
     const handleAddCategory = useCallback(
         (name: string) => {

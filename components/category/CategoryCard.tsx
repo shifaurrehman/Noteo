@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useAppSelector } from "../../store/hooks"; 
 import { selectColors } from "../../store/selectors";
 import { CARD_HEIGHT,  CARD_WIDTH, CARD_MARGIN } from "@/constants/categories";
-import { Category } from "@/types/category";
+import { Category } from "@/types/category/category.types";
 
 interface CategoryCardProps {
   category: Category;

@@ -1,21 +1,28 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { call, put, takeEvery } from "redux-saga/effects";
-import { setError, setLastSyncAt, setLoading, setToken, setUser, User } from "../slices/authSlice";
-import { loginUserApi, registerUserApi } from "../api/authApi";
 import { clearStorage } from "@/utilities/auth";
+import { loginUserApi, registerUserApi } from "@/services/api/services/authService";
+import { tokenStorage } from "@/services/storage/tokenStorage";
+import { LoginResponse, RegisterResponse } from "@/types/auth/auth.types";
+import { User } from "@/types/user/user.types";
+import { setError, setLastSyncAt, setLoading, setUser } from "../slices/authSlice";
+import { showErrorToast } from "@/utilities/toast/message-toast";
+import { getErrorMessage } from "@/utilities/toast/get-toast-message";
 
-// Login saga (will be extended with API call)
+// Login saga (will be extended with API call) 
 function* loginSaga(action: PayloadAction<{ email: string; password: string }>) {
   try {
     yield put(setLoading(true));
-    yield put(setError(null));
-    const user: User = yield call(loginUserApi, action.payload);
-
-    const token = "token_" + user.id;
+    const response: LoginResponse = yield call(loginUserApi, action.payload);
+    console.log("response in loginSaga: ", response);
+    const user: User = {...response.user, registered: true};
+    const { accessToken, refreshToken } = response;
+    yield call(tokenStorage.saveTokens, accessToken, refreshToken);
     yield put(setUser(user));
-    yield put(setToken(token));
   } catch (error: any) {
-    yield put(setError(error.message || "Failed to login"));
+    const message = getErrorMessage(error) || "Failed to login";
+    showErrorToast({ message: message });
+    yield put(setError(message));
   } finally {
     yield put(setLoading(false));
   }
@@ -25,14 +32,14 @@ function* loginSaga(action: PayloadAction<{ email: string; password: string }>) 
 function* registerSaga(action: PayloadAction<{ email: string; name: string; password: string }>) {
   try {
     yield put(setLoading(true));
-    yield put(setError(null));
-
-    const newUser: User = yield call(registerUserApi, action.payload);
-    const token = "token_" + newUser.id;
-    yield put(setUser(newUser));
-    yield put(setToken(token));
+    const response: RegisterResponse = yield call(registerUserApi, action.payload);
+    const { accessToken, refreshToken, user } = response;
+    yield call(tokenStorage.saveTokens, accessToken, refreshToken);
+    yield put(setUser(user));
   } catch (error: any) {
-    yield put(setError(error.message || "Failed to register"));
+    const message = getErrorMessage(error) || "Failed to register";
+    showErrorToast({ message: message });
+    yield put(setError(message));
   } finally {
     yield put(setLoading(false));
   }
@@ -41,8 +48,8 @@ function* registerSaga(action: PayloadAction<{ email: string; name: string; pass
 // Logout saga
 function* logoutSaga() {
   try {
-    // 1. Clear Redux reducers
-    yield call(clearStorage) // clears AsyncStorage completely
+    yield call(clearStorage);
+    yield call(tokenStorage.clearTokens);
   } catch (error: any) {
     yield put(setError(error.message || "Failed to logout"));
   }
@@ -53,12 +60,10 @@ function* syncUserDataSaga(action: PayloadAction<string>) {
   try {
     const lastSyncAt = new Date().toISOString();
     yield put(setLastSyncAt(lastSyncAt));
-
   } catch (error: any) {
     yield put(setError(error.message || "Failed to sync data"));
   }
 }
-
 
 // Watcher sagas
 export function* watchLogin() {
@@ -70,7 +75,7 @@ export function* watchRegister() {
 }
 
 export function* watchLogout() {
-  yield takeEvery("auth/logout", logoutSaga);
+  yield takeEvery("auth/logoutUser", logoutSaga);
 }
 
 export function* watchSyncUserData() {

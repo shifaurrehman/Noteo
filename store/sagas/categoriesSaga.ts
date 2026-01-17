@@ -1,14 +1,10 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { call, put, takeEvery } from "redux-saga/effects";
-import { Category } from "../../types";
 import { loadCategories, setError, setLoading } from "../slices/categoriesSlice";
 import { deleteNotesByCategory } from "../slices/notesSlice";
-import {
-  createCategoryApi,
-  deleteCategoryApi,
-  fetchCategoriesApi,
-  updateCategoryApi,
-} from "../api/categoryApi";
+
+import { Category } from "@/types/category/category.types";
+import { createCategoryApi, deleteCategoryApi, fetchCategoriesApi, updateCategoryApi } from "@/services/api/services/categoriesService";
 
 // Load categories from storage
 function* loadCategoriesSaga() {
@@ -28,7 +24,7 @@ function* saveCategorySaga(action: PayloadAction<Category>) {
   try {
     yield put(setLoading(true));
     yield call(createCategoryApi, action.payload);
-    yield call(loadCategoriesSaga);
+    // yield call(loadCategoriesSaga);
   } catch (error: any) {
     console.error("error in saveCategorySaga: ", error)
     yield put(setError(error.message || "Failed to save category"));

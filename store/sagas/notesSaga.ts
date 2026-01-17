@@ -1,8 +1,8 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { call, put, takeEvery } from "redux-saga/effects";
-import { Note } from "../../types";
 import { setError, setLoading, setNotes } from "../slices/notesSlice";
-import { createNoteApi, deleteNoteApi, fetchNotesApi, updateNoteApi } from "../api/notesApi";
+import { Note } from "@/types/notes/notes.types";
+import { createNoteApi, deleteNoteApi, fetchNotesApi, updateNoteApi } from "@/services/api/services/notesService";
 
 // Load notes from storage
 function* loadNotesSaga() {
