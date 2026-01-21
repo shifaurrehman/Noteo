@@ -1,21 +1,21 @@
+import AuthInput from "@/components/auth/AuthEmail";
+import GradientButton from "@/components/auth/CustomButton";
+import { useAuth } from "@/hooks/useAuth";
+import { validateEmail } from "@/utilities/auth";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Keyboard,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
-import GradientButton from "@/components/auth/CustomButton";
-import AuthInput from "@/components/auth/AuthEmail";
-import { validateEmail } from "@/utilities/auth";
-import { useAuth } from "@/hooks/useAuth";
 
 export default function Login() {
   const router = useRouter();
@@ -66,7 +66,7 @@ export default function Login() {
     }
   }, [isAuthenticated, loginAttempted, router]);
 
-  const handleGuest = async () => {};
+  const handleGuest = async () => { };
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
@@ -110,7 +110,10 @@ export default function Login() {
             />
 
             {/* Forgot Password */}
-            <TouchableOpacity style={styles.forgotPassword}>
+            <TouchableOpacity
+              style={styles.forgotPassword}
+              onPress={() => router.push("/auth/forgot-password")}
+            >
               <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
             </TouchableOpacity>
 
