@@ -9,13 +9,12 @@ import { setError, setLastSyncAt, setLoading, setUser } from "../slices/authSlic
 import { showErrorToast } from "@/utilities/toast/message-toast";
 import { getErrorMessage } from "@/utilities/toast/get-toast-message";
 
-// Login saga (will be extended with API call) 
+// Login saga (will be extended with API call)
 function* loginSaga(action: PayloadAction<{ email: string; password: string }>) {
   try {
     yield put(setLoading(true));
     const response: LoginResponse = yield call(loginUserApi, action.payload);
-    console.log("response in loginSaga: ", response);
-    const user: User = {...response.user, registered: true};
+    const user: User = { ...response.user, registered: true };
     const { accessToken, refreshToken } = response;
     yield call(tokenStorage.saveTokens, accessToken, refreshToken);
     yield put(setUser(user));
@@ -75,7 +74,7 @@ export function* watchRegister() {
 }
 
 export function* watchLogout() {
-  yield takeEvery("auth/logoutUser", logoutSaga);
+  yield takeEvery("auth/logout", logoutSaga);
 }
 
 export function* watchSyncUserData() {

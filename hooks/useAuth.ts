@@ -1,4 +1,4 @@
-import { loginUser, logoutUser, registerUser } from "@/store/slices/authSlice";
+import { loginUser, registerUser, logout } from "@/store/slices/authSlice";
 import { AppDispatch, RootState } from "@/store/store";
 import { LoginCredentials, RegisterData } from "@/types/auth/auth.types";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,8 +15,8 @@ export const useAuth = () => {
     return dispatch(registerUser(data));
   };
 
-  const logout = () => {
-    return dispatch(logoutUser());
+  const logoutUser = () => {
+    return dispatch(logout());
   };
 
   return {
@@ -26,6 +26,6 @@ export const useAuth = () => {
     error,
     login,
     register,
-    logout,
+    logoutUser,
   };
 };

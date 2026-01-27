@@ -1,6 +1,7 @@
-import { BASE_URL } from "@/utilities";
 import axios, { AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig } from "axios";
 import { tokenStorage } from "../../storage/tokenStorage";
+import { BASE_URL } from "./api.config";
+import { authEvents, FORCE_LOGOUT_EVENT } from "@/utilities/events";
 
 interface FailedRequest {
   resolve: (value?: any) => void;
@@ -13,7 +14,7 @@ interface ProcessQueueArgs {
 }
 
 // constants
-const AUTH_WHITELIST = ["/auth/login", "/auth/register", "/auth/refresh", "/auth/reset-password"];
+const AUTH_WHITELIST = ["/auth/login", "/auth/register", "/auth/refresh", "/auth/reset-password", "/auth/forgot-password", "/auth/verify-email"];
 const REQUEST_TIMEOUT = 10000;
 
 // axios instance
@@ -41,6 +42,10 @@ const processQueue = ({ error, token = null }: ProcessQueueArgs) => {
 
 api.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
+    console.log("===== AXIOS REQUEST START =====");
+    console.log("Request URL:", config.url);
+    console.log("Request Headers:", config.headers);
+    console.log("===== AXIOS REQUEST END =====");
     const token = await tokenStorage.getAccessToken();
 
     if (token && config.headers) {
@@ -55,7 +60,15 @@ api.interceptors.request.use(
 );
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log("API RESPONSE:", {
+      url: response.config.url,
+      method: response.config.method,
+      status: response.status,
+      data: response.data,
+    });
+    return response;
+  },
   async (error: AxiosError) => {
     console.log("===== AXIOS ERROR START =====");
 
@@ -135,3 +148,7 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+const handleForcedLogout = async () => {
+  authEvents.emit(FORCE_LOGOUT_EVENT); 
+};

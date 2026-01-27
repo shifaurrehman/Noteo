@@ -1,11 +1,28 @@
+export const SYNC_STATUS = {
+  PENDING: "pending",
+  SYNCED: "synced",
+  ERROR: "error",
+} as const;
+
+export type SyncStatus = typeof SYNC_STATUS[keyof typeof SYNC_STATUS];
+
 export interface Category {
   id: string;
-  userId: string;
   name: string;
   isFavorite: boolean;
   createdAt: string;
   updatedAt: string | null;
   isDeleted: boolean;
-  syncStatus: "pending" | "synced" | "error";
+  syncStatus: SyncStatus;
   version: number;
 }
+
+export type CategoryApi = {
+  id: string;
+  name: string;
+  isFavorite: boolean;
+  createdAt: string;
+  updatedAt: string | null;
+  isDeleted: boolean;
+  version: number;
+};

@@ -5,15 +5,16 @@ import { Header } from "@/components/header/Header";
 import { SearchBar } from "@/components/searchbar/SearchBar";
 import { CARD_HEIGHT, EmptyCategoryText, NUM_COLUMNS } from "@/constants/categories";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectCategories, selectColors } from "@/store/selectors";
+import { selectCategories, selectColors, selectUser } from "@/store/selectors";
 import { addCategory, deleteCategory, updateCategory } from "@/store/slices/categoriesSlice";
 import { deleteNotesByCategory } from "@/store/slices/notesSlice";
 import { commonStyles } from "@/styles/global";
 import { createHomeScreenStyles } from "@/styles/home/HomeScreen.styles";
-import { Category } from "@/types/category/category.types";
+import { Category, CategoryApi } from "@/types/category/category.types";
 import { CreateNewCategory } from "@/utilities/category/CategoryUtils";
 import { filterCategories } from "@/utilities/home/HomeScreenUtils";
 import { useNavigation } from "@/utilities/routes/Routes";
+import { showErrorToast } from "@/utilities/toast/message-toast";
 import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import React, { useCallback, useMemo, useState } from "react";
@@ -24,9 +25,8 @@ const HomeScreen: React.FC = () => {
     const { viewCategoryNotes } = useNavigation();
     const dispatch = useAppDispatch();
     const categories = useAppSelector(selectCategories);
+    const user = useAppSelector(selectUser);
     const colors = useAppSelector(selectColors);
-    const user = useAppSelector((state) => state?.auth?.user);
-    console.log("HOME SCREEN: ","user in homeScreen: ", user);
 
     const [editCategory, setEditCategory] = useState<Category | null>(null);
     const [searchText, setSearchText] = useState("");
@@ -38,35 +38,37 @@ const HomeScreen: React.FC = () => {
         return filterCategories(categories, { searchText });
     }, [categories, searchText]);
 
-    const handleAddCategory = useCallback(
-        (name: string) => {
-            if (!user?.id) return;
-            const newCategory: Category = CreateNewCategory(name, user.id);
-            dispatch(addCategory(newCategory));
-            setShowAddModal(false);
-        },
-        [dispatch, user?.id]
-    );
+    const handleAddCategory = useCallback((name: string) => {
+        if (!user?.id) return;
+        const newCategory: CategoryApi = CreateNewCategory({ name: name });
+        dispatch(addCategory(newCategory));
+        setShowAddModal(false);
+    }, [dispatch, user?.id]);
 
     const handleEditCategory = useCallback((category: Category) => {
         setEditCategory(category);
         setShowAddModal(true);
     }, []);
 
-    const handleSaveEditedCategory = useCallback(
-        (newName: string) => {
-            if (!editCategory) return;
-            dispatch(
-                updateCategory({
-                    id: editCategory.id,
-                    updates: { name: newName },
-                })
-            );
-            setEditCategory(null);
-            setShowAddModal(false);
-        },
-        [dispatch, editCategory]
-    );
+    const handleSaveEditedCategory = useCallback((newName: string) => {
+        if (editCategory?.name === newName) {
+            showErrorToast({ message: "Nothing to update!" })
+            return;
+        }
+        console.log("New name in edit category...", newName);
+        if (!editCategory) return;
+        dispatch(
+            updateCategory({
+                id: editCategory.id,
+                updates: {
+                    name: newName,
+                    updatedAt: new Date().toISOString(),
+                },
+            })
+        );
+        setEditCategory(null);
+        setShowAddModal(false);
+    }, [dispatch, editCategory]);
 
     const handleDeleteCategory = useCallback(
         (id: string) => {

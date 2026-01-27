@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Category } from "@/types/category/category.types";
+import { Category, CategoryApi, SYNC_STATUS, SyncStatus } from "@/types/category/category.types";
 
 interface CategoriesState {
   categories: Category[];
@@ -17,19 +17,28 @@ const categoriesSlice = createSlice({
   name: "categories",
   initialState: initialState,
   reducers: {
-    loadCategories: (state, action: PayloadAction<Category[]>) => {
-      state.categories = action.payload;
+    loadCategories: (state, action: PayloadAction<CategoryApi[]>) => {
+      state.categories = action.payload.map((cat) => ({
+        ...cat,
+        syncStatus: SYNC_STATUS.SYNCED,
+      }));
       state.loading = false;
       state.error = null;
     },
     fetchCategories: () => {},
-    addCategory: (state, action: PayloadAction<Category>) => {
-      state.categories.push(action.payload);
+    addCategory: (state, action: PayloadAction<CategoryApi>) => {
+      state.categories.push({ ...action.payload, syncStatus: SYNC_STATUS.PENDING });
     },
-    updateCategory: (state, action: PayloadAction<{ id: string; updates: Partial<Category> }>) => {
+    updateCategory: (state, action: PayloadAction<{ id: string; updates: Partial<CategoryApi> }>) => {
       const index = state.categories.findIndex((category) => category.id === action.payload.id);
       if (index !== -1) {
         state.categories[index] = { ...state.categories[index], ...action.payload.updates };
+      }
+    },
+    updateCategorySyncStatus: (state, action: PayloadAction<{ id: string; syncStatus: SyncStatus }>) => {
+      const index = state.categories.findIndex((c) => c.id === action.payload.id);
+      if (index !== -1) {
+        state.categories[index].syncStatus = action.payload.syncStatus;
       }
     },
     deleteCategory: (state, action: PayloadAction<string>) => {
@@ -50,6 +59,7 @@ export const {
   fetchCategories,
   addCategory,
   updateCategory,
+  updateCategorySyncStatus,
   deleteCategory,
   setLoading,
   setError,

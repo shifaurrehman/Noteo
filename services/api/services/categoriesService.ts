@@ -1,24 +1,24 @@
-import { Category } from "@/types/category/category.types";
+import { Category, CategoryApi } from "@/types/category/category.types";
 import api from "../config/api";
+import { API_ENDPOINTS } from "../config/endpoints";
 
 // Get all categories
-export const fetchCategoriesApi = async (): Promise<Category[]> => {
-  const response = await api.get<Category[]>("/categories");
+export const fetchCategoriesApi = async (): Promise<CategoryApi[]> => {
+  const response = await api.get<CategoryApi[]>(API_ENDPOINTS.categories.getAll);
   return response.data;
 };
 
-
-export const createCategoryApi = async (category: Category): Promise<Category> => {
-  const res = await api.post<Category>("/categories", category);
+export const createCategoryApi = async (category: CategoryApi): Promise<CategoryApi> => {
+  const res = await api.post<CategoryApi>(API_ENDPOINTS.categories.create, category);
   return res.data;
 };
 
-export const updateCategoryApi = async (id: string, updates: Partial<Category>) => {
-  const res = await api.patch<Category>(`/categories/${id}`, updates);
+export const updateCategoryApi = async (id: string, updates: Partial<CategoryApi>) => {
+  const res = await api.patch<CategoryApi>(API_ENDPOINTS.categories.update(id), updates);
   return res.data;
 };
 
 export const deleteCategoryApi = async (id: string) => {
-  const res = await api.delete<Category>(`/categories/${id}`);
+  const res = await api.delete<Category>(API_ENDPOINTS.categories.delete(id));
   return res.data;
 };

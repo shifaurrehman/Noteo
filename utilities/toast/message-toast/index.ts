@@ -34,9 +34,9 @@ export const showSuccessToast = (props: BaseToastProps) => {
   showMessageToast({ ...props, type: "success" });
 };
 
-export const showWarningToast = (props: BaseToastProps) => {
-  showMessageToast({ ...props, type: "warning" });
-};
+// export const showWarningToast = (props: BaseToastProps) => {
+//   showMessageToast({ ...props, type: "warning" });
+// };
 
 export const showErrorToast = (props: BaseToastProps) => {
   showMessageToast({ ...props, type: "error" });
