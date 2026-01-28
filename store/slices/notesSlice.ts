@@ -1,5 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Note } from '@/types/notes/notes.types';
+import { SYNC_STATUS, SyncStatus } from "@/types/category/category.types";
+import { Note, NoteApi } from "@/types/notes/notes.types";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface NotesState {
   notes: Note[];
@@ -14,18 +15,27 @@ const initialState: NotesState = {
 };
 
 const notesSlice = createSlice({
-  name: 'notes',
+  name: "notes",
   initialState,
   reducers: {
-    setNotes: (state, action: PayloadAction<Note[]>) => {
-      state.notes = action.payload;
+    loadNotes: (state, action: PayloadAction<NoteApi[]>) => {
+      state.notes = action.payload.map((note) => ({
+        ...note,
+        syncStatus: SYNC_STATUS.SYNCED,
+      }));
       state.loading = false;
       state.error = null;
     },
-    addNote: (state, action: PayloadAction<Note>) => {
-      state.notes.push(action.payload);
+    addNote: (state, action: PayloadAction<NoteApi>) => {
+      state.notes.push({ ...action.payload, syncStatus: SYNC_STATUS.PENDING });
     },
-    updateNote: (state, action: PayloadAction<{ id: string; updates: Partial<Note> }>) => {
+    updateNoteSyncStatus: (state, action: PayloadAction<{ id: string; syncStatus: SyncStatus }>) => {
+      const index = state.notes.findIndex((note) => note.id === action.payload.id);
+      if (index !== -1) {
+        state.notes[index].syncStatus = action.payload.syncStatus;
+      }
+    },
+    updateNote: (state, action: PayloadAction<{ id: string; updates: Partial<NoteApi> }>) => {
       const index = state.notes.findIndex((note) => note.id === action.payload.id);
       if (index !== -1) {
         state.notes[index] = {
@@ -48,19 +58,19 @@ const notesSlice = createSlice({
       state.error = action.payload;
       state.loading = false;
     },
-    loadNotes: () => { },
+    fetchNotes: () => {},
   },
 });
 
 export const {
-  setNotes,
+  loadNotes,
   addNote,
   updateNote,
   deleteNote,
   deleteNotesByCategory,
   setLoading,
   setError,
-  loadNotes,
+  fetchNotes,
+  updateNoteSyncStatus,
 } = notesSlice.actions;
 export default notesSlice.reducer;
-

@@ -137,6 +137,7 @@ api.interceptors.response.use(
       } catch (refreshError) {
         processQueue({ error: refreshError as Error, token: null });
         console.error("Refresh token failed:", refreshError);
+        await handleForcedLogout();
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

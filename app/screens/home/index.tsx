@@ -2,6 +2,7 @@ import { IconPressable } from "@/components/button/IconPressable";
 import { AddCategoryModal } from "@/components/category/AddCategoryModal";
 import { CategoryCard } from "@/components/category/CategoryCard";
 import { Header } from "@/components/header/Header";
+import { ConfirmationModal } from "@/components/modal/ConfirmationModal";
 import { SearchBar } from "@/components/searchbar/SearchBar";
 import { CARD_HEIGHT, EmptyCategoryText, NUM_COLUMNS } from "@/constants/categories";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -31,6 +32,8 @@ const HomeScreen: React.FC = () => {
     const [editCategory, setEditCategory] = useState<Category | null>(null);
     const [searchText, setSearchText] = useState("");
     const [showAddModal, setShowAddModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
     const [activeMenuId, setActiveMenuId] = React.useState<string | null>(null);
     const styles = createHomeScreenStyles(colors);
 
@@ -72,12 +75,20 @@ const HomeScreen: React.FC = () => {
 
     const handleDeleteCategory = useCallback(
         (id: string) => {
-            dispatch(deleteNotesByCategory(id)); // remove all notes of this category
-            dispatch(deleteCategory(id));
-            setShowAddModal(false);
+            setCategoryToDelete(id);
+            setShowDeleteModal(true);
         },
-        [dispatch]
+        []
     );
+
+    const confirmDeleteCategory = useCallback(() => {
+        if (categoryToDelete) {
+            dispatch(deleteNotesByCategory(categoryToDelete));
+            dispatch(deleteCategory(categoryToDelete));
+            setCategoryToDelete(null);
+            setShowDeleteModal(false);
+        }
+    }, [dispatch, categoryToDelete]);
 
     const handleFavoriteCategory = useCallback(
         (category: Category) => {
@@ -183,6 +194,17 @@ const HomeScreen: React.FC = () => {
                         initialValue={editCategory?.name}
                     />
                 )}
+
+                {/* Delete Confirmation Modal */}
+                <ConfirmationModal
+                    visible={showDeleteModal}
+                    onClose={() => setShowDeleteModal(false)}
+                    onConfirm={confirmDeleteCategory}
+                    title="Delete Category?"
+                    message="Are you sure you want to delete this category? All notes associated with it will also be permanently deleted."
+                    confirmText="Delete"
+                    type="danger"
+                />
             </View>
         </SafeAreaView>
     );

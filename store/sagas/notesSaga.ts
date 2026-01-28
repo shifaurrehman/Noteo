@@ -1,41 +1,61 @@
+import {
+  createNoteApi,
+  deleteNoteApi,
+  fetchNotesApi,
+  updateNoteApi,
+} from "@/services/api/services/notesService";
+import { SYNC_STATUS } from "@/types/category/category.types";
+import { NoteApi } from "@/types/notes/notes.types";
+import { getErrorMessage } from "@/utilities/toast/get-toast-message";
+import { showErrorToast, showInfoToast } from "@/utilities/toast/message-toast";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { call, put, takeEvery } from "redux-saga/effects";
-import { setError, setLoading, setNotes } from "../slices/notesSlice";
-import { Note } from "@/types/notes/notes.types";
-import { createNoteApi, deleteNoteApi, fetchNotesApi, updateNoteApi } from "@/services/api/services/notesService";
+import { loadNotes, setError, setLoading, updateNoteSyncStatus } from "../slices/notesSlice";
 
 // Load notes from storage
 function* loadNotesSaga() {
   try {
     yield put(setLoading(true));
-    const notes: Note[] = yield call(fetchNotesApi);
-    yield put(setNotes(notes));
+    const notes: NoteApi[] = yield call(fetchNotesApi);
+    yield put(loadNotes(notes));
+    showInfoToast({ message: "Notes loaded successfully" });
   } catch (error: any) {
-    yield put(setError(error.message || "Failed to load notes"));
+    const message = getErrorMessage(error);
+    showErrorToast({ message: "failed to load notes" });
+    yield put(setError(message));
   } finally {
     yield put(setLoading(false));
   }
 }
 
 // Add note saga
-function* addNoteSaga(action: PayloadAction<Note>) {
+function* addNoteSaga(action: PayloadAction<NoteApi>) {
   try {
     yield put(setLoading(true));
     yield call(createNoteApi, action.payload);
+    yield put(updateNoteSyncStatus({ id: action.payload.id, syncStatus: SYNC_STATUS.SYNCED }));
+    showInfoToast({ message: "Note added successfully" });
   } catch (error: any) {
-    yield put(setError(error.message || "Failed to add note"));
+    const message = getErrorMessage(error);
+    showErrorToast({ message: "failed to add note" });
+    yield put(updateNoteSyncStatus({ id: action.payload.id, syncStatus: SYNC_STATUS.ERROR }));
+    yield put(setError(message));
   } finally {
     yield put(setLoading(false));
   }
 }
 
 // Update note saga
-function* updateNoteSaga(action: PayloadAction<{ id: string; updates: Partial<Note> }>) {
+function* updateNoteSaga(action: PayloadAction<{ id: string; updates: Partial<NoteApi> }>) {
   try {
     yield put(setLoading(true));
     yield call(updateNoteApi, action.payload.id, action.payload.updates);
+    showInfoToast({ message: "Note updated successfully" });
   } catch (error: any) {
-    yield put(setError(error.message || "Failed to update note"));
+    const message = getErrorMessage(error);
+    showErrorToast({ message: "failed to update note" });
+    yield put(updateNoteSyncStatus({ id: action.payload.id, syncStatus: SYNC_STATUS.ERROR }));
+    yield put(setError(message));
   } finally {
     yield put(setLoading(false));
   }
@@ -46,8 +66,12 @@ function* deleteNoteSaga(action: PayloadAction<string>) {
   try {
     yield put(setLoading(true));
     yield call(deleteNoteApi, action.payload);
+    showInfoToast({ message: "Note deleted successfully" });
   } catch (error: any) {
-    yield put(setError(error.message || "Failed to delete note"));
+    const message = getErrorMessage(error);
+    showErrorToast({ message: "failed to delete note" });
+    yield put(updateNoteSyncStatus({ id: action.payload, syncStatus: SYNC_STATUS.ERROR }));
+    yield put(setError(message));
   } finally {
     yield put(setLoading(false));
   }
@@ -55,7 +79,7 @@ function* deleteNoteSaga(action: PayloadAction<string>) {
 
 // Watcher sagas
 export function* watchLoadNotes() {
-  yield takeEvery("notes/loadNotes", loadNotesSaga);
+  yield takeEvery("notes/fetchNotes", loadNotesSaga);
 }
 
 export function* watchAddNote() {

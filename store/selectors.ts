@@ -56,14 +56,14 @@ export const selectColors = createSelector([selectTheme], (theme) => {
 });
 
 // Categories selectors
-export const selectCategories = (state: RootState) => state.categories.categories;
+export const selectCategories = (state: RootState) => state.categories.categories || [];
 export const selectCategoriesLoading = (state: RootState) => state.categories.loading;
 export const selectCategoriesError = (state: RootState) => state.categories.error;
 export const selectCategoryById = (state: RootState, id: string) =>
-  state.categories.categories.find((cat) => cat.id === id);
+  (state.categories.categories || []).find((cat) => cat.id === id);
 
 // Notes selectors
-export const selectNotes = (state: RootState) => state.notes.notes;
+export const selectNotes = (state: RootState) => state.notes.notes || [];
 export const selectNotesLoading = (state: RootState) => state.notes.loading;
 export const selectNotesError = (state: RootState) => state.notes.error;
 export const selectNotesByCategory = createSelector(
@@ -74,7 +74,7 @@ export const selectNotesByCategory = createSelector(
   }
 );
 export const selectNoteById = (state: RootState, id: string) =>
-  state.notes.notes.find((note) => note.id === id);
+  (state.notes.notes || []).find((note) => note.id === id);
 
 // Auth selectors
 export const selectUser = (state: RootState) => state.auth.user;
