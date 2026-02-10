@@ -11,6 +11,7 @@ import {
   REHYDRATE,
 } from "redux-persist";
 import createSagaMiddleware, { AnyAction } from "redux-saga";
+import { offlineMiddleware } from "./middleware/offlineMiddleware";
 import { rootSaga } from "./sagas/rootSaga";
 import authReducer from "./slices/authSlice";
 import categoriesReducer from "./slices/categoriesSlice";
@@ -64,10 +65,7 @@ export const store = configureStore({
       },
     })
       .concat(sagaMiddleware)
-      .concat((store: any) => (next: any) => (action: any) => {
-        const result = next(action);
-        return result;
-      }),
+      .concat(offlineMiddleware),
   devTools: __DEV__, // Enable Redux DevTools in development
 });
 
@@ -78,5 +76,5 @@ export const persistor = persistStore(store);
 sagaMiddleware.run(rootSaga);
 
 // Export types
-export type RootState = ReturnType<typeof store.getState>;
+export type RootState = ReturnType<typeof rootReducer>;
 export type AppDispatch = typeof store.dispatch;

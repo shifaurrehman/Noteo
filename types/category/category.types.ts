@@ -4,7 +4,7 @@ export const SYNC_STATUS = {
   ERROR: "error",
 } as const;
 
-export type SyncStatus = typeof SYNC_STATUS[keyof typeof SYNC_STATUS];
+export type SyncStatus = (typeof SYNC_STATUS)[keyof typeof SYNC_STATUS];
 
 export interface Category {
   id: string;
@@ -15,6 +15,7 @@ export interface Category {
   isDeleted: boolean;
   syncStatus: SyncStatus;
   version: number;
+  isLocal?: boolean;
 }
 
 export type CategoryApi = {
@@ -25,4 +26,5 @@ export type CategoryApi = {
   updatedAt: string | null;
   isDeleted: boolean;
   version: number;
+  isLocal?: boolean;
 };

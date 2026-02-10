@@ -66,6 +66,7 @@ function* deleteNoteSaga(action: PayloadAction<string>) {
   try {
     yield put(setLoading(true));
     yield call(deleteNoteApi, action.payload);
+    yield put(updateNoteSyncStatus({ id: action.payload, syncStatus: SYNC_STATUS.SYNCED }));
     showInfoToast({ message: "Note deleted successfully" });
   } catch (error: any) {
     const message = getErrorMessage(error);

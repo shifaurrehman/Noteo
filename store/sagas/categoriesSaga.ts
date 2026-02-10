@@ -2,6 +2,7 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { call, put, takeEvery } from "redux-saga/effects";
 import { loadCategories, setError, setLoading, updateCategorySyncStatus } from "../slices/categoriesSlice";
 import { deleteNotesByCategory } from "../slices/notesSlice";
+import * as CategoriesActions from "../actions/categoriesActions";
 
 import {
   createCategoryApi,
@@ -71,6 +72,7 @@ function* deleteCategorySaga(action: PayloadAction<string>) {
     yield put(setLoading(true));
     yield call(deleteCategoryApi, action.payload);
     yield put(deleteNotesByCategory(action.payload));
+    yield put(updateCategorySyncStatus({ id: action.payload, syncStatus: SYNC_STATUS.SYNCED }));
     showInfoToast({ message: "category deleted successfully" });
   } catch (error: any) {
     console.error("error in deleteCategorySaga: ", error);
@@ -85,17 +87,18 @@ function* deleteCategorySaga(action: PayloadAction<string>) {
 
 // Watcher sagas
 export function* watchLoadCategories() {
-  yield takeEvery("categories/fetchCategories", loadCategoriesSaga);
+  yield takeEvery(CategoriesActions.FETCH_CATEGORIES_API, loadCategoriesSaga);
 }
 
 export function* watchAddCategory() {
-  yield takeEvery("categories/addCategory", saveCategorySaga);
+  // Listen for the Shadow Action dispatched by Middleware
+  yield takeEvery(CategoriesActions.ADD_CATEGORY_API, saveCategorySaga);
 }
 
 export function* watchUpdateCategory() {
-  yield takeEvery("categories/updateCategory", updateCategorySaga);
+  yield takeEvery(CategoriesActions.UPDATE_CATEGORY_API, updateCategorySaga);
 }
 
 export function* watchDeleteCategory() {
-  yield takeEvery("categories/deleteCategory", deleteCategorySaga);
+  yield takeEvery(CategoriesActions.DELETE_CATEGORY_API, deleteCategorySaga);
 }

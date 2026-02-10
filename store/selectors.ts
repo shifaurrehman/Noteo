@@ -69,12 +69,12 @@ export const selectNotesError = (state: RootState) => state.notes.error;
 export const selectNotesByCategory = createSelector(
   [selectNotes, (state: RootState, categoryId: string) => categoryId],
   (notes, categoryId) => {
-    const categoryNotes = notes.filter((note) => note.categoryId === categoryId);
+    const categoryNotes = notes.filter((note) => note.categoryId === categoryId && !note.isDeleted);
     return categoryNotes;
   }
 );
 export const selectNoteById = (state: RootState, id: string) =>
-  (state.notes.notes || []).find((note) => note.id === id);
+  (state.notes.notes || []).find((note) => note.id === id && !note.isDeleted);
 
 // Auth selectors
 export const selectUser = (state: RootState) => state.auth.user;

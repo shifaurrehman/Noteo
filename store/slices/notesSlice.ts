@@ -46,10 +46,19 @@ const notesSlice = createSlice({
       }
     },
     deleteNote: (state, action: PayloadAction<string>) => {
-      state.notes = state.notes.filter((note) => note.id !== action.payload);
+      const index = state.notes.findIndex((note) => note.id === action.payload);
+      if (index !== -1) {
+        state.notes[index].isDeleted = true;
+        state.notes[index].syncStatus = SYNC_STATUS.PENDING;
+      }
     },
     deleteNotesByCategory: (state, action: PayloadAction<string>) => {
-      state.notes = state.notes.filter((note) => note.categoryId !== action.payload);
+      state.notes = state.notes.map((note) => {
+        if (note.categoryId === action.payload) {
+          return { ...note, isDeleted: true, syncStatus: SYNC_STATUS.PENDING };
+        }
+        return note;
+      });
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;

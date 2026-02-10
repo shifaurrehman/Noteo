@@ -22,3 +22,12 @@ export const deleteCategoryApi = async (id: string) => {
   const res = await api.delete<Category>(API_ENDPOINTS.categories.delete(id));
   return res.data;
 };
+
+export const syncCategoriesApi = async (payload: {
+  created: CategoryApi[];
+  updated: CategoryApi[];
+  deleted: { id: string }[];
+}) => {
+  const res = await api.post(API_ENDPOINTS.sync.categories, payload);
+  return res.data;
+};
