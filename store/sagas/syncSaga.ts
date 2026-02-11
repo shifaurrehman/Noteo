@@ -14,6 +14,7 @@ export function* syncPendingCategoriesSaga() {
     const state: RootState = yield select();
     const categories = state.categories.categories;
     const pendingCategories = categories.filter((cat: Category) => cat.syncStatus === SYNC_STATUS.PENDING);
+    const failedCategories = categories.filter((cat: Category) => cat.syncStatus === SYNC_STATUS.ERROR);
 
     if (pendingCategories.length === 0) {
       console.log("[Sync Saga] No pending categories to sync");
@@ -25,14 +26,14 @@ export function* syncPendingCategoriesSaga() {
     // Prepare batch payload
     const created: CategoryApi[] = [];
     const updated: CategoryApi[] = [];
-    const deleted: { id: string }[] = [];
+    const deleted: CategoryApi[] = [];
 
     for (const category of pendingCategories) {
       if (category.isDeleted) {
         if (category.isLocal) {
           yield put(deleteCategory(category.id));
         } else {
-          deleted.push({ id: category.id });
+          deleted.push(category);
         }
       } else if (category.isLocal) {
         created.push(category);
@@ -65,8 +66,6 @@ export function* syncPendingCategoriesSaga() {
 
       // 3. Handle deleted items
       for (const item of deleted) {
-        // We can either remove them or keep them as deleted.
-        // Let's keep them legally soft deleted but synced.
         yield put(markCategoryAsSynced({ id: item.id }));
       }
 
@@ -74,9 +73,6 @@ export function* syncPendingCategoriesSaga() {
     } catch (error: any) {
       console.error("[Sync Saga] Batch sync failed:", error);
       showErrorToast({ message: "Failed to sync categories" });
-      // Mark all involved as error?
-      // For now, leave them as PENDING to retry, or mark ERROR if we want to stop retrying automatically.
-      // Let's mark as ERROR so user knows.
       for (const cat of created)
         yield put(updateCategorySyncStatus({ id: cat.id, syncStatus: SYNC_STATUS.ERROR }));
       for (const cat of updated)
