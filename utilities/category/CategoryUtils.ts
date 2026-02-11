@@ -1,16 +1,15 @@
-import { Category } from "@/types/category";
+import { CategoryApi } from "@/types/category/category.types";
 import { v4 as uuidv4 } from "uuid";
 
-export const CreateNewCategory = (name: string, userId: string, isFavorite?: boolean): Category => {
+export const CreateNewCategory = ({name, isFavorite = false}: {name: string; isFavorite?: boolean}): CategoryApi => {
   return {
     id: uuidv4(),
-    userId: userId,
     name: name,
-    isFavorite: isFavorite ?? false,
+    isFavorite: isFavorite,
     createdAt: new Date().toISOString(),
     updatedAt: null,
     isDeleted: false,
-    syncStatus: "pending",
-    version: 0,
+    version: 1,
+    isLocal: true,
   };
 };

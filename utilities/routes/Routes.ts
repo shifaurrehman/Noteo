@@ -1,4 +1,4 @@
-import { ViewCategoryNotesParams } from "@/types/notes";
+import { ViewCategoryNotesParams } from "@/types/notes/notes.types";
 import { useRouter } from "expo-router";
 
 export const useNavigation = () => {

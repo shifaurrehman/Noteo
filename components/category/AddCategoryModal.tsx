@@ -10,12 +10,13 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
+  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useAppSelector } from "@/store/hooks";
 import { selectColors } from "@/store/selectors";
 import { IconPressable } from "../button/IconPressable";
-import { Colors } from "@/constants/theme";
+import { showInfoToast } from "@/utilities/toast/message-toast";
 
 interface AddCategoryModalProps {
   visible: boolean;
@@ -45,10 +46,10 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = memo(({
       onSave(trimmedName);
       setName("");
       onClose();
+    }else{
+      showInfoToast({ message: "Category name is required" });
     }
   };
-
-  const isInvalid = name.trim().length === 0;
 
   return (
     <Modal
@@ -100,7 +101,6 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = memo(({
                     onChangeText={setName}
                     autoFocus
                     maxLength={25}
-                    onSubmitEditing={handleSave}
                   />
                   <Text style={[styles.charCount, { color: colors.textSecondary }]}>
                     {name.length}/25
@@ -110,10 +110,9 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = memo(({
                 <TouchableOpacity
                   style={[
                     styles.saveButton,
-                    { backgroundColor: isInvalid ? colors.border : colors.primary }
+                    { backgroundColor: colors.primary }
                   ]}
                   onPress={handleSave}
-                  disabled={isInvalid}
                   activeOpacity={0.8}
                 >
                   <Text style={styles.saveButtonText}>
@@ -128,10 +127,12 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = memo(({
     </Modal>
   );
 });
-
+const { width, height } = Dimensions.get("window");
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
+    width: width,
+    height: height,
     backgroundColor: "rgba(0, 0, 0, 0.4)", // Darker for better focus
     justifyContent: "flex-end",
   },

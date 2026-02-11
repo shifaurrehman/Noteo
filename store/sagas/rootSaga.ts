@@ -6,13 +6,9 @@ import {
   watchDeleteCategory,
 } from "./categoriesSaga";
 import { watchLoadNotes, watchAddNote, watchUpdateNote, watchDeleteNote } from "./notesSaga";
-import {
-  watchLogin,
-  watchRegister,
-  watchLogout,
-  watchSyncUserData,
-} from "./authSaga";
+import { watchLogin, watchRegister, watchLogout, watchSyncUserData } from "./authSaga";
 import { watchLoadTheme, watchThemeChanges } from "./themeSaga";
+import { watchNetworkRestore } from "./networkSaga";
 
 export function* rootSaga() {
   yield all([
@@ -37,5 +33,8 @@ export function* rootSaga() {
     fork(watchRegister),
     fork(watchLogout),
     fork(watchSyncUserData),
+
+    // Network sync saga
+    fork(watchNetworkRestore),
   ]);
 }

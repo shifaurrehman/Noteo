@@ -2,7 +2,7 @@ import React from "react";
 import { FlatList, View, Text, Dimensions, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { CategoryCard } from "./CategoryCard";
-import { Category } from "@/types/category";
+import { Category } from "@/types/category/category.types";
 
 const { width } = Dimensions.get("window");
 const CARD_MARGIN = 10;
@@ -77,8 +77,8 @@ const styles = StyleSheet.create({
   flatListWrapper: {
     flex: 1,
     width: "100%",
-    justifyContent:"center",
-    alignItems:"center",
+    justifyContent: "center",
+    alignItems: "center",
   },
   listContainer: {
     paddingBottom: 20,

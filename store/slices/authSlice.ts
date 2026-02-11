@@ -1,21 +1,10 @@
+import { User } from "@/types/user/user.types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  password: string;
-  createdAt: string;
-  registered: boolean;
-  lastSyncAt?: string;
-}
-
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
-  token: string | null;
 }
 
 const initialState: AuthState = {
@@ -23,7 +12,6 @@ const initialState: AuthState = {
   isAuthenticated: false,
   loading: false,
   error: null,
-  token: null,
 };
 
 const authSlice = createSlice({
@@ -33,25 +21,18 @@ const authSlice = createSlice({
     setUser: (state, action: PayloadAction<User | null>) => {
       state.user = action.payload;
       state.isAuthenticated = true;
-      state.loading = false;
       state.error = null;
-    },
-    setToken: (state, action: PayloadAction<string | null>) => {
-      state.token = action.payload;
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
-      state.loading = false;
     },
     logout: (state) => {
       state.user = null;
       state.isAuthenticated = false;
-      state.token = null;
       state.error = null;
-      // registered remains true if previously registered
     },
     updateUser: (state, action: PayloadAction<Partial<User>>) => {
       if (state.user) {
@@ -68,6 +49,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { setUser, setToken, setLoading, setError, logout, updateUser, setLastSyncAt, loginUser, registerUser } =
+export const { setUser, setLoading, setError, logout, updateUser, setLastSyncAt, loginUser, registerUser } =
   authSlice.actions;
 export default authSlice.reducer;

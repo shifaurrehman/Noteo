@@ -54,7 +54,7 @@ const AddNoteScreen = () => {
 
   const handleCreateNote = () => {
     if (!user || !validateNote()) return;
-    const newNote = createNewNote(title, content, categoryId, user.id);
+    const newNote = createNewNote({title, content, categoryId});
     dispatch(addNote(newNote));
     router.back();
   };

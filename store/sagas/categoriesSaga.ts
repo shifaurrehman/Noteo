@@ -1,50 +1,66 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { call, put, takeEvery } from "redux-saga/effects";
-import { Category } from "../../types";
-import { loadCategories, setError, setLoading } from "../slices/categoriesSlice";
+import { loadCategories, setError, setLoading, updateCategorySyncStatus } from "../slices/categoriesSlice";
 import { deleteNotesByCategory } from "../slices/notesSlice";
+import * as CategoriesActions from "../actions/categoriesActions";
+
 import {
   createCategoryApi,
   deleteCategoryApi,
   fetchCategoriesApi,
   updateCategoryApi,
-} from "../api/categoryApi";
+} from "@/services/api/services/categoriesService";
+import { CategoryApi, SYNC_STATUS } from "@/types/category/category.types";
+import { getErrorMessage } from "@/utilities/toast/get-toast-message";
+import { showErrorToast, showInfoToast } from "@/utilities/toast/message-toast";
 
 // Load categories from storage
 function* loadCategoriesSaga() {
   try {
     yield put(setLoading(true));
-    const categories: Category[] = yield call(fetchCategoriesApi);
+    const categories: CategoryApi[] = yield call(fetchCategoriesApi);
     yield put(loadCategories(categories));
+    showInfoToast({ message: "categories loaded successfully" });
   } catch (error: any) {
-    yield put(setError(error.message || "Failed to load categories"));
+    console.error("error in loadCategoriesSaga: ", error);
+    const message = getErrorMessage(error) || "Failed to load categories";
+    showErrorToast({ message: message });
+    yield put(setError(message));
   } finally {
     yield put(setLoading(false));
   }
 }
 
 // Save category to storage
-function* saveCategorySaga(action: PayloadAction<Category>) {
+function* saveCategorySaga(action: PayloadAction<CategoryApi>) {
   try {
     yield put(setLoading(true));
     yield call(createCategoryApi, action.payload);
-    yield call(loadCategoriesSaga);
+    yield put(updateCategorySyncStatus({ id: action.payload.id, syncStatus: SYNC_STATUS.SYNCED }));
+    showInfoToast({ message: "category added successfully" });
   } catch (error: any) {
-    console.error("error in saveCategorySaga: ", error)
-    yield put(setError(error.message || "Failed to save category"));
+    console.error("error in saveCategorySaga: ", error);
+    const message = getErrorMessage(error) || "Failed to save category";
+    showErrorToast({ message: message });
+    yield put(updateCategorySyncStatus({ id: action.payload.id, syncStatus: SYNC_STATUS.ERROR }));
+    yield put(setError(message));
   } finally {
     yield put(setLoading(false));
   }
 }
 
 // Update category saga
-function* updateCategorySaga(action: PayloadAction<{ id: string; updates: Partial<Category> }>) {
+function* updateCategorySaga(action: PayloadAction<{ id: string; updates: Partial<CategoryApi> }>) {
   try {
     yield put(setLoading(true));
     yield call(updateCategoryApi, action.payload.id, action.payload.updates);
-    yield call(loadCategoriesSaga);
+    showInfoToast({ message: "category updated successfully" });
   } catch (error: any) {
-    yield put(setError(error.message || "Failed to update category"));
+    console.error("error in updateCategorySaga: ", error);
+    const message = getErrorMessage(error) || "Failed to update category";
+    showErrorToast({ message: message });
+    yield put(updateCategorySyncStatus({ id: action.payload.id, syncStatus: SYNC_STATUS.ERROR }));
+    yield put(setError(message));
   } finally {
     yield put(setLoading(false));
   }
@@ -56,9 +72,14 @@ function* deleteCategorySaga(action: PayloadAction<string>) {
     yield put(setLoading(true));
     yield call(deleteCategoryApi, action.payload);
     yield put(deleteNotesByCategory(action.payload));
-    yield call(loadCategoriesSaga);
+    yield put(updateCategorySyncStatus({ id: action.payload, syncStatus: SYNC_STATUS.SYNCED }));
+    showInfoToast({ message: "category deleted successfully" });
   } catch (error: any) {
-    yield put(setError(error.message || "Failed to delete category"));
+    console.error("error in deleteCategorySaga: ", error);
+    const message = getErrorMessage(error) || "Failed to delete category";
+    showErrorToast({ message: message });
+    yield put(updateCategorySyncStatus({ id: action.payload, syncStatus: SYNC_STATUS.ERROR }));
+    yield put(setError(message));
   } finally {
     yield put(setLoading(false));
   }
@@ -66,17 +87,18 @@ function* deleteCategorySaga(action: PayloadAction<string>) {
 
 // Watcher sagas
 export function* watchLoadCategories() {
-  yield takeEvery("categories/fetchCategories", loadCategoriesSaga);
+  yield takeEvery(CategoriesActions.FETCH_CATEGORIES_API, loadCategoriesSaga);
 }
 
 export function* watchAddCategory() {
-  yield takeEvery("categories/addCategory", saveCategorySaga);
+  // Listen for the Shadow Action dispatched by Middleware
+  yield takeEvery(CategoriesActions.ADD_CATEGORY_API, saveCategorySaga);
 }
 
 export function* watchUpdateCategory() {
-  yield takeEvery("categories/updateCategory", updateCategorySaga);
+  yield takeEvery(CategoriesActions.UPDATE_CATEGORY_API, updateCategorySaga);
 }
 
 export function* watchDeleteCategory() {
-  yield takeEvery("categories/deleteCategory", deleteCategorySaga);
+  yield takeEvery(CategoriesActions.DELETE_CATEGORY_API, deleteCategorySaga);
 }

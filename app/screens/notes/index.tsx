@@ -1,21 +1,22 @@
 import { Header } from "@/components/header/Header";
+import { ConfirmationModal } from "@/components/modal/ConfirmationModal";
 import { NoteCard } from "@/components/notes/NoteCard";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { createCategoryStyles } from "@/styles/category/Category.styles";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect } from "react";
-import { Alert, FlatList, Text, TouchableOpacity, View } from "react-native";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import React, { useCallback, useEffect, useState } from "react";
+import { FlatList, Text, View } from "react-native";
 
+import { IconPressable } from "@/components/button/IconPressable";
 import {
   selectCategoryById,
   selectColors,
   selectNotesByCategory,
 } from "@/store/selectors";
-import { deleteNote, loadNotes, updateNote } from "@/store/slices/notesSlice";
-import { Note } from "@/types";
+import { deleteNote, fetchNotes, updateNote } from "@/store/slices/notesSlice";
+import { Note } from "@/types/notes/notes.types";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { IconPressable } from "@/components/button/IconPressable";
 
 const NotesScreen = () => {
   const { categoryId, name, isFavorite } = useLocalSearchParams<{ categoryId: string; name?: string; isFavorite?: string }>();
@@ -23,33 +24,33 @@ const NotesScreen = () => {
   const category = useAppSelector((state) => (categoryId ? selectCategoryById(state, categoryId) : null));
   const notes = useAppSelector((state) => (categoryId ? selectNotesByCategory(state, categoryId) : []));
   const colors = useAppSelector(selectColors);
-  console.log("isFavorite note or not..... ", isFavorite);
+  console.log("NOTES SCREEN: ", "isFavorite note or not..... ", isFavorite);
 
   // dispatcher and styles
   const dispatch = useAppDispatch();
   const styles = createCategoryStyles(colors);
 
+  const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
   const categoryName = name || category?.name || "Notes";
 
   useEffect(() => {
-    dispatch(loadNotes());
+    dispatch(fetchNotes());
   }, [dispatch]);
 
-  const handleDeleteNote = (note: Note) => {
-    Alert.alert("Delete Note", "Are you sure you want to delete this note?", [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () => {
-          dispatch(deleteNote(note.id));
-        },
-      },
-    ]);
-  };
+  const handleDeleteNote = useCallback((note: Note) => {
+    setNoteToDelete(note);
+    setShowDeleteModal(true);
+  }, []);
+
+  const confirmDeleteNote = useCallback(() => {
+    if (noteToDelete) {
+      dispatch(deleteNote(noteToDelete.id));
+      setNoteToDelete(null);
+      setShowDeleteModal(false);
+    }
+  }, [dispatch, noteToDelete]);
 
   const handleToggleFavorite = (note: Note) => {
     dispatch(updateNote({ id: note.id, updates: { isFavorite: !note.isFavorite } }));
@@ -110,6 +111,20 @@ const NotesScreen = () => {
             <Text style={styles.floatingButtonText}>+</Text>
           </IconPressable>
         )}
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmationModal
+          visible={showDeleteModal}
+          onClose={() => {
+            setShowDeleteModal(false);
+            setNoteToDelete(null);
+          }}
+          onConfirm={confirmDeleteNote}
+          title="Delete Note?"
+          message="Are you sure you want to delete this note? This action cannot be undone."
+          confirmText="Delete"
+          type="danger"
+        />
       </View>
     </SafeAreaView>
   );

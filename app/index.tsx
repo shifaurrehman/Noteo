@@ -1,14 +1,13 @@
-import 'react-native-get-random-values';
-import React, { useEffect, useRef } from "react";
-import { Text, StyleSheet, Animated, Dimensions } from "react-native";
+import { useAppSelector } from "@/store/hooks";
+import { selectColors, selectIsAuthenticated, selectUser } from "@/store/selectors";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
-import { useAppSelector } from "@/store/hooks";
-import { selectColors, selectIsAuthenticated, selectUser } from "@/store/selectors";
+import React, { useEffect, useRef } from "react";
+import { Animated, Dimensions, StyleSheet, Text } from "react-native";
+import 'react-native-get-random-values';
 
 const { width } = Dimensions.get("window");
-
 export default function SplashScreen() {
   const router = useRouter();
   // selectors
@@ -31,12 +30,8 @@ export default function SplashScreen() {
     const timer = setTimeout(() => {
       let nextRoute: "/auth/Login" | "/(tabs)/home" = "/auth/Login";
 
-      if (user) {
-        if (!user.registered) {
-          nextRoute = "/(tabs)/home"
-        } else if (user.registered && isAuthenticated) {
-          nextRoute = "/(tabs)/home"
-        }
+      if (isAuthenticated) {
+        nextRoute = "/(tabs)/home";
       }
 
       router.replace(nextRoute);
@@ -64,7 +59,7 @@ export default function SplashScreen() {
         />
       </Animated.View>
 
-      <Text style={[styles.appName, { color: colors.primary }]}>AI Note Taker</Text>
+      <Text style={[styles.appName, { color: colors.primary }]}>Simple Note Taker</Text>
       <Text style={[styles.tagline, { color: "#ccc" }]}>Your smart notes companion</Text>
     </LinearGradient>
   );

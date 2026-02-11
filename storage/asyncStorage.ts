@@ -29,7 +29,7 @@ export const deleteData = async (key: string) => {
 export const clearStorage = async () => {
   try {
     await AsyncStorage.clear();
-    console.log('AsyncStorage cleared!');
+    console.warn('AsyncStorage cleared!');
   } catch (e) {
     console.error('Error clearing AsyncStorage', e);
   }

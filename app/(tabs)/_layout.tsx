@@ -1,11 +1,17 @@
 import { NetworkStatusBar } from "@/components/network/networkBar";
 import { useAppSelector } from "@/store/hooks";
-import { selectColors } from "@/store/selectors";
+import { selectColors, selectIsAuthenticated } from "@/store/selectors";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 
 export default function TabLayout() {
   const colors = useAppSelector(selectColors);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+
+  if (!isAuthenticated) {
+    return <Redirect href="/auth/Login" />;
+  }
+
   return (
     <>
     <NetworkStatusBar/>
