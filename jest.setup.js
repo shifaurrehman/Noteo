@@ -31,12 +31,23 @@ jest.mock("redux-persist", () => {
 
 // 🔴 REQUIRED for Expo SDK 54+
 // Prevent Expo winter runtime from loading in Jest
-jest.mock("expo", () => ({
-    ...jest.requireActual("expo"),
-}));
+jest.mock("expo", () => ({}));
 
 jest.mock("expo-constants", () => ({
     expoConfig: {},
     manifest: {},
 }));
 
+jest.mock("expo-notifications", () => ({
+    AndroidNotificationPriority: {
+        MIN: "min",
+        LOW: "low",
+        DEFAULT: "default",
+        HIGH: "high",
+        MAX: "max",
+    },
+    getPermissionsAsync: jest.fn(),
+    requestPermissionsAsync: jest.fn(),
+    scheduleNotificationAsync: jest.fn(),
+    dismissNotificationAsync: jest.fn(),
+}));

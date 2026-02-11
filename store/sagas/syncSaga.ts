@@ -1,6 +1,10 @@
 import { syncCategoriesApi } from "@/services/api/services/categoriesService";
 import { Category, CategoryApi, SYNC_STATUS } from "@/types/category/category.types";
-import { showErrorToast, showInfoToast } from "@/utilities/toast/message-toast";
+import {
+  requestNotificationPermissions,
+  showSyncErrorNotification,
+  showSyncNotification,
+} from "@/utilities/notifications/sync-notification";
 import { call, put, select } from "redux-saga/effects";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -11,10 +15,15 @@ import {
 } from "../slices/categoriesSlice";
 import { RootState } from "../store";
 
-
 export function* syncPendingCategoriesSaga() {
   try {
     console.log("[Sync Saga] Starting smart sync of categories...");
+
+    // 0. Request notification permissions
+    const hasPermission: boolean = yield call(requestNotificationPermissions);
+    if (!hasPermission) {
+      console.warn("[Sync Saga] Notification permissions not granted");
+    }
 
     // 1. Combine PENDING + ERROR categories from Redux
     const state: RootState = yield select();
@@ -30,7 +39,13 @@ export function* syncPendingCategoriesSaga() {
 
     console.log(`[Sync Saga] Found ${categoriesToSync.length} categories to validate and sync`);
 
+    if (hasPermission) {
+      yield call(showSyncNotification, 0, categoriesToSync.length);
+    }
+
     const validCategories: Category[] = [];
+    let processedCount = 0;
+    const totalToSync = categoriesToSync.length;
 
     // 2 & 3. Validate required fields and auto-fill or mark as ERROR
     for (const category of categoriesToSync) {
@@ -61,11 +76,16 @@ export function* syncPendingCategoriesSaga() {
       } else {
         console.warn(`[Sync Saga] Category ${category.id} is irrecoverable. Marking as ERROR.`);
         yield put(updateCategorySyncStatus({ id: category.id, syncStatus: SYNC_STATUS.ERROR }));
+        processedCount++;
+        if (hasPermission) yield call(showSyncNotification, processedCount, totalToSync);
       }
     }
 
     if (validCategories.length === 0) {
       console.log("[Sync Saga] No valid categories to sync after validation");
+      if (hasPermission) {
+        yield call(showSyncNotification, processedCount, totalToSync, "Failed to sync categories");
+      }
       return;
     }
 
@@ -79,6 +99,8 @@ export function* syncPendingCategoriesSaga() {
         if (category.isLocal) {
           // If it was never synced, just delete it locally
           yield put(deleteCategory(category.id));
+          processedCount++;
+          if (hasPermission) yield call(showSyncNotification, processedCount, totalToSync);
         } else {
           deleted.push({ id: category.id });
         }
@@ -89,8 +111,11 @@ export function* syncPendingCategoriesSaga() {
       }
     }
 
-    // If there's nothing to sync to server
+    // If there's nothing to sync to server (and all local deletions are done)
     if (created.length === 0 && updated.length === 0 && deleted.length === 0) {
+      if (hasPermission && processedCount === totalToSync) {
+        yield call(showSyncNotification, processedCount, totalToSync);
+      }
       return;
     }
 
@@ -104,29 +129,44 @@ export function* syncPendingCategoriesSaga() {
       // Mark items as SYNCED
       for (const cat of created) {
         yield put(markCategoryAsSynced({ id: cat.id, isLocal: false }));
+        processedCount++;
+        if (hasPermission) yield call(showSyncNotification, processedCount, totalToSync);
       }
       for (const cat of updated) {
         yield put(markCategoryAsSynced({ id: cat.id }));
+        processedCount++;
+        if (hasPermission) yield call(showSyncNotification, processedCount, totalToSync);
       }
       for (const item of deleted) {
         yield put(markCategoryAsSynced({ id: item.id }));
+        processedCount++;
+        if (hasPermission) yield call(showSyncNotification, processedCount, totalToSync);
       }
-
-      showInfoToast({ message: "Categories synced successfully" });
     } catch (error: any) {
       console.error("[Sync Saga] Batch sync failed:", error);
-      showErrorToast({ message: "Failed to sync categories with server" });
 
       // 5c. Mark all items in the failed batch as ERROR
-      for (const cat of created)
+      for (const cat of created) {
         yield put(updateCategorySyncStatus({ id: cat.id, syncStatus: SYNC_STATUS.ERROR }));
-      for (const cat of updated)
+        processedCount++;
+      }
+      for (const cat of updated) {
         yield put(updateCategorySyncStatus({ id: cat.id, syncStatus: SYNC_STATUS.ERROR }));
-      for (const item of deleted)
+        processedCount++;
+      }
+      for (const item of deleted) {
         yield put(updateCategorySyncStatus({ id: item.id, syncStatus: SYNC_STATUS.ERROR }));
+        processedCount++;
+      }
+
+      if (hasPermission) {
+        yield call(showSyncNotification, processedCount, totalToSync, "Failed to sync categories");
+      }
     }
   } catch (error: any) {
     console.error("[Sync Saga] Unexpected error in syncPendingCategoriesSaga:", error);
-    showErrorToast({ message: "An unexpected error occurred during sync" });
+    if (hasPermission) {
+      yield call(showSyncErrorNotification, "An unexpected error occurred during sync");
+    }
   }
 }
