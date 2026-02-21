@@ -1,5 +1,6 @@
 import { call, select, take } from "redux-saga/effects";
 import { RootState } from "../store";
+import { syncPendingNotesSaga } from "./syncNotesSaga";
 import { syncPendingCategoriesSaga } from "./syncSaga";
 import { setNetworkState } from "../slices/networkSlice";
 
@@ -13,6 +14,7 @@ export function* watchNetworkRestore(): Generator {
     if (isConnected && user?.registered) {
       console.log("[Sync Saga] Network restored and user registered - triggering sync");
       yield call(syncPendingCategoriesSaga);
+      yield call(syncPendingNotesSaga);
     }
   }
 }

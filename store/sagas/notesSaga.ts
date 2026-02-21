@@ -10,6 +10,7 @@ import { getErrorMessage } from "@/utilities/toast/get-toast-message";
 import { showErrorToast, showInfoToast } from "@/utilities/toast/message-toast";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { call, put, takeEvery } from "redux-saga/effects";
+import * as NotesActions from "../actions/notesActions";
 import { loadNotes, setError, setLoading, updateNoteSyncStatus } from "../slices/notesSlice";
 
 // Load notes from storage
@@ -80,17 +81,17 @@ function* deleteNoteSaga(action: PayloadAction<string>) {
 
 // Watcher sagas
 export function* watchLoadNotes() {
-  yield takeEvery("notes/fetchNotes", loadNotesSaga);
+  yield takeEvery(NotesActions.FETCH_NOTES_API, loadNotesSaga);
 }
 
 export function* watchAddNote() {
-  yield takeEvery("notes/addNote", addNoteSaga);
+  yield takeEvery(NotesActions.ADD_NOTE_API, addNoteSaga);
 }
 
 export function* watchUpdateNote() {
-  yield takeEvery("notes/updateNote", updateNoteSaga);
+  yield takeEvery(NotesActions.UPDATE_NOTE_API, updateNoteSaga);
 }
 
 export function* watchDeleteNote() {
-  yield takeEvery("notes/deleteNote", deleteNoteSaga);
+  yield takeEvery(NotesActions.DELETE_NOTE_API, deleteNoteSaga);
 }

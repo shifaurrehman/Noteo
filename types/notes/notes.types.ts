@@ -7,6 +7,12 @@ export interface CreateNewNoteParams {
   isFavorite?: boolean;
 }
 
+export interface ViewCategoryNotesParams {
+  categoryId: string;
+  categoryName: string;
+  isFavorite: boolean;
+}
+
 export interface NoteApi {
   id: string;
   categoryId: string;
@@ -20,5 +26,6 @@ export interface NoteApi {
 }
 
 export interface Note extends NoteApi {
-  syncStatus?: SyncStatus;
+  syncStatus: SyncStatus;
+  isLocal?: boolean;
 }
