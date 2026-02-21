@@ -1,5 +1,6 @@
 import { Middleware } from "@reduxjs/toolkit";
 import * as CategoriesActions from "../actions/categoriesActions";
+import * as NotesActions from "../actions/notesActions";
 
 export const offlineMiddleware: Middleware<{}, any> = (store) => (next) => (action: any) => {
   const result = next(action);
@@ -8,7 +9,9 @@ export const offlineMiddleware: Middleware<{}, any> = (store) => (next) => (acti
     return result;
   }
 
-  const apiActionType = CategoriesActions.CATEGORIES_API_MAP[action.type];
+  // Check both categories and notes API maps
+  const apiActionType =
+    CategoriesActions.CATEGORIES_API_MAP[action.type] || NotesActions.NOTES_API_MAP[action.type];
   if (!apiActionType) return result;
 
   const { isConnected } = store.getState().network;
