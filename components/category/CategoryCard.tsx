@@ -1,9 +1,9 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useAppSelector } from "../../store/hooks"; 
+import { useAppSelector } from "../../store/hooks";
 import { selectColors } from "../../store/selectors";
-import { CARD_HEIGHT,  CARD_WIDTH, CARD_MARGIN } from "@/constants/categories";
+import { CARD_HEIGHT, CARD_WIDTH, CARD_MARGIN } from "@/constants/categories";
 import { Category } from "@/types/category/category.types";
 
 interface CategoryCardProps {
@@ -14,6 +14,8 @@ interface CategoryCardProps {
   onFavorite?: () => void;
   isMenuVisible?: boolean;
   onToggleMenu?: () => void;
+  width: number;
+  height: number;
 }
 
 export const CategoryCard: React.FC<CategoryCardProps> = ({
@@ -24,6 +26,8 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
   onFavorite,
   isMenuVisible,
   onToggleMenu,
+  width,
+  height,
 }) => {
   const colors = useAppSelector(selectColors);
 
@@ -40,10 +44,10 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
       shadowOffset: { width: 0, height: 2 },
       elevation: 3,
       margin: CARD_MARGIN,
-      width: CARD_WIDTH,
-      height: CARD_HEIGHT,
+      width: width,
+      height: height,
       position: "relative",
-      overflow: "visible", // IMPORTANT
+      overflow: "visible",
     },
     text: {
       fontSize: 16,

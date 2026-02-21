@@ -22,6 +22,7 @@ const notesSlice = createSlice({
       state.notes = action.payload.map((note) => ({
         ...note,
         syncStatus: SYNC_STATUS.SYNCED,
+        isLocal: false,
       }));
       state.loading = false;
       state.error = null;
@@ -35,6 +36,15 @@ const notesSlice = createSlice({
         state.notes[index].syncStatus = action.payload.syncStatus;
       }
     },
+    markNoteAsSynced: (state, action: PayloadAction<{ id: string; isLocal?: boolean }>) => {
+      const index = state.notes.findIndex((n) => n.id === action.payload.id);
+      if (index !== -1) {
+        state.notes[index].syncStatus = SYNC_STATUS.SYNCED;
+        if (action.payload.isLocal !== undefined) {
+          state.notes[index].isLocal = action.payload.isLocal;
+        }
+      }
+    },
     updateNote: (state, action: PayloadAction<{ id: string; updates: Partial<NoteApi> }>) => {
       const index = state.notes.findIndex((note) => note.id === action.payload.id);
       if (index !== -1) {
@@ -42,14 +52,24 @@ const notesSlice = createSlice({
           ...state.notes[index],
           ...action.payload.updates,
           updatedAt: new Date().toISOString(),
+          syncStatus: SYNC_STATUS.PENDING,
         };
       }
     },
     deleteNote: (state, action: PayloadAction<string>) => {
-      const index = state.notes.findIndex((note) => note.id === action.payload);
-      if (index !== -1) {
-        state.notes[index].isDeleted = true;
-        state.notes[index].syncStatus = SYNC_STATUS.PENDING;
+      const note = state.notes.find((n) => n.id === action.payload);
+      if (note) {
+        if (note.isLocal) {
+          // If it's local (never synced), just remove it
+          state.notes = state.notes.filter((n) => n.id !== action.payload);
+        } else {
+          // If it's from server, soft delete it
+          const index = state.notes.findIndex((n) => n.id === action.payload);
+          if (index !== -1) {
+            state.notes[index].isDeleted = true;
+            state.notes[index].syncStatus = SYNC_STATUS.PENDING;
+          }
+        }
       }
     },
     deleteNotesByCategory: (state, action: PayloadAction<string>) => {
@@ -81,5 +101,6 @@ export const {
   setError,
   fetchNotes,
   updateNoteSyncStatus,
+  markNoteAsSynced,
 } = notesSlice.actions;
 export default notesSlice.reducer;
