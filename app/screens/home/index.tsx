@@ -19,7 +19,7 @@ import { useNavigation } from "@/utilities/routes/Routes";
 import { showErrorToast } from "@/utilities/toast/message-toast";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useMemo, useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, RefreshControl, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const HomeScreen: React.FC = () => {
@@ -211,6 +211,7 @@ const HomeScreen: React.FC = () => {
                         keyExtractor={(item) => item.id.toString()}
                         showsVerticalScrollIndicator={false}
                         ListEmptyComponent={renderEmptyFlatListData}
+                        refreshControl={renderRefreshControl()}
                     />
                 </View>
 
