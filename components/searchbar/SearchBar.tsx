@@ -1,7 +1,8 @@
 // src/components/common/SearchBar.tsx
-import React, { useState } from 'react';
+import responsive, { useDeviceType, useResponsive } from '@/utilities/responsive';
 import { Ionicons } from '@expo/vector-icons';
-import { Dimensions, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 
 interface SearchBarProps {
     value: string;
@@ -16,7 +17,6 @@ interface SearchBarProps {
         primary?: string;
     };
 }
-const { width } = Dimensions.get('window');
 export const SearchBar: React.FC<SearchBarProps> = ({
     value,
     onChangeText,
@@ -25,15 +25,48 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     colors,
 }) => {
     const [isFocused, setIsFocused] = useState(false);
+    const { width } = useResponsive();
+    const deviceType = useDeviceType();
+
+    // Dynamically calculate the dimensions based on the device type and screen size
+    const { mainHeight, borderRadius, fontSize, iconSize } = useMemo(() => {
+        // Base heights depending on device
+        const heightMapping = {
+            mobile: Math.max(48, responsive.height(52)), // between 48 and scale
+            tablet: 56,
+            desktop: 60,
+            web: 60,
+        };
+
+        const calculatedHeight = heightMapping[deviceType] || 48;
+
+        return {
+            mainHeight: calculatedHeight,
+            borderRadius: calculatedHeight / 2,
+            fontSize: responsive.fontSizeAdvanced(16, width),
+            iconSize: responsive.iconSize(24, width),
+        };
+    }, [deviceType, width]);
+
     return (
-        <View style={styles.container}>
-            <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: isFocused ? colors.primary : colors.border, }]}>
+        <View style={[styles.container, { height: mainHeight + responsive.padding(20) }]}>
+            <View
+                style={[
+                    styles.inputWrapper,
+                    {
+                        backgroundColor: colors.surface,
+                        borderColor: isFocused ? colors.primary : colors.border,
+                        height: mainHeight,
+                        borderRadius: borderRadius,
+                    }
+                ]}
+            >
                 <TextInput
                     placeholder={placeholder}
                     placeholderTextColor={colors.textSecondary}
                     value={value}
                     onChangeText={onChangeText}
-                    style={[styles.input, { color: colors.text }]}
+                    style={[styles.input, { color: colors.text, fontSize }]}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
                 />
@@ -43,7 +76,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                         style={styles.clearButton}
                         onPress={onClear ? onClear : () => onChangeText('')}
                     >
-                        <Ionicons name="close-circle" size={30} color={colors.textSecondary} />
+                        <Ionicons name="close-circle" size={iconSize} color={colors.textSecondary} />
                     </TouchableOpacity>
                 )}
             </View>
@@ -53,32 +86,27 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
 const styles = StyleSheet.create({
     container: {
-        paddingHorizontal: 15,
-        paddingVertical: 10,
+        paddingHorizontal: responsive.padding(16),
         alignSelf: "center",
-        width: width,
-        height: width * 0.18,
-        alignItems: "center",
-        justifyContent: "center"
+        width: "100%",
+        maxWidth: 1200,
+        justifyContent: "center",
     },
     inputWrapper: {
         position: 'relative',
-        borderRadius: (width * 0.21) / 2, // since height = width * 0.21
         borderWidth: 1,
         width: "100%",
-        height: "100%",
         justifyContent: "center",
     },
     input: {
-        paddingHorizontal: 20,
-        paddingVertical: 12,
-        fontSize: 16,
+        paddingHorizontal: responsive.padding(20),
+        height: "100%",
     },
     clearButton: {
         position: 'absolute',
-        right: 8,
-        top: '50%',
-        transform: [{ translateY: -20 }], // half of icon size (20 / 2)
-        padding: 4,
+        right: responsive.padding(12),
+        height: "100%",
+        justifyContent: "center",
+        paddingHorizontal: responsive.padding(4),
     },
 });
