@@ -18,10 +18,9 @@ export function* syncPendingCategoriesSaga() {
 
     // 1. Combine PENDING + ERROR categories from Redux
     const state: RootState = yield select();
-    const categories: Category[] = state.categories.categories;
-    const categoriesToSync = categories.filter(
-      (cat: Category) => cat.syncStatus === SYNC_STATUS.PENDING || cat.syncStatus === SYNC_STATUS.ERROR
-    );
+    const categories = state.categories.categories;
+    const pendingCategories = categories.filter((cat: Category) => cat.syncStatus === SYNC_STATUS.PENDING);
+    const failedCategories = categories.filter((cat: Category) => cat.syncStatus === SYNC_STATUS.ERROR);
 
     if (categoriesToSync.length === 0) {
       console.log("[Sync Saga] No categories to sync");
@@ -72,7 +71,7 @@ export function* syncPendingCategoriesSaga() {
     // 4. Prepare batch payload
     const created: CategoryApi[] = [];
     const updated: CategoryApi[] = [];
-    const deleted: { id: string }[] = [];
+    const deleted: CategoryApi[] = [];
 
     for (const category of validCategories) {
       if (category.isDeleted) {
@@ -80,7 +79,7 @@ export function* syncPendingCategoriesSaga() {
           // If it was never synced, just delete it locally
           yield put(deleteCategory(category.id));
         } else {
-          deleted.push({ id: category.id });
+          deleted.push(category);
         }
       } else if (category.isLocal) {
         created.push(category);
@@ -115,9 +114,7 @@ export function* syncPendingCategoriesSaga() {
       showInfoToast({ message: "Categories synced successfully" });
     } catch (error: any) {
       console.error("[Sync Saga] Batch sync failed:", error);
-      showErrorToast({ message: "Failed to sync categories with server" });
-
-      // 5c. Mark all items in the failed batch as ERROR
+      showErrorToast({ message: "Failed to sync categories" });
       for (const cat of created)
         yield put(updateCategorySyncStatus({ id: cat.id, syncStatus: SYNC_STATUS.ERROR }));
       for (const cat of updated)

@@ -6,8 +6,8 @@ import { ConfirmationModal } from "@/components/modal/ConfirmationModal";
 import { SearchBar } from "@/components/searchbar/SearchBar";
 import { EmptyCategoryText } from "@/constants/categories";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectCategories, selectColors, selectUser } from "@/store/selectors";
-import { addCategory, deleteCategory, updateCategory } from "@/store/slices/categoriesSlice";
+import { selectCategories, selectCategoriesLoading, selectColors, selectIsConnected, selectUser } from "@/store/selectors";
+import { addCategory, deleteCategory, fetchCategories, updateCategory } from "@/store/slices/categoriesSlice";
 import { deleteNotesByCategory } from "@/store/slices/notesSlice";
 import { commonStyles } from "@/styles/global";
 import { createHomeScreenStyles } from "@/styles/home/HomeScreen.styles";
@@ -29,6 +29,9 @@ const HomeScreen: React.FC = () => {
     const categories = useAppSelector(selectCategories);
     const user = useAppSelector(selectUser);
     const colors = useAppSelector(selectColors);
+    const isConnected = useAppSelector(selectIsConnected);
+    const isLoading = useAppSelector(selectCategoriesLoading);
+    console.log("Categories in home screen: ", JSON.stringify(categories, null, 2))
 
     const [editCategory, setEditCategory] = useState<Category | null>(null);
     const [searchText, setSearchText] = useState("");
@@ -114,6 +117,24 @@ const HomeScreen: React.FC = () => {
         setEditCategory(null);
         setShowAddModal(false);
     };
+
+    const onRefresh = useCallback(() => {
+        dispatch(fetchCategories());
+    }, [dispatch]);
+
+    const renderRefreshControl = () => {
+        if (!isConnected) return undefined;
+        return (
+            <RefreshControl
+                refreshing={isLoading}
+                onRefresh={onRefresh}
+                tintColor={colors.primary}
+                colors={[colors.primary]}
+                progressBackgroundColor={colors.surface}
+            />
+        );
+    };
+
     const emptyText = () => {
         if (searchText) return EmptyCategoryText.noFound;
         return EmptyCategoryText.noCategories;
