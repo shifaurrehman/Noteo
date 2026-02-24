@@ -1,34 +1,15 @@
-/**
- * Responsive Configuration & Theme-Aware Constants
- *
- * Centralized configuration for responsive design system
- * Integrates with your existing theme system for consistency
- */
-
 import responsive from "./index";
 
-// ============================================================================
-// SPACING SYSTEM (Design Tokens)
-// ============================================================================
-
 export const SPACING = {
-  // Tight spacing (xs)
   xs: 4,
-  // Small spacing (sm)
   sm: 8,
-  // Medium spacing (md) - Default
   md: 12,
-  // Large spacing (lg)
   lg: 16,
-  // Extra large spacing (xl)
   xl: 24,
-  // 2x extra large (2xl)
   "2xl": 32,
-  // 3x extra large (3xl)
   "3xl": 40,
 } as const;
 
-// Responsive spacing (scales by device)
 export const getResponsiveSpacingByDevice = () => {
   return {
     xs: responsive.padding(SPACING.xs),
@@ -41,12 +22,7 @@ export const getResponsiveSpacingByDevice = () => {
   };
 };
 
-// ============================================================================
-// TYPOGRAPHY SYSTEM (Font Sizes)
-// ============================================================================
-
 export const FONT_SIZES = {
-  // Display sizes
   display: 48,
   h1: 40,
   h2: 32,
@@ -54,22 +30,18 @@ export const FONT_SIZES = {
   h4: 24,
   h5: 20,
   h6: 16,
-  // Body sizes
   body: 16,
   bodyLarge: 18,
   bodyMedium: 16,
   bodySmall: 14,
-  // Label sizes
   label: 12,
   labelLarge: 14,
   labelMedium: 12,
   labelSmall: 11,
-  // Caption sizes
   caption: 12,
   captionSmall: 10,
 } as const;
 
-// Responsive font sizes (scales by device)
 export const getResponsiveFontSizes = () => {
   return Object.entries(FONT_SIZES).reduce(
     (acc, [key, size]) => {
@@ -79,10 +51,6 @@ export const getResponsiveFontSizes = () => {
     {} as Record<keyof typeof FONT_SIZES, number>
   );
 };
-
-// ============================================================================
-// BORDER RADIUS (Rounded Corners)
-// ============================================================================
 
 export const BORDER_RADIUS = {
   none: 0,
@@ -94,7 +62,6 @@ export const BORDER_RADIUS = {
   full: 9999,
 } as const;
 
-// Responsive border radius
 export const getResponsiveBorderRadius = () => {
   return Object.entries(BORDER_RADIUS).reduce(
     (acc, [key, radius]) => {
@@ -105,21 +72,16 @@ export const getResponsiveBorderRadius = () => {
   );
 };
 
-// ============================================================================
-// ICON SIZES
-// ============================================================================
-
 export const ICON_SIZES = {
-  xs: 16, // Small icons (badges, indicators)
-  sm: 20, // Small icons (toolbar)
-  md: 24, // Medium icons (standard)
-  lg: 32, // Large icons (feature)
-  xl: 40, // Extra large icons (hero)
-  "2xl": 48, // 2x large (prominent)
-  "3xl": 56, // 3x large (massive)
+  xs: 16,
+  sm: 20,
+  md: 24,
+  lg: 32,
+  xl: 40,
+  "2xl": 48,
+  "3xl": 56,
 } as const;
 
-// Responsive icon sizes
 export const getResponsiveIconSizes = () => {
   return Object.entries(ICON_SIZES).reduce(
     (acc, [key, size]) => {
@@ -130,12 +92,7 @@ export const getResponsiveIconSizes = () => {
   );
 };
 
-// ============================================================================
-// COMPONENT SIZING
-// ============================================================================
-
 export const COMPONENT_SIZES = {
-  // Button sizes
   button: {
     small: {
       height: 32,
@@ -153,7 +110,6 @@ export const COMPONENT_SIZES = {
       fontSize: FONT_SIZES.bodyLarge,
     },
   },
-  // Input/TextField sizes
   input: {
     small: {
       height: 36,
@@ -185,9 +141,6 @@ export const COMPONENT_SIZES = {
   },
 } as const;
 
-// ============================================================================
-// LINE HEIGHT SYSTEM
-// ============================================================================
 
 export const LINE_HEIGHTS = {
   tight: 1.1,
@@ -201,9 +154,6 @@ export const getLineHeight = (fontSize: number, type: keyof typeof LINE_HEIGHTS 
   return responsive.lineHeight(Math.round(fontSize * LINE_HEIGHTS[type]));
 };
 
-// ============================================================================
-// SHADOW/ELEVATION SYSTEM
-// ============================================================================
 
 export const SHADOWS = {
   none: { shadowOpacity: 0 },
@@ -244,19 +194,12 @@ export const SHADOWS = {
   },
 } as const;
 
-// ============================================================================
-// BREAKPOINT CONFIG
-// ============================================================================
-
 export const BREAKPOINTS = {
   mobile: 600,
   tablet: 900,
   desktop: 1280,
 } as const;
 
-// ============================================================================
-// Z-INDEX SYSTEM (Stacking Order)
-// ============================================================================
 
 export const Z_INDEX = {
   base: 0,
@@ -268,10 +211,6 @@ export const Z_INDEX = {
   tooltip: 1500,
 } as const;
 
-// ============================================================================
-// ANIMATION/TRANSITION DURATIONS (milliseconds)
-// ============================================================================
-
 export const ANIMATION_DURATIONS = {
   instant: 0,
   fast: 100,
@@ -281,9 +220,6 @@ export const ANIMATION_DURATIONS = {
   slowest: 1000,
 } as const;
 
-// ============================================================================
-// PRESETS - Complete Style Objects
-// ============================================================================
 
 export const STYLE_PRESETS = {
   // Container presets
@@ -320,10 +256,6 @@ export const STYLE_PRESETS = {
   },
 };
 
-// ============================================================================
-// RESPONSIVE GRID CONFIG
-// ============================================================================
-
 export const GRID_CONFIG = {
   mobile: {
     columns: 1,
@@ -342,10 +274,6 @@ export const GRID_CONFIG = {
   },
 } as const;
 
-// ============================================================================
-// SCREEN SIZE UTILITIES
-// ============================================================================
-
 export const getScreenSizeCategory = (width: number) => {
   if (width < BREAKPOINTS.mobile) return "mobile";
   if (width < BREAKPOINTS.tablet) return "tablet";
@@ -356,10 +284,6 @@ export const getGridConfigByWidth = (width: number) => {
   const category = getScreenSizeCategory(width);
   return GRID_CONFIG[category];
 };
-
-// ============================================================================
-// LAYOUT PRESETS
-// ============================================================================
 
 export const LAYOUT_PRESETS = {
   // Page container with padding
@@ -411,9 +335,6 @@ export const LAYOUT_PRESETS = {
   },
 } as const;
 
-// ============================================================================
-// SAFE AREA PADDING (For notched devices)
-// ============================================================================
 
 export const getSafeAreaPadding = (hasNotch: boolean = false) => {
   return {
@@ -424,20 +345,12 @@ export const getSafeAreaPadding = (hasNotch: boolean = false) => {
   };
 };
 
-// ============================================================================
-// COLOR & THEME UTILITIES
-// ============================================================================
-
 export const OPACITY = {
   disabled: 0.5,
   hover: 0.8,
   focus: 0.9,
   active: 1,
 } as const;
-
-// ============================================================================
-// EXPORT ALL UTILITIES
-// ============================================================================
 
 export const ResponsiveConfig = {
   SPACING,

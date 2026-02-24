@@ -1,5 +1,7 @@
+import { DEVICE_TYPE } from "@/constants/deviceType";
 import { useEffect, useMemo, useState } from "react";
 import { Dimensions, Platform } from "react-native";
+import { isWeb } from "../global";
 
 export type DeviceType = "mobile" | "tablet" | "desktop" | "web";
 export type Orientation = "portrait" | "landscape";
@@ -55,14 +57,13 @@ const getDeviceDimensions = () => {
  * Determine device type based on screen width
  */
 const getDeviceType = (width: number): DeviceType => {
-  if (Platform.OS === "web") {
-    if (width >= BREAKPOINTS.desktop) return "desktop";
-    if (width >= BREAKPOINTS.tablet) return "tablet";
-    return "mobile";
+  if (isWeb) {
+    if (width >= BREAKPOINTS.desktop) return DEVICE_TYPE.DESKTOP;
+    if (width >= BREAKPOINTS.tablet) return DEVICE_TYPE.TABLET;
+    return DEVICE_TYPE.MOBILE;
   }
-  return "mobile";
+  return DEVICE_TYPE.MOBILE;
 };
-
 
 const getOrientation = (width: number, height: number): Orientation => {
   return width > height ? "landscape" : "portrait";
@@ -139,7 +140,6 @@ class ResponsiveUtils {
     return Math.round(scaledSize * this.fontScaleFactor);
   };
 
-
   fontSizeAdvanced = (size: number, width?: number, height?: number): number => {
     const scaledSize = advancedResponsiveFontSize(size, width, height);
     return Math.round(scaledSize * this.fontScaleFactor);
@@ -157,13 +157,20 @@ class ResponsiveUtils {
     return Math.round(scaleSize(size, baseWidth));
   };
 
-
   iconSize = (size: number, baseWidth?: number): number => {
     return Math.round(scaleSize(size, baseWidth));
   };
 
   lineHeight = (size: number, baseWidth?: number): number => {
     return Math.round(scaleVerticalSize(size));
+  };
+
+  componentHeight = (sizes: Partial<Record<DeviceType, number>>, baseWidth?: number): number => {
+    const { deviceType } = this.getResponsiveValues();
+    const fallback = sizes.mobile ?? 44;
+    const baseHeight = sizes[deviceType] ?? fallback;
+
+    return this.height(baseHeight, baseWidth);
   };
 
   getResponsiveValues = (): ResponsiveValues => {
@@ -180,7 +187,6 @@ class ResponsiveUtils {
       fontScale: this.fontScaleFactor,
     };
   };
-
 
   isMobile = (): boolean => {
     const { width } = getDeviceDimensions();
@@ -248,6 +254,63 @@ class ResponsiveUtils {
     const { width } = getDeviceDimensions();
     const breakpointValue = this.config.breakpoints[breakpoint];
     return width >= breakpointValue;
+  };
+
+  // ============================================================================
+  // GRID LAYOUT HELPER
+  // ============================================================================
+
+  /**
+   * Calculate a responsive grid layout for any container.
+   *
+   * Math guarantee:
+   *   sidePadding * 2 + (columns * cardWidth) + (gap * (columns - 1)) = containerWidth
+   *
+   * @param containerWidth  - Total available width in pixels (e.g. screen width)
+   * @param deviceType      - Current device type ("mobile" | "tablet" | "desktop" | "web")
+   * @param options         - Optional overrides for columns, gap, and sidePadding
+   * @returns               - { columns, cardWidth, gap, sidePadding }
+   */
+  getGridLayout = (
+    containerWidth: number,
+    deviceType: DeviceType,
+    options?: {
+      columns?: number;
+      gap?: number;
+      sidePadding?: number;
+    }
+  ): {
+    columns: number;
+    cardWidth: number;
+    gap: number;
+    sidePadding: number;
+  } => {
+    // Default column counts per device type
+    const defaultColumns: Record<DeviceType, number> = {
+      mobile: 2,
+      tablet: 3,
+      desktop: 4,
+      web: 4,
+    };
+
+    // Default gap and sidePadding scaled relative to base width
+    const defaultGap = scaleSize(14, containerWidth);
+    const defaultSidePadding = scaleSize(16, containerWidth);
+
+    const columns = options?.columns ?? defaultColumns[deviceType];
+    const gap = options?.gap ?? Math.floor(defaultGap);
+    const sidePadding = options?.sidePadding ?? Math.floor(defaultSidePadding);
+
+    const totalGap = gap * (columns - 1);
+    const totalPadding = sidePadding * 2;
+    const cardWidth = Math.floor((containerWidth - totalPadding - totalGap) / columns);
+
+    return {
+      columns,
+      cardWidth,
+      gap,
+      sidePadding,
+    };
   };
 }
 
