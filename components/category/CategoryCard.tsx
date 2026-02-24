@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useAppSelector } from "../../store/hooks";
 import { selectColors } from "../../store/selectors";
@@ -16,6 +16,7 @@ interface CategoryCardProps {
   onToggleMenu?: () => void;
   width: number;
   height: number;
+  style?: StyleProp<ViewStyle>;
 }
 
 export const CategoryCard: React.FC<CategoryCardProps> = ({
@@ -28,6 +29,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
   onToggleMenu,
   width,
   height,
+  style,
 }) => {
   const colors = useAppSelector(selectColors);
 
@@ -43,7 +45,6 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
       shadowRadius: 4,
       shadowOffset: { width: 0, height: 2 },
       elevation: 3,
-      margin: CARD_MARGIN,
       width: width,
       height: height,
       position: "relative",
@@ -92,7 +93,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
 
   return (
     <View style={{ position: "relative" }}>
-      <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.8}>
+      <TouchableOpacity style={[styles.card, style]} onPress={onPress} activeOpacity={0.8}>
         {/* 3-dot Menu Button */}
         <TouchableOpacity
           style={styles.menuIconContainer}

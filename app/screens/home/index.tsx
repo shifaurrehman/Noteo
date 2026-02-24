@@ -4,7 +4,7 @@ import { CategoryCard } from "@/components/category/CategoryCard";
 import { Header } from "@/components/header/Header";
 import { ConfirmationModal } from "@/components/modal/ConfirmationModal";
 import { SearchBar } from "@/components/searchbar/SearchBar";
-import { CARD_MARGIN, EmptyCategoryText } from "@/constants/categories";
+import { EmptyCategoryText } from "@/constants/categories";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectCategories, selectCategoriesLoading, selectColors, selectIsConnected, selectUser } from "@/store/selectors";
 import { addCategory, deleteCategory, fetchCategories, updateCategory } from "@/store/slices/categoriesSlice";
@@ -13,20 +13,18 @@ import { commonStyles } from "@/styles/global";
 import { createHomeScreenStyles } from "@/styles/home/HomeScreen.styles";
 import { Category, CategoryApi } from "@/types/category/category.types";
 import { CreateNewCategory } from "@/utilities/category/CategoryUtils";
-import { isWeb } from "@/utilities/global";
 import { filterCategories } from "@/utilities/home/HomeScreenUtils";
+import responsive, { useResponsive } from "@/utilities/responsive";
 import { useNavigation } from "@/utilities/routes/Routes";
 import { showErrorToast } from "@/utilities/toast/message-toast";
 import { Ionicons } from "@expo/vector-icons";
-import { FlashList } from "@shopify/flash-list";
 import React, { useCallback, useMemo, useState } from "react";
-import { Text, useWindowDimensions, View } from "react-native";
-import { RefreshControl, Text, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const HomeScreen: React.FC = () => {
     const { viewCategoryNotes } = useNavigation();
-    const { width } = useWindowDimensions();
+    const { deviceType } = useResponsive();
     const dispatch = useAppDispatch();
     const categories = useAppSelector(selectCategories);
     const user = useAppSelector(selectUser);
@@ -41,18 +39,10 @@ const HomeScreen: React.FC = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
     const [activeMenuId, setActiveMenuId] = React.useState<string | null>(null);
+    const [containerWidth, setContainerWidth] = useState(0);
     const styles = createHomeScreenStyles(colors);
 
-    const numColumns = isWeb
-        ? width > 1200
-            ? 4
-            : width > 900
-                ? 3
-                : 2
-        : 2;
-
-    const cardWidth = (width - CARD_MARGIN * (numColumns + 1)) / numColumns;
-    const cardHeight = cardWidth; // keep square
+    const { columns: numColumns, cardWidth, gap, sidePadding } = responsive.getGridLayout(containerWidth, deviceType); const cardHeight = cardWidth;
 
     const filteredCategories = useMemo(() => {
         return filterCategories(categories, { searchText });
@@ -150,22 +140,29 @@ const HomeScreen: React.FC = () => {
         return EmptyCategoryText.noCategories;
     };
 
-    const renderItem = ({ item }: { item: Category }) => (
-        <CategoryCard
-            category={item}
-            onPress={() => {
-                setActiveMenuId(null);
-                handleOpenNotes(item);
-            }}
-            onEdit={() => handleEditCategory(item)}
-            onDelete={() => handleDeleteCategory(item.id)}
-            onFavorite={() => handleFavoriteCategory(item)}
-            isMenuVisible={activeMenuId === item.id}
-            onToggleMenu={() => setActiveMenuId(activeMenuId === item.id ? null : item.id)}
-            width={cardWidth}          // ✅ pass dynamic width
-            height={cardHeight}
-        />
-    );
+    const renderItem = ({ item, index }: { item: Category; index: number }) => {
+        const isLastInRow = (index + 1) % numColumns === 0;
+        return (
+            <CategoryCard
+                category={item}
+                onPress={() => {
+                    setActiveMenuId(null);
+                    handleOpenNotes(item);
+                }}
+                onEdit={() => handleEditCategory(item)}
+                onDelete={() => handleDeleteCategory(item.id)}
+                onFavorite={() => handleFavoriteCategory(item)}
+                isMenuVisible={activeMenuId === item.id}
+                onToggleMenu={() => setActiveMenuId(activeMenuId === item.id ? null : item.id)}
+                width={cardWidth}
+                height={cardHeight}
+                style={{
+                    marginRight: isLastInRow ? 0 : gap,
+                    marginBottom: gap,
+                }}
+            />
+        );
+    };
 
     const renderEmptyFlatListData = () => {
         return (
@@ -178,9 +175,9 @@ const HomeScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+            <Header title={"Ai Note Taker"} titleStyle={{ color: colors.primary }} />
             <View style={styles.container}>
                 {/* header */}
-                <Header title={"Ai Note Taker"} titleStyle={{ color: colors.primary }} />
 
                 {/* search bar */}
                 <SearchBar
@@ -198,20 +195,22 @@ const HomeScreen: React.FC = () => {
                 />
 
                 {/* categories list */}
-                <View style={styles.flashListWrapper}>
-                    <FlashList
+                <View style={styles.flashListWrapper}
+                    onLayout={(event) => {
+                        const { width } = event.nativeEvent.layout;
+                        setContainerWidth(width);
+                    }}>
+                    <FlatList
                         data={filteredCategories}
                         renderItem={renderItem}
-                        estimatedItemSize={cardHeight}
                         numColumns={numColumns}
-                        contentContainerStyle={styles.listContainer}
+                        contentContainerStyle={{
+                            paddingHorizontal: sidePadding,
+                            paddingVertical: gap,
+                        }}
                         keyExtractor={(item) => item.id.toString()}
                         showsVerticalScrollIndicator={false}
                         ListEmptyComponent={renderEmptyFlatListData}
-                        contentContainerStyle={{
-                            paddingHorizontal: CARD_MARGIN,
-                            paddingVertical: CARD_MARGIN,
-                        }}
                     />
                 </View>
 
