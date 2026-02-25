@@ -19,8 +19,7 @@ export function* syncPendingCategoriesSaga() {
     // 1. Combine PENDING + ERROR categories from Redux
     const state: RootState = yield select();
     const categories = state.categories.categories;
-    const pendingCategories = categories.filter((cat: Category) => cat.syncStatus === SYNC_STATUS.PENDING);
-    const failedCategories = categories.filter((cat: Category) => cat.syncStatus === SYNC_STATUS.ERROR);
+    const categoriesToSync = categories.filter((cat: Category) => cat.syncStatus === SYNC_STATUS.PENDING || cat.syncStatus === SYNC_STATUS.ERROR);
 
     if (categoriesToSync.length === 0) {
       console.log("[Sync Saga] No categories to sync");
