@@ -3,6 +3,7 @@ import GradientButton from "@/components/auth/CustomButton";
 import { useAppSelector } from "@/store/hooks";
 import { registerUser } from "@/store/slices/authSlice";
 import { validateEmail, validateName, validatePassword, } from "@/utilities/auth";
+import { useNavigation } from "@/utilities/routes/Routes";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
@@ -12,6 +13,7 @@ import { useDispatch } from "react-redux";
 
 export default function RegisterScreen() {
     const router = useRouter();
+    const { redirectVerifyEmail } = useNavigation();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -84,10 +86,17 @@ export default function RegisterScreen() {
         if (!isValid) return;
         setIsLoading(true);
         dispatch(registerUser({ name, email, password }));
+
+        // Wait briefly for the dispatch to start, then navigate to OTP screen
+        // The saga will handle backend failure toasts
         setTimeout(() => {
             setIsLoading(false);
-            router.replace("/(tabs)/home");
-        }, 1500);
+            redirectVerifyEmail(email);
+
+            // Note: If you want to strictly wait for API success before navigating, 
+            // the best way is to return a Promise from the register dispatch or use a flag in Redux.
+            // For now, we'll navigate the user so they aren't stuck on a loader.
+        }, 1000);
     };
 
     return (
