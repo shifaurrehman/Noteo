@@ -1,3 +1,7 @@
+if (__DEV__) {
+  require("../../ReactotronConfig");
+}
+
 import { logout } from "@/store/slices/authSlice";
 import { setNetworkState } from "@/store/slices/networkSlice";
 import { authEvents, FORCE_LOGOUT_EVENT } from "@/utilities/events";
