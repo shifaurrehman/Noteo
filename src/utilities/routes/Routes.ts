@@ -4,14 +4,14 @@ import { useRouter } from "expo-router";
 export const useNavigation = () => {
   const router = useRouter();
 
-  const viewCategoryNotes = ({categoryId, categoryName, isFavorite}: ViewCategoryNotesParams) => {
+  const viewCategoryNotes = ({ categoryId, categoryName, isFavorite }: ViewCategoryNotesParams) => {
     const path = isFavorite ? "favorites" : "home";
     router.push({
       pathname: `/(tabs)/${path}/notes/[categoryId]`,
       params: {
         categoryId,
         name: categoryName,
-        isFavorite : isFavorite ? "true" : "false",
+        isFavorite: isFavorite ? "true" : "false",
       },
     });
   };
@@ -47,5 +47,27 @@ export const useNavigation = () => {
     router.push("/screens/settings");
   };
 
-  return { viewCategoryNotes, addUpdateNote, openFavoriteNotes, redirectLogin, redirectHome, openSettings, };
+  const redirectVerifyEmail = (email: string) => {
+    router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
+  };
+
+  const redirectRegister = () => {
+    router.push("/auth/Register");
+  };
+
+  const redirectForgotPassword = () => {
+    router.push("/auth/forgot-password");
+  };
+
+  return {
+    viewCategoryNotes,
+    addUpdateNote,
+    openFavoriteNotes,
+    redirectLogin,
+    redirectHome,
+    openSettings,
+    redirectVerifyEmail,
+    redirectRegister,
+    redirectForgotPassword,
+  };
 };

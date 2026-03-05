@@ -9,10 +9,12 @@ interface AuthInputProps {
   placeholder: string;
   error?: string;
   iconName?: string;
-  keyboardType?: "default" | "email-address" | "numeric" | "phone-pad";
+  keyboardType?: "default" | "email-address" | "numeric" | "phone-pad" | "number-pad";
   secureTextEntry?: boolean;
   autoCapitalize?: "none" | "sentences" | "words" | "characters";
+  maxLength?: number;
 }
+
 
 const AuthInput: React.FC<AuthInputProps> = ({
   value,
@@ -23,6 +25,7 @@ const AuthInput: React.FC<AuthInputProps> = ({
   keyboardType = "default",
   secureTextEntry = false,
   autoCapitalize = "none",
+  maxLength,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -33,7 +36,7 @@ const AuthInput: React.FC<AuthInputProps> = ({
       <View style={[styles.inputWrapper, error ? styles.inputError : null]}>
         {iconName && (
           <View style={styles.iconContainer}>
-            <Ionicons name={iconName} size={20} color="#667eea" />
+            <Ionicons name={iconName as any} size={20} color="#667eea" />
           </View>
         )}
         <TextInput
@@ -46,6 +49,7 @@ const AuthInput: React.FC<AuthInputProps> = ({
           secureTextEntry={isPassword && !showPassword}
           autoCapitalize={autoCapitalize}
           autoCorrect={false}
+          maxLength={maxLength}
         />
         {isPassword && (
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>

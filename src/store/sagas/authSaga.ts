@@ -6,8 +6,9 @@ import { tokenStorage } from "@/services/storage/tokenStorage";
 import { LoginResponse, RegisterResponse } from "@/types/auth/auth.types";
 import { User } from "@/types/user/user.types";
 import { setError, setLastSyncAt, setLoading, setUser } from "../slices/authSlice";
-import { showErrorToast } from "@/utilities/toast/message-toast";
 import { getErrorMessage } from "@/utilities/toast/get-toast-message";
+import { router } from "expo-router";
+import { showErrorToast } from "@/utilities/toast/message-toast";
 
 // Login saga (will be extended with API call)
 function* loginSaga(action: PayloadAction<{ email: string; password: string }>) {
@@ -20,7 +21,14 @@ function* loginSaga(action: PayloadAction<{ email: string; password: string }>) 
     yield put(setUser(user));
   } catch (error: any) {
     const message = getErrorMessage(error) || "Failed to login";
-    showErrorToast({ message: message });
+
+    if (message.toLowerCase().includes("not verified") || message.toLowerCase().includes("unverified")) {
+      showErrorToast({ message: "Email not verified. Redirecting to verification..." });
+      router.push(`/auth/verify-email?email=${encodeURIComponent(action.payload.email)}` as any);
+    } else {
+      showErrorToast({ message: message });
+    }
+
     yield put(setError(message));
   } finally {
     yield put(setLoading(false));
@@ -32,9 +40,14 @@ function* registerSaga(action: PayloadAction<{ email: string; name: string; pass
   try {
     yield put(setLoading(true));
     const response: RegisterResponse = yield call(registerUserApi, action.payload);
-    const { accessToken, refreshToken, user } = response;
-    yield call(tokenStorage.saveTokens, accessToken, refreshToken);
-    yield put(setUser(user));
+    // Note: Do NOT set user and tokens here if email verification is required by your backend
+    // The user will log in via the OTP verification screen instead.
+
+    // If your backend returns an implicit login anyway (and bypasses OTP), you can keep this:
+    if (response.accessToken && response.refreshToken && (response.user as any)?.isVerified !== false) {
+      yield call(tokenStorage.saveTokens, response.accessToken, response.refreshToken);
+      yield put(setUser(response.user));
+    }
   } catch (error: any) {
     const message = getErrorMessage(error) || "Failed to register";
     showErrorToast({ message: message });
