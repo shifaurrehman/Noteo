@@ -1,4 +1,4 @@
-import NotesScreen from "@/app/screens/notes";
+import NotesScreen from "@/screens/notes";
 import React from "react";
 
 export default function Notes() {

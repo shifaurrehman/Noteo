@@ -1,4 +1,4 @@
-import FavoriteScreen from '@/app/screens/favorite'
+import FavoriteScreen from '@/screens/favorite'
 import React from 'react'
 
 export default function Favorites() {
