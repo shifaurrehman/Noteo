@@ -1,5 +1,6 @@
 import AuthInput from "@/components/auth/AuthEmail";
 import GradientButton from "@/components/auth/CustomButton";
+import { useAuth } from "@/hooks/useAuth";
 import { useAppSelector } from "@/store/hooks";
 import { registerUser } from "@/store/slices/authSlice";
 import { validateEmail, validateName, validatePassword, } from "@/utilities/auth";
@@ -18,23 +19,17 @@ export default function RegisterScreen() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
+    const { loading, error, register } = useAuth();
     const [errors, setErrors] = useState({
         name: "",
         email: "",
         password: "",
         confirmPassword: "",
     });
-    const isLoadingUser = useAppSelector((state) => state.auth.loading);
-    const user = useAppSelector((state) => state.auth.user);
-    const error = useAppSelector((state) => state.auth.error);
-
-    const dispatch = useDispatch();
 
     const validateInputFields = () => {
         const newErrors = { name: "", email: "", password: "", confirmPassword: "" };
 
-        // Validate inputs
         let isValid = true;
 
         if (!name.trim()) {
@@ -84,19 +79,10 @@ export default function RegisterScreen() {
     const handleRegister = async () => {
         const isValid = validateInputFields();
         if (!isValid) return;
-        setIsLoading(true);
-        dispatch(registerUser({ name, email, password }));
-
-        // Wait briefly for the dispatch to start, then navigate to OTP screen
-        // The saga will handle backend failure toasts
-        setTimeout(() => {
-            setIsLoading(false);
+        register({ name, email, password });
+        if(!loading && !error){
             redirectVerifyEmail(email);
-
-            // Note: If you want to strictly wait for API success before navigating, 
-            // the best way is to return a Promise from the register dispatch or use a flag in Redux.
-            // For now, we'll navigate the user so they aren't stuck on a loader.
-        }, 1000);
+        }
     };
 
     return (
@@ -160,7 +146,7 @@ export default function RegisterScreen() {
                             secureTextEntry
                         />
                         {/* Register Button */}
-                        <GradientButton title="Sign Up" loading={isLoading} onPress={handleRegister} />
+                        <GradientButton title="Sign Up" loading={loading} onPress={handleRegister} />
                         {/* Terms and Privacy */}
                         <Text style={styles.termsText}>
                             By signing up, you agree to our <Text style={styles.termsLink}>Terms of Service</Text> and{" "}

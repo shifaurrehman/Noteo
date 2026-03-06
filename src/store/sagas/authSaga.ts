@@ -10,7 +10,6 @@ import { getErrorMessage } from "@/utilities/toast/get-toast-message";
 import { router } from "expo-router";
 import { showErrorToast } from "@/utilities/toast/message-toast";
 
-// Login saga (will be extended with API call)
 function* loginSaga(action: PayloadAction<{ email: string; password: string }>) {
   try {
     yield put(setLoading(true));
@@ -20,7 +19,7 @@ function* loginSaga(action: PayloadAction<{ email: string; password: string }>) 
     yield call(tokenStorage.saveTokens, accessToken, refreshToken);
     yield put(setUser(user));
   } catch (error: any) {
-    const message = getErrorMessage(error) || "Failed to login";
+    const message = getErrorMessage(error);
 
     if (message.toLowerCase().includes("not verified") || message.toLowerCase().includes("unverified")) {
       showErrorToast({ message: "Email not verified. Redirecting to verification..." });
@@ -35,15 +34,10 @@ function* loginSaga(action: PayloadAction<{ email: string; password: string }>) 
   }
 }
 
-// Register/Create user saga
 function* registerSaga(action: PayloadAction<{ email: string; name: string; password: string }>) {
   try {
     yield put(setLoading(true));
     const response: RegisterResponse = yield call(registerUserApi, action.payload);
-    // Note: Do NOT set user and tokens here if email verification is required by your backend
-    // The user will log in via the OTP verification screen instead.
-
-    // If your backend returns an implicit login anyway (and bypasses OTP), you can keep this:
     if (response.accessToken && response.refreshToken && (response.user as any)?.isVerified !== false) {
       yield call(tokenStorage.saveTokens, response.accessToken, response.refreshToken);
       yield put(setUser(response.user));
