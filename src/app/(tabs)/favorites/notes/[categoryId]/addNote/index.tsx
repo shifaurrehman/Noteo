@@ -1,5 +1,5 @@
 
-import AddNoteScreen from "@/app/screens/addNote";
+import AddNoteScreen from "@/screens/addNote";
 import React from "react";
 
 export default function addNote() {

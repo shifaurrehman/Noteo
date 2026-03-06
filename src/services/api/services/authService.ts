@@ -40,3 +40,15 @@ export const resetPasswordApi = async (payload: {
   const response = await api.post(API_ENDPOINTS.auth.resetPassword, payload);
   return response.data;
 };
+
+// VERIFY EMAIL
+export const verifyEmailApi = async (payload: { email: string; otp: string }): Promise<LoginResponse> => {
+  const response = await api.post(API_ENDPOINTS.auth.verifyEmail, payload);
+  return response.data;
+};
+
+// RESEND VERIFICATION EMAIL
+export const resendVerificationEmailApi = async (payload: { email: string }): Promise<void> => {
+  const response = await api.post("/auth/resend-verification", payload);
+  return response.data;
+};

@@ -25,7 +25,7 @@ export default function LoginScreen() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loginAttempted, setLoginAttempted] = useState(false);
-    const { redirectHome } = useNavigation();
+    const { redirectHome, redirectRegister, redirectForgotPassword } = useNavigation();
     const dispatch = useDispatch();
 
     const [errors, setErrors] = useState({ email: "", password: "", });
@@ -118,7 +118,7 @@ export default function LoginScreen() {
                         {/* Forgot Password */}
                         <TouchableOpacity
                             style={styles.forgotPassword}
-                            onPress={() => router.push("/auth/forgot-password")}
+                            onPress={() => redirectForgotPassword()}
                         >
                             <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
                         </TouchableOpacity>
@@ -147,7 +147,7 @@ export default function LoginScreen() {
                         {/* Register Link */}
                         <View style={styles.registerContainer}>
                             <Text style={styles.registerPrompt}>{`Don't have an account? `}</Text>
-                            <TouchableOpacity onPress={() => router.push("/auth/Register")}>
+                            <TouchableOpacity onPress={() => redirectRegister()}>
                                 <Text style={styles.registerLink}>Sign Up</Text>
                             </TouchableOpacity>
                         </View>
