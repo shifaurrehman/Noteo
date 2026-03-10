@@ -7,7 +7,7 @@ export const useNavigation = () => {
   const viewCategoryNotes = ({ categoryId, categoryName, isFavorite }: ViewCategoryNotesParams) => {
     const path = isFavorite ? "favorites" : "home";
     router.push({
-      pathname: `/(tabs)/${path}/notes/[categoryId]`,
+      pathname: "/notes/[categoryId]",
       params: {
         categoryId,
         name: categoryName,
@@ -18,7 +18,7 @@ export const useNavigation = () => {
 
   const addUpdateNote = (categoryId: string) => {
     router.push({
-      pathname: "/(tabs)/home/notes/[categoryId]/addNote",
+      pathname: "/notes/[categoryId]/add-note",
       params: {
         categoryId,
       },
@@ -27,7 +27,7 @@ export const useNavigation = () => {
 
   const openFavoriteNotes = (categoryId: string, categoryName: string) => {
     router.push({
-      pathname: "/(tabs)/favorites/notes/[categoryId]",
+      pathname: "/notes/[categoryId]",
       params: {
         categoryId,
         name: categoryName,
@@ -36,27 +36,27 @@ export const useNavigation = () => {
   };
 
   const redirectLogin = () => {
-    router.replace("/auth/Login");
+    router.replace("/login");
   };
 
   const redirectHome = () => {
-    router.replace("/(tabs)/home");
+    router.replace("/home");
   };
 
   const openSettings = () => {
-    router.push("/screens/settings");
+    router.push("/settings");
   };
 
   const redirectVerifyEmail = (email: string) => {
-    router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
+    router.push(`/verify-email?email=${encodeURIComponent(email)}`);
   };
 
   const redirectRegister = () => {
-    router.push("/auth/Register");
+    router.push("/register");
   };
 
   const redirectForgotPassword = () => {
-    router.push("/auth/forgot-password");
+    router.push("/forgot-password");
   };
 
   return {

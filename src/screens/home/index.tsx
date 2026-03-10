@@ -42,7 +42,8 @@ const HomeScreen: React.FC = () => {
     const [containerWidth, setContainerWidth] = useState(0);
     const styles = createHomeScreenStyles(colors);
 
-    const { columns: numColumns, cardWidth, gap, sidePadding } = responsive.getGridLayout(containerWidth, deviceType); const cardHeight = cardWidth;
+    const { columns: numColumns, cardWidth, gap, sidePadding } = responsive.getGridLayout(containerWidth, deviceType); 
+    const cardHeight = cardWidth;
 
     const filteredCategories = useMemo(() => {
         return filterCategories(categories, { searchText });
