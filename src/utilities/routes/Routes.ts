@@ -16,12 +16,17 @@ export const useNavigation = () => {
     });
   };
 
-  const addUpdateNote = (categoryId: string) => {
+  const openAddNote = (categoryId: string) => {
     router.push({
       pathname: "/notes/[categoryId]/add-note",
-      params: {
-        categoryId,
-      },
+      params: { categoryId },
+    });
+  };
+
+  const openEditNote = (categoryId: string, noteId: string) => {
+    router.push({
+      pathname: "/notes/[categoryId]/add-note",
+      params: { categoryId, noteId },
     });
   };
 
@@ -59,9 +64,17 @@ export const useNavigation = () => {
     router.push("/forgot-password");
   };
 
+  const redirectResetPassword = (email: string) => {
+    router.push({
+      pathname: "/(auth)/reset-password",
+      params: { email },
+    });
+  };
+
   return {
     viewCategoryNotes,
-    addUpdateNote,
+    openAddNote,
+    openEditNote,
     openFavoriteNotes,
     redirectLogin,
     redirectHome,
@@ -69,5 +82,6 @@ export const useNavigation = () => {
     redirectVerifyEmail,
     redirectRegister,
     redirectForgotPassword,
+    redirectResetPassword
   };
 };

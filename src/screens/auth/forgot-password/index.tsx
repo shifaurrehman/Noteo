@@ -2,6 +2,7 @@ import AuthInput from "@/components/auth/AuthEmail";
 import GradientButton from "@/components/auth/CustomButton";
 import { forgotPasswordApi } from "@/services/api/services/authService";
 import { validateEmail } from "@/utilities/auth";
+import { useNavigation } from "@/utilities/routes/Routes";
 import { showErrorToast, showSuccessToast } from "@/utilities/toast/message-toast";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -19,6 +20,7 @@ import {
 
 export default function ForgotPasswordScreen() {
     const router = useRouter();
+    const { redirectResetPassword } = useNavigation();
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -39,10 +41,7 @@ export default function ForgotPasswordScreen() {
         try {
             await forgotPasswordApi({ email });
             showSuccessToast({ title: "OTP Sent", message: "If the email exists, an OTP has been sent." });
-            router.push({
-                pathname: "/auth/reset-password",
-                params: { email },
-            });
+            redirectResetPassword(email);
         } catch (err) {
             console.error(err);
             showErrorToast({ title: "Error", message: "Failed to send OTP. Please try again." });
