@@ -1,10 +1,11 @@
 import AuthInput from "@/components/auth/AuthEmail"; // Reusing AuthInput
 import GradientButton from "@/components/auth/CustomButton";
 import { resetPasswordApi } from "@/services/api/services/authService";
+import { useNavigation } from "@/utilities/routes/Routes";
 import { showErrorToast, showSuccessToast } from "@/utilities/toast/message-toast";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
     KeyboardAvoidingView,
@@ -20,7 +21,7 @@ import {
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
 export default function ResetPasswordScreen() {
-    const router = useRouter();
+    const { redirectLogin } = useNavigation();
     const { email } = useLocalSearchParams<{ email: string }>();
     const [otp, setOtp] = useState("");
     const [newPassword, setNewPassword] = useState("");
@@ -64,7 +65,7 @@ export default function ResetPasswordScreen() {
         try {
             await resetPasswordApi({ email, otp, newPassword });
             showSuccessToast({ title: "Success", message: "Password reset successful! Please login." });
-            router.replace("/auth/Login"); // Case-sensitive check might be needed
+            redirectLogin();
         } catch (err) {
             console.error(err);
             showErrorToast({ title: "Error", message: "Invalid or expired OTP" });
@@ -132,7 +133,7 @@ export default function ResetPasswordScreen() {
                         <GradientButton title="Reset Password" loading={loading} onPress={handleResetPassword} />
 
                         {/* Back to Login */}
-                        <TouchableOpacity onPress={() => router.replace("/auth/Login")} style={styles.backLinkContainer}>
+                        <TouchableOpacity onPress={redirectLogin} style={styles.backLinkContainer}>
                             <Text style={styles.backLinkText}>Cancel</Text>
                         </TouchableOpacity>
                     </View>

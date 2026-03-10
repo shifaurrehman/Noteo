@@ -7,10 +7,10 @@ import { router } from "expo-router";
 import React from "react";
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { selectColors, selectTheme, selectThemeSettings } from "../../../store/selectors";
-import { setTheme, updateSettings } from "../../../store/slices/themeSlice";
 import { useNavigation } from "@/utilities/routes/Routes";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { setTheme, updateSettings } from "@/store/slices/themeSlice";
+import { selectColors, selectTheme, selectThemeSettings } from "@/store/selectors";
 
 
 export default function SettingsScreen() {
