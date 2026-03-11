@@ -17,6 +17,7 @@ import {
 import { deleteNote, fetchNotes, updateNote } from "@/store/slices/notesSlice";
 import { Note } from "@/types/notes/notes.types";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@/utilities/routes/Routes";
 
 const NotesScreen = () => {
   const { categoryId, name, isFavorite } = useLocalSearchParams<{ categoryId: string; name?: string; isFavorite?: string }>();
@@ -28,6 +29,7 @@ const NotesScreen = () => {
 
   // dispatcher and styles
   const dispatch = useAppDispatch();
+  const { openAddNote, openEditNote } = useNavigation();
   const styles = createCategoryStyles(colors);
 
   const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
@@ -57,17 +59,17 @@ const NotesScreen = () => {
   };
 
   const handleOpenAddNote = (categoryId: string) => {
-    router.push(`/home/notes/${categoryId}/addNote`);
+    openAddNote(categoryId);
   };
-  const editNote = (noteId: string) => {
-    router.push(`/home/notes/${categoryId}/addNote?noteId=${noteId}`);
+  const handleEditNote = (noteId: string) => {
+    openEditNote(categoryId, noteId);
   };
 
   const renderItem = ({ item }: { item: Note }) => {
     return (
       <NoteCard
         note={item}
-        onPress={() => editNote(item.id)}
+        onPress={() => handleEditNote(item.id)}
         onDelete={() => handleDeleteNote(item)}
         onToggleFavorite={() => handleToggleFavorite(item)}
       />
