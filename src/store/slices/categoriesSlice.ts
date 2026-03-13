@@ -7,7 +7,7 @@ interface CategoriesState {
   error: string | null;
 }
 
-const initialState: CategoriesState = {
+export const initialState: CategoriesState = {
   categories: [],
   loading: false,
   error: null,

@@ -8,7 +8,7 @@ interface NotesState {
   error: string | null;
 }
 
-const initialState: NotesState = {
+export const initialState: NotesState = {
   notes: [],
   loading: false,
   error: null,

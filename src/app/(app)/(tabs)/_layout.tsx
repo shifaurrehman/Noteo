@@ -12,6 +12,10 @@ const HeartIcon = ({ color }: { color: string }) => (
   <FontAwesome size={28} name="heart" color={color} />
 );
 
+const SettingsIcon = ({ color }: { color: string }) => (
+  <FontAwesome size={28} name="cog" color={color} />
+);
+
 export default function TabLayout() {
   const colors = useAppSelector(selectColors);
 
@@ -38,6 +42,14 @@ export default function TabLayout() {
           options={{
             title: "Favorites",
             tabBarIcon: HeartIcon,
+          }}
+        />
+
+        <Tabs.Screen
+          name="settings"
+          options={{
+            title: "Settings",
+            tabBarIcon: SettingsIcon,
           }}
         />
       </Tabs>

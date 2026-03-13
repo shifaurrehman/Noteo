@@ -6,7 +6,7 @@ interface ThemeState {
   settings: AppSettings;
 }
 
-const initialState: ThemeState = {
+export const initialState: ThemeState = {
   theme: 'light',
   settings: {
     theme: 'light',
