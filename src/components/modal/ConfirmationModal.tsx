@@ -124,6 +124,8 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = memo(({
     );
 });
 
+ConfirmationModal.displayName = 'ConfirmationModal';
+
 const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({

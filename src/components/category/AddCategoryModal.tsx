@@ -127,6 +127,9 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = memo(({
     </Modal>
   );
 });
+
+AddCategoryModal.displayName = 'AddCategoryModal';
+
 const { width, height } = Dimensions.get("window");
 const styles = StyleSheet.create({
   overlay: {
