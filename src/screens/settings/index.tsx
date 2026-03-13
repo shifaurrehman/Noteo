@@ -36,7 +36,7 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
       <View style={styles.container}>
-        <Header title="Settings" showSettings={false} onBack={() => router.back()} />
+        <Header title="Settings" showSettings={false} />
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           {/* Theme Section */}
