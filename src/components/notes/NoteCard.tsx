@@ -94,6 +94,8 @@ export const NoteCard: React.FC<NoteCardProps> = memo(({ note, onPress, onDelete
   );
 });
 
+NoteCard.displayName = 'NoteCard';
+
 const styles = StyleSheet.create({
   card: {
     width: width - 32,
