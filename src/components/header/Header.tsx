@@ -20,7 +20,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   title,
-  showSettings = true,
+  showSettings = false,
   onBack,
   backgroundColor,
   borderColor,
