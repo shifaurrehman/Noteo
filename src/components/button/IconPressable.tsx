@@ -35,7 +35,7 @@ export const IconPressable = ({
   // keep bg in sync if theme changes
   useEffect(() => {
     bg.value = backgroundColor;
-  }, [backgroundColor]);
+  }, [backgroundColor, bg]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],

@@ -86,7 +86,7 @@ const FavoriteScreen: React.FC = () => {
 
     const handleOpenNotes = useCallback((category: Category) => {
         viewCategoryNotes({ categoryId: category.id, categoryName: category.name, isFavorite: true });
-    }, []);
+    }, [viewCategoryNotes]);
 
     const handleCloseModal = () => {
         setEditCategory(null);

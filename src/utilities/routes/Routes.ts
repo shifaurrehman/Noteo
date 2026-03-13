@@ -5,7 +5,6 @@ export const useNavigation = () => {
   const router = useRouter();
 
   const viewCategoryNotes = ({ categoryId, categoryName, isFavorite }: ViewCategoryNotesParams) => {
-    const path = isFavorite ? "favorites" : "home";
     router.push({
       pathname: "/notes/[categoryId]",
       params: {

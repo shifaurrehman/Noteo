@@ -3,7 +3,6 @@ import { Header } from "@/components/header/Header";
 import { getCurrentYear } from "@/constants/dateTime";
 import { logout } from "@/store/slices/authSlice";
 import { createSettingsScreenStyles } from "@/styles/settings/Settings.styles";
-import { router } from "expo-router";
 import React from "react";
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";

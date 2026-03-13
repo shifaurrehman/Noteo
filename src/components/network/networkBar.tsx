@@ -41,7 +41,7 @@ export const NetworkStatusBar = () => {
         }, 3000);
 
         return () => clearTimeout(timer);
-    }, [isConnected]);
+    }, [isConnected, anim]);
 
     if (!visible) return null;
 

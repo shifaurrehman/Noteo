@@ -38,7 +38,7 @@ export default function SplashScreen() {
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [user, isAuthenticated, router]);
+  }, [user, isAuthenticated, router, scaleAnim]);
 
   const gradientColors: [string, string, string] = ["#1c1c1e", "#5a00ff", "#ff008c"]
 

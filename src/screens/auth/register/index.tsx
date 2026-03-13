@@ -1,8 +1,6 @@
 import AuthInput from "@/components/auth/AuthEmail";
 import GradientButton from "@/components/auth/CustomButton";
 import { useAuth } from "@/hooks/useAuth";
-import { useAppSelector } from "@/store/hooks";
-import { registerUser } from "@/store/slices/authSlice";
 import { validateEmail, validateName, validatePassword, } from "@/utilities/auth";
 import { useNavigation } from "@/utilities/routes/Routes";
 import { Ionicons } from "@expo/vector-icons";
@@ -10,7 +8,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, } from "react-native";
-import { useDispatch } from "react-redux";
+
 
 export default function RegisterScreen() {
     const router = useRouter();

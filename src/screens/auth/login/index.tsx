@@ -6,7 +6,6 @@ import { validateEmail } from "@/utilities/auth";
 import { useNavigation } from "@/utilities/routes/Routes";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
     Keyboard,
@@ -21,7 +20,6 @@ import {
 import { useDispatch } from "react-redux";
 
 export default function LoginScreen() {
-    const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loginAttempted, setLoginAttempted] = useState(false);
@@ -31,7 +29,7 @@ export default function LoginScreen() {
     const [errors, setErrors] = useState({ email: "", password: "", });
     const { loading, login, isAuthenticated } = useAuth();
 
-    const validateInputFields = () => {
+    const validateInputFields = useCallback(() => {
         const newErrors = { email: "", password: "" };
         let isValid = true;
 
@@ -50,7 +48,8 @@ export default function LoginScreen() {
 
         setErrors(newErrors);
         return isValid;
-    };
+    }, [email, password]);
+
     const handleChange = (field: keyof typeof errors, value: string) => {
         if (field === "email") setEmail(value);
         if (field === "password") setPassword(value);
@@ -63,14 +62,14 @@ export default function LoginScreen() {
         Keyboard.dismiss();
         setLoginAttempted(true)
         login({ email, password });
-    }, [email, password, login]);
+    }, [email, password, login, validateInputFields]);
 
     useEffect(() => {
         if (loginAttempted && isAuthenticated) {
             redirectHome();
             dispatch(fetchCategories());
         }
-    }, [isAuthenticated, loginAttempted, router]);
+    }, [isAuthenticated, loginAttempted, redirectHome, dispatch]);
 
     const handleGuest = async () => { };
 

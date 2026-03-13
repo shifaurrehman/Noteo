@@ -1,5 +1,4 @@
 import { call, put, takeEvery, select } from 'redux-saga/effects';
-import { PayloadAction } from '@reduxjs/toolkit';
 import { getData, saveData } from '../../storage/asyncStorage';
 import { loadSettings } from '../slices/themeSlice';
 import { AppSettings } from '../../types';

@@ -1,6 +1,6 @@
 import { DEVICE_TYPE } from "@/constants/deviceType";
 import { useEffect, useMemo, useState } from "react";
-import { Dimensions, Platform } from "react-native";
+import { Dimensions } from "react-native";
 import { isWeb } from "../global";
 
 export type DeviceType = "mobile" | "tablet" | "desktop" | "web";
@@ -86,27 +86,9 @@ const calculateResponsiveFontSize = (
   return Math.round(size * scaleFactor);
 };
 
-const getFontScaleFactor = async (): Promise<number> => {
-  try {
-    if (Platform.OS === "ios") {
-      // iOS has native font scaling
-      const dim = Dimensions.get("window");
-      // Max font scale is typically 1.3 for accessibility
-      return 1;
-    }
-    if (Platform.OS === "android") {
-      // Android has native font scaling
-      return 1;
-    }
-    // Web
-    return 1;
-  } catch {
-    return 1;
-  }
-};
-
 /**
  * Advanced responsive font size with better scaling algorithm
+
  * Logarithmic scaling prevents extreme sizes
  */
 const advancedResponsiveFontSize = (
@@ -120,8 +102,8 @@ const advancedResponsiveFontSize = (
 };
 
 class ResponsiveUtils {
-  private config: ResponsiveConfig;
-  private fontScaleFactor: number = 1;
+  private readonly config: ResponsiveConfig;
+  private readonly fontScaleFactor: number = 1;
 
   constructor(config: ResponsiveConfig = DEFAULT_CONFIG) {
     this.config = config;
@@ -225,8 +207,8 @@ class ResponsiveUtils {
   /**
    * Get maximum width for content (useful for web)
    */
-  getMaxContentWidth = (): number => {
-    const { width } = getDeviceDimensions();
+  getMaxContentWidth = (containerWidth?: number): number => {
+    const width = containerWidth ?? getDeviceDimensions().width;
     const { deviceType } = this.getResponsiveValues();
 
     if (deviceType === "desktop") {
@@ -418,11 +400,9 @@ export const useIsLandscape = (): boolean => {
  * Hook to get responsive spacing
  */
 export const useSpacing = (category: "tight" | "normal" | "loose" = "normal"): number => {
-  const { width } = useResponsive();
-
   return useMemo(() => {
     return responsive.getSpacing(category);
-  }, [width, category]);
+  }, [category]);
 };
 
 /**
@@ -432,7 +412,7 @@ export const useMaxContentWidth = (): number => {
   const { width } = useResponsive();
 
   return useMemo(() => {
-    return responsive.getMaxContentWidth();
+    return responsive.getMaxContentWidth(width);
   }, [width]);
 };
 

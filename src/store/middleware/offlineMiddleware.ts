@@ -2,7 +2,7 @@ import { Middleware } from "@reduxjs/toolkit";
 import * as CategoriesActions from "../actions/categoriesActions";
 import * as NotesActions from "../actions/notesActions";
 
-export const offlineMiddleware: Middleware<{}, any> = (store) => (next) => (action: any) => {
+export const offlineMiddleware: Middleware<object, any> = (store) => (next) => (action: any) => {
   const result = next(action);
 
   if (!action || typeof action !== "object" || !("type" in action)) {
