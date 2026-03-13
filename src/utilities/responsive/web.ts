@@ -178,7 +178,6 @@ export const getGridStyles = (width: number, columns?: number) => {
  */
 export const getResponsiveFlexStyles = (width: number, direction: "row" | "column" = "column") => {
   // Stack vertically on mobile, horizontally on desktop
-  const flexDirection = width >= WebBreakpoints.md ? "row" : "column";
   const justifyContent = width >= WebBreakpoints.lg ? "space-between" : "flex-start";
 
   return {

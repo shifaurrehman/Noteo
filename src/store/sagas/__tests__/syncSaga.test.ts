@@ -11,15 +11,15 @@ import {
 } from "../../slices/categoriesSlice";
 import { syncPendingCategoriesSaga } from "../syncSaga";
 
-// Mock uuid
-jest.mock("uuid", () => ({
-  v4: () => "new-uuid",
-}));
-
 import { initialState as authInitialState } from "../../slices/authSlice";
 import { initialState as networkInitialState } from "../../slices/networkSlice";
 import { initialState as notesInitialState } from "../../slices/notesSlice";
 import { initialState as themeInitialState } from "../../slices/themeSlice";
+
+// Mock uuid
+jest.mock("uuid", () => ({
+  v4: () => "new-uuid",
+}));
 
 // ... (rest of the imports)
 

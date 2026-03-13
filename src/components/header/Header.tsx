@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ViewStyle, TextStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
 import { useAppSelector } from '@/store/hooks';
 import { selectColors } from '@/store/selectors';
 import { useNavigation } from '@/utilities/routes/Routes';
