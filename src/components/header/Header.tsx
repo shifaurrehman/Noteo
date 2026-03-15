@@ -1,9 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ViewStyle, TextStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useAppSelector } from '@/store/hooks';
-import { selectColors } from '@/store/selectors';
 import { useNavigation } from '@/utilities/routes/Routes';
+import { useTheme } from '@/hooks/useTheme';
 
 interface HeaderProps {
   title: string;
@@ -28,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({
   rightIcon,
   containerStyle,
 }) => {
-  const colors = useAppSelector(selectColors);
+  const { colors } = useTheme();
   const { openSettings } = useNavigation()
 
   const styles = StyleSheet.create({
@@ -44,7 +43,7 @@ export const Header: React.FC<HeaderProps> = ({
     title: {
       fontSize: 22,
       fontWeight: 'bold',
-      color: colors.text,
+      color: colors.textMain,
       flex: 1,
       textAlign: 'center',
     },
@@ -58,7 +57,7 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Left Icon */}
       {onBack ? (
         <TouchableOpacity style={styles.icon} onPress={onBack}>
-          {leftIcon || <Ionicons name="arrow-back" size={24} color={colors.text} />}
+          {leftIcon || <Ionicons name="arrow-back" size={24} color={colors.textMain} />}
         </TouchableOpacity>
       ) : (
         <View style={{ width: 32 }} />
@@ -75,7 +74,7 @@ export const Header: React.FC<HeaderProps> = ({
           style={styles.icon}
           onPress={openSettings}
         >
-          {rightIcon || <Ionicons name="settings-outline" size={24} color={colors.text} />}
+          {rightIcon || <Ionicons name="settings-outline" size={24} color={colors.textMain} />}
         </TouchableOpacity>
       ) : (
         <View style={{ width: 32 }} />

@@ -52,7 +52,7 @@ export const SettingsButton: React.FC<Props> = ({
 
       {/* Text */}
       <View style={{ flex: 1 }}>
-        <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
+        <Text style={[styles.title, { color: colors.textMain }]}>{title}</Text>
         {description && (
           <Text style={[styles.description, { color: colors.textSecondary }]}>
             {description}

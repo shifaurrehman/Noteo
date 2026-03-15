@@ -1,5 +1,6 @@
 import { useAppSelector } from "@/store/hooks";
-import { selectColors, selectIsAuthenticated, selectUser } from "@/store/selectors";
+import { selectIsAuthenticated, selectUser } from "@/store/selectors";
+import { useTheme } from "@/hooks/useTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
@@ -11,7 +12,7 @@ const { width } = Dimensions.get("window");
 export default function SplashScreen() {
   const router = useRouter();
   // selectors
-  const colors = useAppSelector(selectColors);
+  const { colors } = useTheme();
   const user = useAppSelector(selectUser);
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
 

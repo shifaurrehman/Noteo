@@ -11,9 +11,9 @@ import { FlatList, Text, View } from "react-native";
 import { IconPressable } from "@/components/button/IconPressable";
 import {
   selectCategoryById,
-  selectColors,
   selectNotesByCategory,
 } from "@/store/selectors";
+import { useTheme } from "@/hooks/useTheme";
 import { deleteNote, fetchNotes, updateNote } from "@/store/slices/notesSlice";
 import { Note } from "@/types/notes/notes.types";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -24,7 +24,7 @@ const NotesScreen = () => {
   // selectors
   const category = useAppSelector((state) => (categoryId ? selectCategoryById(state, categoryId) : null));
   const notes = useAppSelector((state) => (categoryId ? selectNotesByCategory(state, categoryId) : []));
-  const colors = useAppSelector(selectColors);
+  const { colors } = useTheme();
   console.log("NOTES SCREEN: ", "isFavorite note or not..... ", isFavorite);
 
   // dispatcher and styles

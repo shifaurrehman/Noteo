@@ -2,8 +2,7 @@ import React, { memo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Note } from '@/types';
-import { useAppSelector } from '@/store/hooks';
-import { selectColors } from '@/store/selectors';
+import { useTheme } from '@/hooks/useTheme';
 import { IconPressable } from '../button/IconPressable';
 
 interface NoteCardProps {
@@ -17,7 +16,7 @@ const { width } = Dimensions.get('window');
 
 // Memoizing prevents unnecessary re-renders in long lists
 export const NoteCard: React.FC<NoteCardProps> = memo(({ note, onPress, onDelete, onToggleFavorite }) => {
-  const colors = useAppSelector(selectColors);
+  const { colors } = useTheme();
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -37,7 +36,7 @@ export const NoteCard: React.FC<NoteCardProps> = memo(({ note, onPress, onDelete
 
       <View style={styles.cardContent}>
         <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
+          <Text style={[styles.title, { color: colors.textMain }]} numberOfLines={1}>
             {note.title || 'Untitled Note'}
           </Text>
           

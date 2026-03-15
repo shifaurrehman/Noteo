@@ -11,7 +11,7 @@ interface SearchBarProps {
     placeholder?: string;
     colors: {
         surface: string;
-        text: string;
+        textMain: string;
         textSecondary: string;
         border: string;
         primary?: string;
@@ -66,7 +66,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                     placeholderTextColor={colors.textSecondary}
                     value={value}
                     onChangeText={onChangeText}
-                    style={[styles.input, { color: colors.text, fontSize }]}
+                    style={[styles.input, { color: colors.textMain, fontSize }]}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
                 />

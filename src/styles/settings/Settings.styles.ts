@@ -1,13 +1,6 @@
 import { StyleSheet } from "react-native";
 
-export const createSettingsScreenStyles = (colors: {
-  background: string;
-  surface: string;
-  text: string;
-  textSecondary: string;
-  border: string;
-  primary: string;
-}) =>
+export const createSettingsScreenStyles = (colors: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -23,7 +16,7 @@ export const createSettingsScreenStyles = (colors: {
     sectionTitle: {
       fontSize: 20,
       fontWeight: "600",
-      color: colors.text,
+      color: colors.textMain,
       marginBottom: 8,
       marginLeft: 6
     },
@@ -45,7 +38,7 @@ export const createSettingsScreenStyles = (colors: {
     settingTitle: {
       fontSize: 16,
       fontWeight: "500",
-      color: colors.text,
+      color: colors.textMain,
       marginBottom: 4,
     },
     settingDescription: {
@@ -68,7 +61,7 @@ export const createSettingsScreenStyles = (colors: {
     },
     themeOptionText: {
       fontSize: 16,
-      color: colors.text,
+      color: colors.textMain,
       marginLeft: 12,
       flex: 1,
     },

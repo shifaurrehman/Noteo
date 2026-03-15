@@ -44,6 +44,8 @@ api.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     console.log("===== AXIOS REQUEST START =====");
     console.log("Request URL:", config.url);
+    console.log("Request Method:", config.method);
+    console.log("Request Data:", config.data);
     console.log("Request Headers:", config.headers);
     console.log("===== AXIOS REQUEST END =====");
     const token = await tokenStorage.getAccessToken();
@@ -77,17 +79,12 @@ api.interceptors.response.use(
     console.log("Message:", error.message);
     console.log("Name:", error.name);
     console.log("Code:", error.code);
-    console.log("Request Headers:", error.config?.headers);
     // 3️⃣ Server responded (4xx / 5xx)
     if (error.response) {
       console.log("Status:", error.response.status);
       console.log("Status Text:", error.response.statusText);
-      console.log("Response Headers:", error.response.headers);
       console.log("Response Data:", error.response.data);
     }
-
-    // 5️⃣ Stack trace
-    console.log("Stack:", error.stack);
 
     console.log("===== AXIOS ERROR END =====");
     const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };

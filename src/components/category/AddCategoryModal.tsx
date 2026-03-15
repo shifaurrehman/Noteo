@@ -13,8 +13,7 @@ import {
   Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useAppSelector } from "@/store/hooks";
-import { selectColors } from "@/store/selectors";
+import { useTheme } from "@/hooks/useTheme";
 import { IconPressable } from "../button/IconPressable";
 import { showInfoToast } from "@/utilities/toast/message-toast";
 
@@ -31,7 +30,7 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = memo(({
   onSave,
   initialValue,
 }) => {
-  const colors = useAppSelector(selectColors);
+  const { colors } = useTheme();
   const [name, setName] = useState("");
 
   useEffect(() => {
@@ -70,7 +69,7 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = memo(({
                 <View style={[styles.handle, { backgroundColor: colors.border }]} />
 
                 <View style={styles.header}>
-                  <Text style={[styles.title, { color: colors.text }]}>
+                  <Text style={[styles.title, { color: colors.textMain }]}>
                     {initialValue ? "Edit Category" : "New Category"}
                   </Text>
                   <IconPressable
@@ -90,7 +89,7 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = memo(({
                     style={[
                       styles.input,
                       {
-                        color: colors.text,
+                        color: colors.textMain,
                         backgroundColor: colors.background,
                         borderColor: name.length > 0 ? colors.primary : colors.border
                       }

@@ -4,7 +4,8 @@ import { Header } from "@/components/header/Header";
 import { SearchBar } from "@/components/searchbar/SearchBar";
 import { EmptyCategoryText } from "@/constants/categories";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectCategories, selectCategoriesLoading, selectColors, selectIsConnected } from "@/store/selectors";
+import { selectCategories, selectCategoriesLoading, selectIsConnected } from "@/store/selectors";
+import { useTheme } from "@/hooks/useTheme";
 import { deleteCategory, fetchCategories, updateCategory } from "@/store/slices/categoriesSlice";
 import { deleteNotesByCategory } from "@/store/slices/notesSlice";
 import { createHomeScreenStyles } from "@/styles/home/HomeScreen.styles";
@@ -23,7 +24,7 @@ const FavoriteScreen: React.FC = () => {
     const { deviceType } = useResponsive();
     const dispatch = useAppDispatch();
     const categories = useAppSelector(selectCategories);
-    const colors = useAppSelector(selectColors);
+    const { colors } = useTheme();
     const isConnected = useAppSelector(selectIsConnected);
     const isLoading = useAppSelector(selectCategoriesLoading);
     const [editCategory, setEditCategory] = useState<Category | null>(null);
@@ -161,7 +162,7 @@ const FavoriteScreen: React.FC = () => {
                     placeholder={"Search favorites..."}
                     colors={{
                         surface: colors.surface,
-                        text: colors.text,
+                        textMain: colors.textMain,
                         textSecondary: colors.textSecondary,
                         border: colors.border,
                         primary: colors.primary,

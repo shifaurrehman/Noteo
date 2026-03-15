@@ -1,58 +1,14 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 
+import { theme } from "../theme/colors";
+
 // Theme selectors
 export const selectTheme = (state: RootState) => state.theme.theme;
 export const selectThemeSettings = (state: RootState) => state.theme.settings;
-export const selectColors = createSelector([selectTheme], (theme) => {
-  const Colors = {
-    light: {
-      primary: "#ff008c",
-      primaryPressed: "#ff008cb0",
-      secondary: "#bebcbcff",
-      background: "#F2F2F7",
-      surface: "#FFFFFF",
-      text: "#000000",
-      textSecondary: "#666666",
-      border: "#E5E5EA",
-      error: "#FF3B30",
-      success: "#34C759",
-      warning: "#FF9500",
-      headerBg: "#FFFFFF",
-      cardBg: "#FFFFFF",
-      shadow: "#000000",
-      delete: "red",
-      iconBg: "rgba(0, 0, 0, 0.05)",
-      iconBgPressed: "rgba(59, 61, 62, 0.15)",
-      iconBgDanger: "rgba(40, 37, 37, 0.15)",
-      disabled: "#ccc",
-      favoriteNote: "#FFD700",
-    },
-    dark: {
-      primary: "#ff008c",
-      primaryPressed: "#ff008cb0",
-      secondary: "#474545ff",
-      background: "#000000",
-      surface: "#1C1C1E",
-      text: "#FFFFFF",
-      textSecondary: "#98989D",
-      border: "#38383A",
-      error: "#FF453A",
-      success: "#32D74B",
-      warning: "#FF9F0A",
-      headerBg: "#1C1C1E",
-      cardBg: "#2C2C2E",
-      shadow: "#000000",
-      delete: "red",
-      iconBg: "rgba(255, 255, 255, 0.08)",
-      iconBgPressed: "rgba(59, 61, 62, 0.15)",
-      iconBgDanger: "rgba(255, 69, 58, 0.25)",
-      disabled: "#ccc",
-      favoriteNote: "#FFD700",
-    },
-  };
-
-  return theme === "light" ? Colors.light : Colors.dark;
+export const selectColors = createSelector([selectTheme], (themeMode) => {
+  const activeTheme = themeMode === "dark" ? "dark" : "light";
+  return theme[activeTheme].colors;
 });
 
 // Categories selectors
