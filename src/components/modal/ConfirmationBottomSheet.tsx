@@ -134,6 +134,8 @@ export const ConfirmationBottomSheet = forwardRef<BottomSheetModal, Props>(
   }
 );
 
+ConfirmationBottomSheet.displayName = 'ConfirmationBottomSheet';
+
 const styles = StyleSheet.create({
   contentContainer: {
     paddingHorizontal: 24,

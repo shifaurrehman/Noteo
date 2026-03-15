@@ -18,7 +18,7 @@ export const CustomSwitch: React.FC<Props> = ({ value, onValueChange, colors }) 
       duration: 250,
       useNativeDriver: false, // transform/translateX can be native, but background colors/positioning often need JS driver for interpolation if not using specific native props
     }).start();
-  }, [value]);
+  }, [value, animatedValue]);
 
   const translateX = animatedValue.interpolate({
     inputRange: [0, 1],

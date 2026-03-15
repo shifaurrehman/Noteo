@@ -148,6 +148,8 @@ export const SelectionBottomSheet = forwardRef<BottomSheetModal, Props>(
   }
 );
 
+SelectionBottomSheet.displayName = 'SelectionBottomSheet';
+
 const styles = StyleSheet.create({
   contentContainer: {
     paddingHorizontal: 24,

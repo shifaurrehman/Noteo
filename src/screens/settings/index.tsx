@@ -1,6 +1,6 @@
 import { logout } from "@/store/slices/authSlice";
 import React, { useState, useRef } from "react";
-import { ScrollView, Text, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
