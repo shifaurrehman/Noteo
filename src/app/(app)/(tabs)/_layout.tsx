@@ -1,6 +1,5 @@
 import { NetworkStatusBar } from "@/components/network/networkBar";
-import { useAppSelector } from "@/store/hooks";
-import { selectColors } from "@/store/selectors";
+import { useTheme } from "@/hooks/useTheme";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs } from "expo-router";
 
@@ -17,7 +16,7 @@ const SettingsIcon = ({ color }: { color: string }) => (
 );
 
 export default function TabLayout() {
-  const colors = useAppSelector(selectColors);
+  const { colors } = useTheme();
 
   return (
     <>

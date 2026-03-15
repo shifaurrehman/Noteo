@@ -25,8 +25,8 @@ interface AppButtonProps {
   haptic?: "light" | "medium" | "heavy";
   colors?: {
     primary?: string;
-    secondary?: string;
-    textPrimary?: string;
+    surface?: string;
+    textMain?: string;
     textSecondary?: string;
     disabled?: string;
   };
@@ -62,18 +62,22 @@ export const AppButton = ({
   };
 
   // Background color based on variant and disabled state
-  const backgroundColor = disabled
-    ? colors.disabled || "#ccc"
-    : variant === "primary"
-    ? colors.primary || "#ff008c"
-    : colors.secondary || "#E5E5EA";
+  const getBackgroundColor = () => {
+    if (disabled) return colors.disabled || "#ccc";
+    return variant === "primary"
+      ? colors.primary || "#ff008c"
+      : colors.surface || "#E5E5EA";
+  };
+  const backgroundColor = getBackgroundColor();
 
   // Text color based on variant and disabled state
-  const color = disabled
-    ? "#999"
-    : variant === "primary"
-    ? colors.textPrimary || "#fff"
-    : colors.textSecondary || "#000";
+  const getTextColor = () => {
+    if (disabled) return "#999";
+    return variant === "primary"
+      ? "#fff"
+      : colors.textMain || "#000";
+  };
+  const color = getTextColor();
 
   return (
     <AnimatedPressable

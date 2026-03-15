@@ -4,7 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useAppSelector } from '@/store/hooks';
-import { selectColors, selectNoteById } from '@/store/selectors';
+import { selectNoteById } from '@/store/selectors';
+import { useTheme } from '@/hooks/useTheme';
 import { IconPressable } from '@/components/button/IconPressable';
 import { AppButton } from '@/components/button/AppButton';
 import { createNewNote } from '@/utilities/notes';
@@ -15,7 +16,7 @@ const { height } = Dimensions.get('window');
 const AddNoteScreen = () => {
   const { categoryId, noteId } = useLocalSearchParams<{ categoryId: string; noteId?: string }>();
   const dispatch = useDispatch();
-  const colors = useAppSelector(selectColors);
+  const { colors } = useTheme();
   const user = useAppSelector((state) => state.auth.user);
   const note = useAppSelector(state => noteId ? selectNoteById(state, noteId) : undefined);
   const isEditMode = Boolean(noteId);
@@ -80,7 +81,7 @@ const AddNoteScreen = () => {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.surface }]}>
       {/* HEADER */}
       <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>{noteId ? 'Edit Note' : 'New Note'}</Text>
+        <Text style={[styles.headerTitle, { color: colors.textMain }]}>{noteId ? 'Edit Note' : 'New Note'}</Text>
         <IconPressable
           onPress={handleCancel}
           size={26}
@@ -88,7 +89,7 @@ const AddNoteScreen = () => {
           backgroundColor={colors.iconBg}
           pressedColor={colors.iconBgPressed}
         >
-          <Ionicons name="close" size={26} color={colors.text} />
+          <Ionicons name="close" size={26} color={colors.textMain} />
         </IconPressable>
       </View>
 
@@ -98,7 +99,7 @@ const AddNoteScreen = () => {
         onChangeText={setTitle}
         placeholder="Title..."
         placeholderTextColor={colors.textSecondary}
-        style={[styles.input, { backgroundColor: colors.background, color: colors.text }]}
+        style={[styles.input, { backgroundColor: colors.background, color: colors.textMain }]}
         autoFocus={true}
       />
       <TextInput
@@ -110,7 +111,7 @@ const AddNoteScreen = () => {
         multiline
         textAlignVertical="top"
         textAlign="left"
-        style={[styles.textArea, { backgroundColor: colors.background, color: colors.text }]}
+        style={[styles.textArea, { backgroundColor: colors.background, color: colors.textMain }]}
       />
 
       <View style={styles.footer}>

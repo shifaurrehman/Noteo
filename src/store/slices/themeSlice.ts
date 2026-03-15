@@ -7,9 +7,9 @@ interface ThemeState {
 }
 
 export const initialState: ThemeState = {
-  theme: 'light',
+  theme: 'system',
   settings: {
-    theme: 'light',
+    theme: 'system',
     fontSize: 'medium',
     notifications: true,
   },

@@ -6,7 +6,8 @@ import { ConfirmationModal } from "@/components/modal/ConfirmationModal";
 import { SearchBar } from "@/components/searchbar/SearchBar";
 import { EmptyCategoryText } from "@/constants/categories";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectCategories, selectCategoriesLoading, selectColors, selectIsConnected, selectUser } from "@/store/selectors";
+import { selectCategories, selectCategoriesLoading, selectIsConnected, selectUser } from "@/store/selectors";
+import { useTheme } from "@/hooks/useTheme";
 import { addCategory, deleteCategory, fetchCategories, updateCategory } from "@/store/slices/categoriesSlice";
 import { deleteNotesByCategory } from "@/store/slices/notesSlice";
 import { commonStyles } from "@/styles/global";
@@ -28,7 +29,7 @@ const HomeScreen: React.FC = () => {
     const dispatch = useAppDispatch();
     const categories = useAppSelector(selectCategories);
     const user = useAppSelector(selectUser);
-    const colors = useAppSelector(selectColors);
+    const { colors } = useTheme();
     const isConnected = useAppSelector(selectIsConnected);
     const isLoading = useAppSelector(selectCategoriesLoading);
     console.log("Categories in home screen: ", JSON.stringify(categories, null, 2))
@@ -188,7 +189,7 @@ const HomeScreen: React.FC = () => {
                     placeholder={"Search categories..."}
                     colors={{
                         surface: colors.surface,
-                        text: colors.text,
+                        textMain: colors.textMain,
                         textSecondary: colors.textSecondary,
                         border: colors.border,
                         primary: colors.primary,

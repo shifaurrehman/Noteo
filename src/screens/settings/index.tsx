@@ -9,18 +9,18 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@/utilities/routes/Routes";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setTheme, updateSettings } from "@/store/slices/themeSlice";
-import { selectColors, selectTheme, selectThemeSettings } from "@/store/selectors";
+import { selectThemeSettings } from "@/store/selectors";
+import { useTheme } from "@/hooks/useTheme";
 
 
 export default function SettingsScreen() {
+  const { mode, colors } = useTheme();
   const { redirectLogin } = useNavigation();
   const dispatch = useAppDispatch();
-  const theme = useAppSelector(selectTheme);
   const settings = useAppSelector(selectThemeSettings);
-  const colors = useAppSelector(selectColors);
   const styles = createSettingsScreenStyles(colors);
 
-  const handleThemeChange = (newTheme: "light" | "dark") => {
+  const handleThemeChange = (newTheme: "light" | "dark" | "system") => {
     dispatch(setTheme(newTheme));
   };
 
@@ -42,18 +42,26 @@ export default function SettingsScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Appearance</Text>
             <SettingsButton
+              title="System"
+              leftIcon="settings-outline"
+              rightIcon={mode === "system" ? "checkmark-circle" : undefined}
+              active={mode === "system"}
+              onPress={() => handleThemeChange("system")}
+              colors={colors}
+            />
+            <SettingsButton
               title="Light Mode"
               leftIcon="sunny-outline"
-              rightIcon={theme === "light" ? "checkmark-circle" : undefined}
-              active={theme === "light"}
+              rightIcon={mode === "light" ? "checkmark-circle" : undefined}
+              active={mode === "light"}
               onPress={() => handleThemeChange("light")}
               colors={colors}
             />
             <SettingsButton
               title="Dark Mode"
               leftIcon="moon-outline"
-              rightIcon={theme === "dark" ? "checkmark-circle" : undefined}
-              active={theme === "dark"}
+              rightIcon={mode === "dark" ? "checkmark-circle" : undefined}
+              active={mode === "dark"}
               onPress={() => handleThemeChange("dark")}
               colors={colors}
             />

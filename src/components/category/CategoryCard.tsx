@@ -1,8 +1,7 @@
 import React from "react";
 import { StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useAppSelector } from "../../store/hooks";
-import { selectColors } from "../../store/selectors";
+import { useTheme } from "@/hooks/useTheme";
 import { Category } from "@/types/category/category.types";
 
 interface CategoryCardProps {
@@ -30,7 +29,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
   height,
   style,
 }) => {
-  const colors = useAppSelector(selectColors);
+  const { colors } = useTheme();
 
 
   const styles = StyleSheet.create({
@@ -53,7 +52,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
       fontSize: 16,
       fontWeight: "600",
       textAlign: "center",
-      color: colors.text,
+      color: colors.textMain,
       paddingHorizontal: 12,
     },
     menuIconContainer: {
@@ -85,7 +84,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
       gap: 8,
     },
     menuText: {
-      color: colors.text,
+      color: colors.textMain,
       fontSize: 14,
     },
   });
@@ -99,7 +98,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
           onPress={onToggleMenu}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
         >
-          <Ionicons name="ellipsis-vertical" size={20} color={colors.text} />
+          <Ionicons name="ellipsis-vertical" size={20} color={colors.textMain} />
         </TouchableOpacity>
 
         <Text style={styles.text}>{category.name}</Text>
@@ -116,7 +115,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
                 onEdit();
               }}
             >
-              <Ionicons name="create-outline" size={18} color={colors.text} />
+              <Ionicons name="create-outline" size={18} color={colors.textMain} />
               <Text style={styles.menuText}>Edit</Text>
             </TouchableOpacity>
           )}
@@ -129,7 +128,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
                 onFavorite();
               }}
             >
-              <Ionicons name={category.isFavorite ? "star" : "star-outline"} size={18} color={category.isFavorite ? colors.primary : colors.text} />
+              <Ionicons name={category.isFavorite ? "star" : "star-outline"} size={18} color={category.isFavorite ? colors.primary : colors.textMain} />
               <Text style={styles.menuText}>Favorite</Text>
             </TouchableOpacity>
           )}
