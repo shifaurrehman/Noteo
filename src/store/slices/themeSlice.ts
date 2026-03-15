@@ -12,6 +12,11 @@ export const initialState: ThemeState = {
     theme: 'system',
     fontSize: 'medium',
     notifications: true,
+    reducedMotion: false,
+    gridDensity: 'comfortable',
+    lineNumbers: false,
+    syncEnabled: true,
+    backupEnabled: true,
   },
 };
 

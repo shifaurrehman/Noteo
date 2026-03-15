@@ -1,24 +1,31 @@
-import { SettingsButton } from "@/components/button/SettingsButton";
-import { Header } from "@/components/header/Header";
-import { getCurrentYear } from "@/constants/dateTime";
 import { logout } from "@/store/slices/authSlice";
-import { createSettingsScreenStyles } from "@/styles/settings/Settings.styles";
-import React from "react";
-import { ScrollView, Text, View } from "react-native";
+import React, { useState, useRef } from "react";
+import { ScrollView, Text, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@/utilities/routes/Routes";
+import { router } from "expo-router";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setTheme, updateSettings } from "@/store/slices/themeSlice";
-import { selectThemeSettings } from "@/store/selectors";
+import { selectThemeSettings, selectIsAuthenticated, selectUser } from "@/store/selectors";
 import { useTheme } from "@/hooks/useTheme";
+import { SettingGroup } from "@/components/settings/SettingGroup";
+import { SettingItem } from "@/components/settings/SettingItem";
+import { Header } from "@/components/header/Header";
+import { SelectionBottomSheet } from "@/components/modal/SelectionBottomSheet";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { ConfirmationBottomSheet } from "@/components/modal/ConfirmationBottomSheet";
 
+type SelectionType = "theme" | "fontSize" | "gridDensity";
 
 export default function SettingsScreen() {
-  const { mode, colors } = useTheme();
-  const { redirectLogin } = useNavigation();
+  const { colors } = useTheme();
   const dispatch = useAppDispatch();
   const settings = useAppSelector(selectThemeSettings);
-  const styles = createSettingsScreenStyles(colors);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const user = useAppSelector(selectUser);
+
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const deleteSheetRef = useRef<BottomSheetModal>(null);
+  const [selectionType, setSelectionType] = useState<SelectionType>("theme");
 
   const handleThemeChange = (newTheme: "light" | "dark" | "system") => {
     dispatch(setTheme(newTheme));
@@ -27,101 +34,231 @@ export default function SettingsScreen() {
   const handleSettingsUpdate = (newSettings: Partial<typeof settings>) => {
     dispatch(updateSettings(newSettings));
   };
+
   const handleLogout = async () => {
     dispatch(logout());
-    redirectLogin();
-  }
+    router.replace("/(auth)/login");
+  };
+
+  const openSelectionSheet = (type: SelectionType) => {
+    setSelectionType(type);
+    bottomSheetRef.current?.present();
+  };
+
+  const handleSelectOption = (value: string) => {
+    if (selectionType === "theme") {
+      handleThemeChange(value as any);
+    } else if (selectionType === "fontSize") {
+      handleSettingsUpdate({ fontSize: value as any });
+    } else if (selectionType === "gridDensity") {
+      handleSettingsUpdate({ gridDensity: value as any });
+    }
+  };
+
+  const themeOptions = [
+    { id: "light", label: "Light", icon: "sunny-outline" as const },
+    { id: "dark", label: "Dark", icon: "moon-outline" as const },
+    { id: "system", label: "System Default", icon: "settings-outline" as const },
+  ];
+
+  const fontSizeOptions = [
+    { id: "small", label: "Small", icon: "text-outline" as const },
+    { id: "medium", label: "Medium", icon: "text-outline" as const },
+    { id: "large", label: "Large", icon: "text-outline" as const },
+  ];
+
+  const gridDensityOptions = [
+    { id: "comfortable", label: "Comfortable", icon: "grid-outline" as const },
+    { id: "compact", label: "Compact", icon: "apps-outline" as const },
+  ];
+
+  const getCurrentOptions = () => {
+    switch (selectionType) {
+      case "theme": return themeOptions;
+      case "fontSize": return fontSizeOptions;
+      case "gridDensity": return gridDensityOptions;
+      default: return [];
+    }
+  };
+
+  const getCurrentValue = () => {
+    switch (selectionType) {
+      case "theme": return settings.theme;
+      case "fontSize": return settings.fontSize || "medium";
+      case "gridDensity": return settings.gridDensity || "comfortable";
+      default: return "";
+    }
+  };
+
+  const getTitle = () => {
+    switch (selectionType) {
+      case "theme": return "Select Theme";
+      case "fontSize": return "Select Font Size";
+      case "gridDensity": return "Select Grid Density";
+      default: return "";
+    }
+  };
+
+  const getDescription = () => {
+    switch (selectionType) {
+      case "theme": return "Choose how AI Notes looks on your device";
+      case "fontSize": return "Choose the font size for your editor";
+      case "gridDensity": return "Choose how much content you see at once";
+      default: return "";
+    }
+  };
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-      <View style={styles.container}>
-        <Header title="Settings" showSettings={false} />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top"]}>
+      <Header title={"Settings"} backgroundColor={colors.background} titleStyle={{ color: colors.primary, textAlign: "left" }} />
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Appearance Section */}
+        <SettingGroup title="Appearance" colors={colors}>
+          <SettingItem
+            title="Theme"
+            leftIcon="color-palette"
+            value={settings.theme.charAt(0).toUpperCase() + settings.theme.slice(1)}
+            onPress={() => openSelectionSheet("theme")}
+            colors={colors}
+          />
+          <SettingItem
+            title="Font Size"
+            leftIcon="text"
+            value={settings.fontSize ? settings.fontSize.charAt(0).toUpperCase() + settings.fontSize.slice(1) : "Medium"}
+            onPress={() => openSelectionSheet("fontSize")}
+            colors={colors}
+          />
+          <SettingItem
+            title="Grid Density"
+            leftIcon="grid"
+            value={settings.gridDensity === 'comfortable' ? 'Comfortable' : 'Compact'}
+            onPress={() => openSelectionSheet("gridDensity")}
+            colors={colors}
+          />
+        </SettingGroup>
 
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          {/* Theme Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Appearance</Text>
-            <SettingsButton
-              title="System"
-              leftIcon="settings-outline"
-              rightIcon={mode === "system" ? "checkmark-circle" : undefined}
-              active={mode === "system"}
-              onPress={() => handleThemeChange("system")}
+        <SettingGroup title="Account" colors={colors}>
+          {!isAuthenticated && (
+            <SettingItem
+              title="Login"
+              leftIcon="log-in-outline"
+              onPress={() => router.push("/(auth)/login")}
               colors={colors}
             />
-            <SettingsButton
-              title="Light Mode"
-              leftIcon="sunny-outline"
-              rightIcon={mode === "light" ? "checkmark-circle" : undefined}
-              active={mode === "light"}
-              onPress={() => handleThemeChange("light")}
+          )}
+          {!isAuthenticated && (
+            <SettingItem
+              title="Create Account"
+              leftIcon="person-add-outline"
+              onPress={() => router.push("/(auth)/register")}
               colors={colors}
             />
-            <SettingsButton
-              title="Dark Mode"
-              leftIcon="moon-outline"
-              rightIcon={mode === "dark" ? "checkmark-circle" : undefined}
-              active={mode === "dark"}
-              onPress={() => handleThemeChange("dark")}
-              colors={colors}
-            />
-          </View>
+          )}
 
-          {/* Preferences Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Preferences</Text>
-            <SettingsButton
-              title="Notifications"
-              description="Receive alerts and reminders"
-              switchValue={settings.notifications ?? true}
-              onSwitchChange={(value) => handleSettingsUpdate({ notifications: value })}
+          {isAuthenticated && (
+            <SettingItem
+              title="Email"
+              leftIcon="mail-outline"
+              value={user?.email}
               colors={colors}
             />
-          </View>
-
-          {/* Additional Settings Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>About</Text>
-
-            <View style={styles.settingItem}>
-              <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>App Version</Text>
-                <Text style={styles.settingDescription}>1.0.0</Text>
-              </View>
-            </View>
-            <SettingsButton
-              title="Help & Support"
-              description="Get help or report an issue"
-              rightIcon="chevron-forward"
-              onPress={() => {
-                /* navigate */
-              }}
+          )}
+          {isAuthenticated && (
+            <SettingItem
+              title="Backup & Restore"
+              leftIcon="cloud-upload-outline"
+              switchValue={settings.backupEnabled}
+              onSwitchChange={(value) => handleSettingsUpdate({ backupEnabled: value })}
               colors={colors}
             />
-
-            <SettingsButton
-              title="Privacy Policy"
-              description="Learn how we handle your data"
-              rightIcon="chevron-forward"
-              onPress={() => {
-                /* navigate */
-              }}
+          )}
+          {isAuthenticated && settings.backupEnabled && (
+            <SettingItem
+              title="Sync Status"
+              leftIcon="sync-outline"
+              value="Synced"
               colors={colors}
             />
-            <SettingsButton
+          )}
+          {isAuthenticated && (
+            <SettingItem
               title="Logout"
-              rightIcon="log-out-outline"
+              leftIcon="log-out-outline"
               onPress={handleLogout}
               colors={colors}
             />
-          </View>
+          )}
+          {isAuthenticated && (
+            <SettingItem
+              title="Delete Account"
+              leftIcon="trash-outline"
+              danger
+              onPress={() => deleteSheetRef.current?.present()}
+              colors={colors}
+            />
+          )}
+        </SettingGroup>
 
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>AI Note Taker</Text>
-            <Text style={styles.footerText}>© {getCurrentYear()} All rights reserved</Text>
-          </View>
-        </ScrollView>
-      </View>
+        {/* About Section */}
+        <SettingGroup title="About" colors={colors}>
+          <SettingItem
+            title="Version"
+            leftIcon="information-circle-outline"
+            value="v2.4.0-stable"
+            colors={colors}
+          />
+          <SettingItem
+            title="Terms of Service"
+            leftIcon="document-text-outline"
+            onPress={() => router.push("/terms")}
+            colors={colors}
+            rightIcon="open-outline"
+          />
+        </SettingGroup>
+        <View style={{ height: 20 }} />
+      </ScrollView>
+
+      <ConfirmationBottomSheet
+        ref={deleteSheetRef}
+        title="Delete Account"
+        message="Your account will be permanently deleted after 30 days if you do not recover it."
+        confirmText="Permanently Delete"
+        onConfirm={() => {
+          // Add deletion logic here
+          console.log("Account deletion confirmed");
+        }}
+        colors={colors}
+        type="danger"
+      />
+
+      <SelectionBottomSheet
+        ref={bottomSheetRef}
+        title={getTitle()}
+        description={getDescription()}
+        options={getCurrentOptions()}
+        selectedValue={getCurrentValue()}
+        onSelect={handleSelectOption}
+        colors={colors}
+      />
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    paddingHorizontal: 16,
+    paddingTop: 24,
+  },
+  footerText: {
+    fontSize: 13,
+    lineHeight: 18,
+    textAlign: "left",
+    paddingHorizontal: 4,
+    marginBottom: 40,
+  }
+});
+
+

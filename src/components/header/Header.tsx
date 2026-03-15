@@ -55,12 +55,10 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <View style={[styles.container, containerStyle]}>
       {/* Left Icon */}
-      {onBack ? (
+      {onBack && (
         <TouchableOpacity style={styles.icon} onPress={onBack}>
           {leftIcon || <Ionicons name="arrow-back" size={24} color={colors.textMain} />}
         </TouchableOpacity>
-      ) : (
-        <View style={{ width: 32 }} />
       )}
 
       {/* Title */}
@@ -69,15 +67,13 @@ export const Header: React.FC<HeaderProps> = ({
       </Text>
 
       {/* Right Icon */}
-      {showSettings ? (
+      {showSettings && (
         <TouchableOpacity
           style={styles.icon}
           onPress={openSettings}
         >
           {rightIcon || <Ionicons name="settings-outline" size={24} color={colors.textMain} />}
         </TouchableOpacity>
-      ) : (
-        <View style={{ width: 32 }} />
       )}
     </View>
   );

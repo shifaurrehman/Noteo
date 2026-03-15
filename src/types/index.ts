@@ -4,6 +4,11 @@ export interface AppSettings {
   theme: ThemeMode;
   fontSize?: "small" | "medium" | "large";
   notifications?: boolean;
+  reducedMotion?: boolean;
+  gridDensity?: "comfortable" | "compact";
+  lineNumbers?: boolean;
+  syncEnabled?: boolean;
+  backupEnabled?: boolean;
 }
 
 export interface User {
