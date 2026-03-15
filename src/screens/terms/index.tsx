@@ -6,7 +6,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useRouter } from 'expo-router';
 
 export default function TermsOfServiceScreen() {
-    const { colors } = useTheme();
+    const { colors, typography } = useTheme();
     const router = useRouter();
 
     return (
@@ -18,43 +18,43 @@ export default function TermsOfServiceScreen() {
             />
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                 <View style={styles.section}>
-                    <Text style={[styles.sectionTitle, { color: colors.textMain }]}>1. Acceptance of Terms</Text>
-                    <Text style={[styles.text, { color: colors.textSecondary }]}>
+                    <Text style={[styles.sectionTitle, { color: colors.textMain, fontSize: typography.h3 }]}>1. Acceptance of Terms</Text>
+                    <Text style={[styles.text, { color: colors.textSecondary, fontSize: typography.body }]}>
                         By accessing and using AI Note Taker, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the application.
                     </Text>
                 </View>
 
                 <View style={styles.section}>
-                    <Text style={[styles.sectionTitle, { color: colors.textMain }]}>2. Use of Service</Text>
-                    <Text style={[styles.text, { color: colors.textSecondary }]}>
+                    <Text style={[styles.sectionTitle, { color: colors.textMain, fontSize: typography.h3 }]}>2. Use of Service</Text>
+                    <Text style={[styles.text, { color: colors.textSecondary, fontSize: typography.body }]}>
                         You are responsible for maintaining the confidentiality of your account and for all activities that occur under your account. You agree to use the service only for lawful purposes.
                     </Text>
                 </View>
 
                 <View style={styles.section}>
-                    <Text style={[styles.sectionTitle, { color: colors.textMain }]}>3. Data Privacy</Text>
-                    <Text style={[styles.text, { color: colors.textSecondary }]}>
+                    <Text style={[styles.sectionTitle, { color: colors.textMain, fontSize: typography.h3 }]}>3. Data Privacy</Text>
+                    <Text style={[styles.text, { color: colors.textSecondary, fontSize: typography.body }]}>
                         Your privacy is important to us. Our Privacy Policy explains how we collect, use, and protect your personal information. By using the service, you agree to the collection and use of information in accordance with our policy.
                     </Text>
                 </View>
 
                 <View style={styles.section}>
-                    <Text style={[styles.sectionTitle, { color: colors.textMain }]}>4. Intellectual Property</Text>
-                    <Text style={[styles.text, { color: colors.textSecondary }]}>
+                    <Text style={[styles.sectionTitle, { color: colors.textMain, fontSize: typography.h3 }]}>4. Intellectual Property</Text>
+                    <Text style={[styles.text, { color: colors.textSecondary, fontSize: typography.body }]}>
                         The service and its original content, features, and functionality are and will remain the exclusive property of AI Note Taker and its licensors.
                     </Text>
                 </View>
 
                 <View style={styles.section}>
-                    <Text style={[styles.sectionTitle, { color: colors.textMain }]}>5. Limitation of Liability</Text>
-                    <Text style={[styles.text, { color: colors.textSecondary }]}>
+                    <Text style={[styles.sectionTitle, { color: colors.textMain, fontSize: typography.h3 }]}>5. Limitation of Liability</Text>
+                    <Text style={[styles.text, { color: colors.textSecondary, fontSize: typography.body }]}>
                         In no event shall AI Note Taker be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses.
                     </Text>
                 </View>
 
                 <View style={styles.section}>
-                    <Text style={[styles.sectionTitle, { color: colors.textMain }]}>6. Changes to Terms</Text>
-                    <Text style={[styles.text, { color: colors.textSecondary }]}>
+                    <Text style={[styles.sectionTitle, { color: colors.textMain, fontSize: typography.h3 }]}>6. Changes to Terms</Text>
+                    <Text style={[styles.text, { color: colors.textSecondary, fontSize: typography.body }]}>
                         We reserve the right, at our sole discretion, to modify or replace these Terms at any time. We will provide notice of any changes by posting the new Terms on this screen.
                     </Text>
                 </View>

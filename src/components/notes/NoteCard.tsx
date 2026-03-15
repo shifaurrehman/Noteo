@@ -16,7 +16,7 @@ const { width } = Dimensions.get('window');
 
 // Memoizing prevents unnecessary re-renders in long lists
 export const NoteCard: React.FC<NoteCardProps> = memo(({ note, onPress, onDelete, onToggleFavorite }) => {
-  const { colors } = useTheme();
+  const { colors, typography } = useTheme();
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -36,7 +36,7 @@ export const NoteCard: React.FC<NoteCardProps> = memo(({ note, onPress, onDelete
 
       <View style={styles.cardContent}>
         <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.textMain }]} numberOfLines={1}>
+          <Text style={[styles.title, { color: colors.textMain, fontSize: typography.h3 }]} numberOfLines={1}>
             {note.title || 'Untitled Note'}
           </Text>
           
@@ -56,14 +56,14 @@ export const NoteCard: React.FC<NoteCardProps> = memo(({ note, onPress, onDelete
           </IconPressable>
         </View>
 
-        <Text style={[styles.content, { color: colors.textSecondary }]} numberOfLines={3}>
+        <Text style={[styles.content, { color: colors.textSecondary, fontSize: typography.bodySmall }]} numberOfLines={3}>
           {note.content || 'No additional text...'}
         </Text>
 
         <View style={styles.footer}>
           <View style={styles.metadata}>
             <Ionicons name="time-outline" size={12} color={colors.textSecondary} style={styles.metaIcon} />
-            <Text style={[styles.date, { color: colors.textSecondary }]}>
+            <Text style={[styles.date, { color: colors.textSecondary, fontSize: typography.caption }]}>
               {`${note.updatedAt ? "Edited " : "Created "}${formatDate(note.updatedAt ?? note.createdAt)}`}
             </Text>
           </View>
@@ -84,7 +84,7 @@ export const NoteCard: React.FC<NoteCardProps> = memo(({ note, onPress, onDelete
             )}
 
             <View style={[styles.tag, { backgroundColor: colors.primary + '15' }]}>
-               <Text style={[styles.tagText, { color: colors.primary }]}>Note</Text>
+               <Text style={[styles.tagText, { color: colors.primary, fontSize: typography.sub }]}>Note</Text>
             </View>
           </View>
         </View>

@@ -3,6 +3,7 @@ import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { ThemeColors } from "@/theme/colors";
 import { CustomSwitch } from "../button/CustomSwitch";
+import { useTheme } from "@/hooks/useTheme";
 
 type Props = {
   title: string;
@@ -27,6 +28,7 @@ export const SettingItem: React.FC<Props> = ({
   colors,
   danger = false,
 }) => {
+  const { typography } = useTheme();
   const isSwitchMode = typeof switchValue === "boolean";
 
   return (
@@ -49,7 +51,7 @@ export const SettingItem: React.FC<Props> = ({
         <Text
           style={[
             styles.title,
-            { color: danger ? colors.danger : colors.textMain },
+            { color: danger ? colors.danger : colors.textMain, fontSize: typography.body },
           ]}
         >
           {title}
@@ -58,7 +60,7 @@ export const SettingItem: React.FC<Props> = ({
 
       <View style={styles.rightContent}>
         {value && (
-          <Text style={[styles.value, { color: colors.textSecondary }]}>
+          <Text style={[styles.value, { color: colors.textSecondary, fontSize: typography.bodySmall }]}>
             {value}
           </Text>
         )}
