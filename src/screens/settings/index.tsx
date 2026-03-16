@@ -4,8 +4,8 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { setTheme, updateSettings } from "@/store/slices/themeSlice";
-import { selectThemeSettings, selectIsAuthenticated, selectUser } from "@/store/selectors";
+import { setTheme, updateSettings } from "@/store/slices/settingsSlice";
+import { selectSettings, selectIsAuthenticated, selectUser } from "@/store/selectors";
 import { useTheme } from "@/hooks/useTheme";
 import { SettingGroup } from "@/components/settings/SettingGroup";
 import { SettingItem } from "@/components/settings/SettingItem";
@@ -19,7 +19,7 @@ type SelectionType = "theme" | "fontSize" | "gridDensity";
 export default function SettingsScreen() {
   const { colors } = useTheme();
   const dispatch = useAppDispatch();
-  const settings = useAppSelector(selectThemeSettings);
+  const settings = useAppSelector(selectSettings);
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const user = useAppSelector(selectUser);
 

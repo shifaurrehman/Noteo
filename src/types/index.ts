@@ -3,12 +3,9 @@ export type ThemeMode = "light" | "dark" | "system";
 export interface AppSettings {
   theme: ThemeMode;
   fontSize?: "small" | "medium" | "large";
-  notifications?: boolean;
-  reducedMotion?: boolean;
-  gridDensity?: "comfortable" | "compact";
-  lineNumbers?: boolean;
-  syncEnabled?: boolean;
-  backupEnabled?: boolean;
+  gridDensity: "comfortable" | "compact";
+  syncStatus: "synced" | "syncing" | "error";
+  backupEnabled: boolean;
 }
 
 export interface User {

@@ -7,14 +7,14 @@ import {
 } from "./categoriesSaga";
 import { watchLoadNotes, watchAddNote, watchUpdateNote, watchDeleteNote } from "./notesSaga";
 import { watchLogin, watchRegister, watchLogout, watchSyncUserData } from "./authSaga";
-import { watchLoadTheme, watchThemeChanges } from "./themeSaga";
+import { watchLoadSettings, watchSettingsChanges } from "./settingsSaga";
 import { watchNetworkRestore } from "./networkSaga";
 
 export function* rootSaga() {
   yield all([
-    // Theme sagas (load first)
-    fork(watchLoadTheme),
-    fork(watchThemeChanges),
+    // Settings sagas (load first)
+    fork(watchLoadSettings),
+    fork(watchSettingsChanges),
 
     // Categories sagas
     fork(watchLoadCategories),

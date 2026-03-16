@@ -4,8 +4,8 @@ import { RootState } from "./store";
 import { theme } from "../theme/colors";
 
 // Theme selectors
-export const selectTheme = (state: RootState) => state.theme.theme;
-export const selectThemeSettings = (state: RootState) => state.theme.settings;
+export const selectTheme = (state: RootState) => state.settings.theme;
+export const selectSettings = (state: RootState) => state.settings;
 export const selectColors = createSelector([selectTheme], (themeMode) => {
   const activeTheme = themeMode === "dark" ? "dark" : "light";
   return theme[activeTheme].colors;

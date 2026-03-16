@@ -17,7 +17,7 @@ import authReducer from "./slices/authSlice";
 import categoriesReducer from "./slices/categoriesSlice";
 import networkReducer from "./slices/networkSlice";
 import notesReducer from "./slices/notesSlice";
-import themeReducer from "./slices/themeSlice";
+import settingsReducer from "./slices/settingsSlice";
 
 // Create saga middleware
 const sagaMiddleware = createSagaMiddleware();
@@ -26,7 +26,7 @@ const sagaMiddleware = createSagaMiddleware();
 const appReducer = combineReducers({
   categories: categoriesReducer,
   notes: notesReducer,
-  theme: themeReducer,
+  settings: settingsReducer,
   auth: authReducer,
   network: networkReducer,
 });
@@ -44,7 +44,7 @@ const persistConfig = {
   key: "root",
   version: 1,
   storage: AsyncStorage,
-  whitelist: ["auth", "theme", "categories", "notes"],
+  whitelist: ["auth", "settings", "categories", "notes"],
   blacklist: ["network"],
 };
 

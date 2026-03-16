@@ -8,12 +8,15 @@ import { useRouter } from 'expo-router';
 export default function TermsOfServiceScreen() {
     const { colors, typography } = useTheme();
     const router = useRouter();
+    const handleBack = () => {
+        router.back();
+    };
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top"]}>
             <Header
                 title="Terms of Service"
-                onBack={() => router.back()}
+                onBack={handleBack}
                 titleStyle={{ color: colors.primary }}
             />
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
