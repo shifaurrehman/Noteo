@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { ThemeColors } from "@/theme/colors";
+import { useTheme } from "@/hooks/useTheme";
 
 type Props = {
   title?: string;
@@ -9,10 +10,12 @@ type Props = {
 };
 
 export const SettingGroup: React.FC<Props> = ({ title, children, colors }) => {
+  const { typography } = useTheme();
+
   return (
     <View style={styles.container}>
       {title && (
-        <Text style={[styles.sectionTitle, { color: colors.lableText }]}>
+        <Text style={[styles.sectionTitle, { color: colors.lableText, fontSize: typography.bodySmall }]}>
           {title}
         </Text>
       )}

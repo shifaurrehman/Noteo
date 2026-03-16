@@ -27,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({
   rightIcon,
   containerStyle,
 }) => {
-  const { colors } = useTheme();
+  const { colors, typography } = useTheme();
   const { openSettings } = useNavigation()
 
   const styles = StyleSheet.create({
@@ -41,7 +41,7 @@ export const Header: React.FC<HeaderProps> = ({
       borderBottomColor: borderColor || colors.border,
     },
     title: {
-      fontSize: 22,
+      fontSize: typography.h1,
       fontWeight: 'bold',
       color: colors.textMain,
       flex: 1,
