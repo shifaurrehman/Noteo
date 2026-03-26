@@ -56,7 +56,7 @@ export const Header: React.FC<HeaderProps> = ({
     <View style={[styles.container, containerStyle]}>
       {/* Left Icon */}
       {onBack && (
-        <TouchableOpacity style={styles.icon} onPress={onBack}>
+        <TouchableOpacity style={styles.icon} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} onPress={onBack}>
           {leftIcon || <Ionicons name="arrow-back" size={24} color={colors.textMain} />}
         </TouchableOpacity>
       )}

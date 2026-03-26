@@ -14,7 +14,7 @@ import { syncPendingCategoriesSaga } from "../syncSaga";
 import { initialState as authInitialState } from "../../slices/authSlice";
 import { initialState as networkInitialState } from "../../slices/networkSlice";
 import { initialState as notesInitialState } from "../../slices/notesSlice";
-import { initialState as themeInitialState } from "../../slices/themeSlice";
+import { initialState as settingsInitialState } from "../../slices/settingsSlice";
 
 // Mock uuid
 jest.mock("uuid", () => ({
@@ -105,7 +105,7 @@ describe("syncPendingCategoriesSaga", () => {
         categories: mockCategories,
       },
       notes: notesInitialState,
-      theme: themeInitialState,
+      settings: settingsInitialState,
       auth: authInitialState,
       network: networkInitialState,
     };
@@ -192,7 +192,7 @@ describe("syncPendingCategoriesSaga", () => {
         categories: mockCategories,
       },
       notes: notesInitialState,
-      theme: themeInitialState,
+      settings: settingsInitialState,
       auth: authInitialState,
       network: networkInitialState,
     };

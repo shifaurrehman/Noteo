@@ -1,14 +1,15 @@
 export type ThemeMode = "light" | "dark" | "system";
+export type FontSize = "small" | "medium" | "large";
+export type GridDensity = "comfortable" | "compact";
+
+export type SyncStatus = 'synced' | 'syncing' | 'error';
 
 export interface AppSettings {
   theme: ThemeMode;
-  fontSize?: "small" | "medium" | "large";
-  notifications?: boolean;
-  reducedMotion?: boolean;
-  gridDensity?: "comfortable" | "compact";
-  lineNumbers?: boolean;
-  syncEnabled?: boolean;
-  backupEnabled?: boolean;
+  fontSize?: FontSize;
+  gridDensity: GridDensity;
+  backupEnabled: boolean;
+  syncStatus?: SyncStatus;
 }
 
 export interface User {

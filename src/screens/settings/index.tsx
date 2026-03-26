@@ -4,8 +4,8 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { setTheme, updateSettings } from "@/store/slices/themeSlice";
-import { selectThemeSettings, selectIsAuthenticated, selectUser } from "@/store/selectors";
+import { setTheme, updateSettings } from "@/store/slices/settingsSlice";
+import { selectSettings, selectIsAuthenticated, selectUser } from "@/store/selectors";
 import { useTheme } from "@/hooks/useTheme";
 import { SettingGroup } from "@/components/settings/SettingGroup";
 import { SettingItem } from "@/components/settings/SettingItem";
@@ -19,9 +19,12 @@ type SelectionType = "theme" | "fontSize" | "gridDensity";
 export default function SettingsScreen() {
   const { colors } = useTheme();
   const dispatch = useAppDispatch();
-  const settings = useAppSelector(selectThemeSettings);
-  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const settings = useAppSelector(selectSettings);
+  console.log("settings", JSON.stringify(settings, null, 2));
+   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const user = useAppSelector(selectUser);
+  console.log("DEBUG: isAuthenticated:", isAuthenticated);
+  console.log("DEBUG: userEmail:", user?.email);
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const deleteSheetRef = useRef<BottomSheetModal>(null);
@@ -108,6 +111,18 @@ export default function SettingsScreen() {
     }
   };
 
+  const getSyncStatusDisplay = () => {
+    switch (settings.syncStatus) {
+      case 'syncing':
+        return 'Syncing...';
+      case 'error':
+        return 'Sync Failed';
+      case 'synced':
+      default:
+        return 'Synced';
+    }
+  };
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top"]}>
       <Header title={"Settings"} backgroundColor={colors.background} titleStyle={{ color: colors.primary, textAlign: "left" }} />
@@ -176,7 +191,7 @@ export default function SettingsScreen() {
             <SettingItem
               title="Sync Status"
               leftIcon="sync-outline"
-              value="Synced"
+              value={getSyncStatusDisplay()}
               colors={colors}
             />
           )}
