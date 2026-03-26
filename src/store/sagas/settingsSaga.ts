@@ -1,50 +1,43 @@
-import { call, put, takeEvery, select } from 'redux-saga/effects';
-import { getData, saveData } from '../../storage/asyncStorage';
-import { loadSettings } from '../slices/settingsSlice';
+import { call, put, select, takeLatest, delay } from 'redux-saga/effects';
+import { updateSettingsApi, getSettingsApi } from '../../services/api/services/settingsService';
+import { 
+  syncComplete, 
+  syncError, 
+  loadSettings,
+  updateSettings,
+  setTheme
+} from '../slices/settingsSlice';
 import { AppSettings } from '../../types';
+import { selectSettings } from '../selectors';
+import { showErrorToast } from '@/utilities/toast/message-toast';
 
-// Load settings from storage
-function* loadSettingsSaga() {
+function* syncSettingsSaga(action: any) {
   try {
-    const savedSettings: AppSettings = yield call(getData, 'appSettings');
-    
-    if (savedSettings) {
-      yield put(loadSettings(savedSettings));
-    } else {
-      // Initialize with default theme (system)
-      const initialSettings: AppSettings = {
-        theme: 'system',
-        fontSize: 'medium',
-        gridDensity: 'comfortable',
-        syncStatus: 'synced',
-        backupEnabled: true,
-      };
-      
-      yield put(loadSettings(initialSettings));
-      yield call(saveData, 'appSettings', initialSettings);
-    }
+    yield delay(1000);    
+    const currentSettings: AppSettings = yield select(selectSettings);
+    const { syncStatus, ...settingsToSync } = currentSettings as any;
+    const updatedSettings: AppSettings = yield call(updateSettingsApi, settingsToSync);
+    yield put(syncComplete(updatedSettings));
   } catch (error: any) {
-    // Handle error silently or log it
-    console.error('Failed to load settings:', error);
+    console.error('Failed to sync settings:', error);
+    yield put(syncError());
+    yield call(showErrorToast, { message: "Failed to sync settings with server" });
   }
 }
 
-// Save settings to storage
-function* saveSettingsSaga() {
+function* loadSettingsFromServerSaga() {
   try {
-    const state: { settings: AppSettings } = yield select();
-    yield call(saveData, 'appSettings', state.settings);
+    const remoteSettings: AppSettings = yield call(getSettingsApi);
+    yield put(loadSettings(remoteSettings));
   } catch (error: any) {
-    console.error('Failed to save settings:', error);
+    console.log('Failed to fetch remote settings, using local:', error);
   }
 }
 
-// Watcher sagas
 export function* watchLoadSettings() {
-  yield takeEvery('settings/loadSettingsAction', loadSettingsSaga);
+  yield takeLatest('settings/loadSettingsAction', loadSettingsFromServerSaga);
 }
 
 export function* watchSettingsChanges() {
-  yield takeEvery(['settings/setTheme', 'settings/updateSettings'], saveSettingsSaga);
+  yield takeLatest([setTheme.type, updateSettings.type], syncSettingsSaga);
 }
-

@@ -20,8 +20,11 @@ export default function SettingsScreen() {
   const { colors } = useTheme();
   const dispatch = useAppDispatch();
   const settings = useAppSelector(selectSettings);
-  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  console.log("settings", JSON.stringify(settings, null, 2));
+   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const user = useAppSelector(selectUser);
+  console.log("DEBUG: isAuthenticated:", isAuthenticated);
+  console.log("DEBUG: userEmail:", user?.email);
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
   const deleteSheetRef = useRef<BottomSheetModal>(null);
@@ -108,6 +111,18 @@ export default function SettingsScreen() {
     }
   };
 
+  const getSyncStatusDisplay = () => {
+    switch (settings.syncStatus) {
+      case 'syncing':
+        return 'Syncing...';
+      case 'error':
+        return 'Sync Failed';
+      case 'synced':
+      default:
+        return 'Synced';
+    }
+  };
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top"]}>
       <Header title={"Settings"} backgroundColor={colors.background} titleStyle={{ color: colors.primary, textAlign: "left" }} />
@@ -176,7 +191,7 @@ export default function SettingsScreen() {
             <SettingItem
               title="Sync Status"
               leftIcon="sync-outline"
-              value="Synced"
+              value={getSyncStatusDisplay()}
               colors={colors}
             />
           )}

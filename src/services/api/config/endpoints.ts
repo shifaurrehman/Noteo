@@ -24,6 +24,7 @@ export const API_ENDPOINTS = {
   categories: createResourceEndpoints("categories"),
   notes: createResourceEndpoints("notes"),
   users: createResourceEndpoints("users"),
+  settings: createEndpoint("/settings"),
 
   sync: {
     categories: createEndpoint("/sync/categories"),

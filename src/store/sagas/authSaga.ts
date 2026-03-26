@@ -6,6 +6,7 @@ import { tokenStorage } from "@/services/storage/tokenStorage";
 import { LoginResponse, RegisterResponse } from "@/types/auth/auth.types";
 import { User } from "@/types/user/user.types";
 import { setError, setLastSyncAt, setLoading, setUser } from "../slices/authSlice";
+import { loadSettingsAction } from "../slices/settingsSlice";
 import { getErrorMessage } from "@/utilities/toast/get-toast-message";
 import { router } from "expo-router";
 import { showErrorToast } from "@/utilities/toast/message-toast";
@@ -18,6 +19,9 @@ function* loginSaga(action: PayloadAction<{ email: string; password: string }>) 
     const { accessToken, refreshToken } = response;
     yield call(tokenStorage.saveTokens, accessToken, refreshToken);
     yield put(setUser(user));
+
+    // Fetch user settings after successful login
+    yield put(loadSettingsAction());
   } catch (error: any) {
     const message = getErrorMessage(error);
 
@@ -41,6 +45,9 @@ function* registerSaga(action: PayloadAction<{ email: string; name: string; pass
     if (response.accessToken && response.refreshToken && (response.user as any)?.isVerified !== false) {
       yield call(tokenStorage.saveTokens, response.accessToken, response.refreshToken);
       yield put(setUser(response.user));
+
+      // Fetch user settings after successful registration (auto-login)
+      yield put(loadSettingsAction());
     }
   } catch (error: any) {
     const message = getErrorMessage(error) || "Failed to register";
@@ -62,7 +69,7 @@ function* logoutSaga() {
 }
 
 // Sync user data from backend
-function* syncUserDataSaga(action: PayloadAction<string>) {
+function* syncUserDataSaga(_action: PayloadAction<string>) {
   try {
     const lastSyncAt = new Date().toISOString();
     yield put(setLastSyncAt(lastSyncAt));

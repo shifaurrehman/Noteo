@@ -12,10 +12,9 @@ import { watchNetworkRestore } from "./networkSaga";
 
 export function* rootSaga() {
   yield all([
-    // Settings sagas (load first)
+    // Settings sagas
     fork(watchLoadSettings),
     fork(watchSettingsChanges),
-
     // Categories sagas
     fork(watchLoadCategories),
     fork(watchAddCategory),

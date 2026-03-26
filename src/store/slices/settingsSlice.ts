@@ -20,10 +20,19 @@ const settingsSlice = createSlice({
       state.theme = state.theme === 'light' ? 'dark' : 'light';
     },
     updateSettings: (state, action: PayloadAction<Partial<AppSettings>>) => {
-      return { ...state, ...action.payload };
+      return { ...state, ...action.payload, syncStatus: 'syncing' };
+    },
+    syncComplete: (state, action: PayloadAction<AppSettings>) => {
+      return { ...action.payload, syncStatus: 'synced' };
+    },
+    syncError: (state) => {
+      state.syncStatus = 'error';
+    },
+    rollbackSettings: (state, action: PayloadAction<AppSettings>) => {
+      return { ...action.payload, syncStatus: 'error' };
     },
     loadSettings: (state, action: PayloadAction<AppSettings>) => {
-      return action.payload;
+      return { ...action.payload, syncStatus: 'synced' };
     },
     loadSettingsAction: () => {
       // This action is handled by saga - no state change needed
@@ -31,6 +40,6 @@ const settingsSlice = createSlice({
   },
 });
 
-export const { setTheme, toggleTheme, updateSettings, loadSettings, loadSettingsAction } = settingsSlice.actions;
+export const { setTheme, toggleTheme, updateSettings, syncComplete, syncError, rollbackSettings, loadSettings, loadSettingsAction } = settingsSlice.actions;
 export default settingsSlice.reducer;
 
