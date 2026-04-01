@@ -1,8 +1,8 @@
 import { IconPressable } from "@/components/button/IconPressable";
-import { AddCategoryModal } from "@/components/category/AddCategoryModal";
+import { AddCategoryBottomSheet } from "@/components/category/AddCategoryBottomSheet";
 import { CategoryCard } from "@/components/category/CategoryCard";
 import { Header } from "@/components/header/Header";
-import { ConfirmationModal } from "@/components/modal/ConfirmationModal";
+import { ConfirmationBottomSheet } from "@/components/modal/ConfirmationBottomSheet";
 import { SearchBar } from "@/components/searchbar/SearchBar";
 import { EmptyCategoryText } from "@/constants/categories";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -19,7 +19,7 @@ import responsive, { useResponsive } from "@/utilities/responsive";
 import { useNavigation } from "@/utilities/routes/Routes";
 import { showErrorToast } from "@/utilities/toast/message-toast";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState, useRef } from "react";
 import { FlatList, RefreshControl, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -34,6 +34,8 @@ const HomeScreen: React.FC = () => {
     const isLoading = useAppSelector(selectCategoriesLoading);
     console.log("Categories in home screen: ", JSON.stringify(categories, null, 2))
 
+    const bottomSheetRef = useRef<any>(null);
+    const deleteSheetRef = useRef<any>(null);
     const [editCategory, setEditCategory] = useState<Category | null>(null);
     const [searchText, setSearchText] = useState("");
     const [showAddModal, setShowAddModal] = useState(false);
@@ -42,6 +44,11 @@ const HomeScreen: React.FC = () => {
     const [activeMenuId, setActiveMenuId] = React.useState<string | null>(null);
     const [containerWidth, setContainerWidth] = useState(0);
     const styles = createHomeScreenStyles(colors);
+
+    // Log initial state
+    React.useEffect(() => {
+        console.log("=== HomeScreen mounted - initial showAddModal:", showAddModal, "initial editCategory:", editCategory);
+    }, []);
 
     const { columns: numColumns, cardWidth, gap, sidePadding } = responsive.getGridLayout(containerWidth, deviceType); 
     const cardHeight = cardWidth;
@@ -55,11 +62,25 @@ const HomeScreen: React.FC = () => {
         const newCategory: CategoryApi = CreateNewCategory({ name: name });
         dispatch(addCategory(newCategory));
         setShowAddModal(false);
+        bottomSheetRef.current?.dismiss();
     }, [dispatch, user?.id]);
 
     const handleEditCategory = useCallback((category: Category) => {
         setEditCategory(category);
-        setShowAddModal(true);
+        bottomSheetRef.current?.present();
+    }, []);
+
+    const handleShowAddModal = useCallback(() => {
+        console.log("=== handleShowAddModal called ===");
+        console.log("Before state update - showAddModal:", showAddModal, "editCategory:", editCategory);
+        setEditCategory(null);
+        setShowAddModal((prev) => {
+            console.log("setShowAddModal callback - previous value:", prev, "new value: true");
+            return true;
+        });
+        console.log("After state update call - setting showAddModal to true");
+        console.log("Bottom sheet ref:", bottomSheetRef);
+        bottomSheetRef.current?.present();
     }, []);
 
     const handleSaveEditedCategory = useCallback((newName: string) => {
@@ -80,12 +101,13 @@ const HomeScreen: React.FC = () => {
         );
         setEditCategory(null);
         setShowAddModal(false);
+        bottomSheetRef.current?.dismiss();
     }, [dispatch, editCategory]);
 
     const handleDeleteCategory = useCallback(
         (id: string) => {
             setCategoryToDelete(id);
-            setShowDeleteModal(true);
+            deleteSheetRef.current?.present();
         },
         []
     );
@@ -95,7 +117,7 @@ const HomeScreen: React.FC = () => {
             dispatch(deleteNotesByCategory(categoryToDelete));
             dispatch(deleteCategory(categoryToDelete));
             setCategoryToDelete(null);
-            setShowDeleteModal(false);
+            deleteSheetRef.current?.dismiss();
         }
     }, [dispatch, categoryToDelete]);
 
@@ -107,6 +129,7 @@ const HomeScreen: React.FC = () => {
                     updates: { isFavorite: !category.isFavorite },
                 })
             );
+            setActiveMenuId(null);
         },
         [dispatch]
     );
@@ -176,8 +199,8 @@ const HomeScreen: React.FC = () => {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-            <Header title={"Ai Note Taker"} titleStyle={{ color: colors.primary }} />
+        <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
+            <Header title={"Ai Note Taker"} backgroundColor={colors.background} titleStyle={{ color: colors.primary }} />
             <View style={styles.container}>
                 {/* header */}
 
@@ -218,7 +241,10 @@ const HomeScreen: React.FC = () => {
                 </View>
 
                 <IconPressable
-                    onPress={() => setShowAddModal(true)}
+                    onPress={() => {
+                        console.log("=== Floating button pressed");
+                        handleShowAddModal();
+                    }}
                     size={60}
                     haptic="heavy"
                     pressedColor={colors.primaryPressed}
@@ -227,24 +253,28 @@ const HomeScreen: React.FC = () => {
                 >
                     <Text style={commonStyles.floatingButtonText}>+</Text>
                 </IconPressable>
-                {/* Add Category Modal */}
-                {showAddModal && (
-                    <AddCategoryModal
-                        visible={showAddModal}
-                        onClose={handleCloseModal}
-                        onSave={editCategory ? handleSaveEditedCategory : handleAddCategory}
-                        initialValue={editCategory?.name}
-                    />
-                )}
 
-                {/* Delete Confirmation Modal */}
-                <ConfirmationModal
-                    visible={showDeleteModal}
-                    onClose={() => setShowDeleteModal(false)}
-                    onConfirm={confirmDeleteCategory}
-                    title="Delete Category?"
+                {/* Add/Edit Category Bottom Sheet */}
+                <AddCategoryBottomSheet
+                    ref={bottomSheetRef}
+                    visible={showAddModal}
+                    onClose={handleCloseModal}
+                    onSave={editCategory ? handleSaveEditedCategory : handleAddCategory}
+                    initialValue={editCategory?.name}
+                />
+                {/* Debug log for bottom sheet props */}
+                <Text style={{ position: 'absolute', top: 0, left: 0, color: 'red', fontSize: 10, zIndex: 9999, backgroundColor: 'yellow', padding: 4 }}>
+                    DEBUG: showAddModal={showAddModal}, editCategory={JSON.stringify(editCategory)}
+                </Text>
+
+                {/* Delete Confirmation Bottom Sheet */}
+                <ConfirmationBottomSheet
+                    ref={deleteSheetRef}
+                    title="Delete Category"
                     message="Are you sure you want to delete this category? All notes associated with it will also be permanently deleted."
-                    confirmText="Delete"
+                    confirmText="Permanently Delete"
+                    onConfirm={confirmDeleteCategory}
+                    colors={colors}
                     type="danger"
                 />
             </View>

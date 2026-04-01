@@ -1,4 +1,4 @@
-import { AddCategoryModal } from "@/components/category/AddCategoryModal";
+import { AddCategoryBottomSheet } from "@/components/category/AddCategoryBottomSheet";
 import { CategoryCard } from "@/components/category/CategoryCard";
 import { Header } from "@/components/header/Header";
 import { SearchBar } from "@/components/searchbar/SearchBar";
@@ -14,7 +14,7 @@ import { filterCategories } from "@/utilities/home/HomeScreenUtils";
 import responsive, { useResponsive } from "@/utilities/responsive";
 import { useNavigation } from "@/utilities/routes/Routes";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { FlatList, RefreshControl, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -27,6 +27,7 @@ const FavoriteScreen: React.FC = () => {
     const { colors } = useTheme();
     const isConnected = useAppSelector(selectIsConnected);
     const isLoading = useAppSelector(selectCategoriesLoading);
+    const bottomSheetRef = useRef<any>(null);
     const [editCategory, setEditCategory] = useState<Category | null>(null);
     const [searchText, setSearchText] = useState("");
     const [showAddModal, setShowAddModal] = useState(false);
@@ -60,6 +61,7 @@ const FavoriteScreen: React.FC = () => {
             );
             setEditCategory(null);
             setShowAddModal(false);
+            bottomSheetRef.current?.dismiss();
         },
         [dispatch, editCategory]
     );
@@ -68,7 +70,7 @@ const FavoriteScreen: React.FC = () => {
         (id: string) => {
             dispatch(deleteNotesByCategory(id)); // remove all notes of this category
             dispatch(deleteCategory(id));
-            setShowAddModal(false);
+            setActiveMenuId(null);
         },
         [dispatch]
     );
@@ -81,6 +83,7 @@ const FavoriteScreen: React.FC = () => {
                     updates: { isFavorite: !category.isFavorite },
                 })
             );
+            setActiveMenuId(null);
         },
         [dispatch]
     );
@@ -149,10 +152,10 @@ const FavoriteScreen: React.FC = () => {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
             <View style={styles.container}>
                 {/* header */}
-                <Header title={"Ai Note Taker"} titleStyle={{ color: colors.primary }} />
+                <Header title={"Ai Note Taker"} backgroundColor={colors.background} titleStyle={{ color: colors.primary }} />
 
                 {/* search bar */}
                 <SearchBar
@@ -190,15 +193,14 @@ const FavoriteScreen: React.FC = () => {
                     />
                 </View>
 
-                {/* Add Category Modal */}
-                {showAddModal && (
-                    <AddCategoryModal
-                        visible={showAddModal}
-                        onClose={handleCloseModal}
-                        onSave={handleSaveEditedCategory}
-                        initialValue={editCategory?.name}
-                    />
-                )}
+                {/* Add/Edit Category Bottom Sheet */}
+                <AddCategoryBottomSheet
+                    ref={bottomSheetRef}
+                    visible={showAddModal}
+                    onClose={handleCloseModal}
+                    onSave={handleSaveEditedCategory}
+                    initialValue={editCategory?.name}
+                />
             </View>
         </SafeAreaView>
     );

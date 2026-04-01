@@ -36,13 +36,10 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
     card: {
       backgroundColor: colors.cardBg,
       borderRadius: 16,
+      borderWidth: 0.5,
+      borderColor: colors.border,
       justifyContent: "center",
       alignItems: "center",
-      shadowColor: colors.shadow,
-      shadowOpacity: 0.08,
-      shadowRadius: 4,
-      shadowOffset: { width: 0, height: 2 },
-      elevation: 3,
       width: width,
       height: height,
       position: "relative",
@@ -91,7 +88,13 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
 
   return (
     <View style={{ position: "relative" }}>
-      <TouchableOpacity style={[styles.card, style]} onPress={onPress} activeOpacity={0.8}>
+      <TouchableOpacity
+        style={[styles.card, style]}
+        onPress={onPress}
+        activeOpacity={1}
+        onPressIn={() => {}}
+        onPressOut={() => {}}
+      >
         {/* 3-dot Menu Button */}
         <TouchableOpacity
           style={styles.menuIconContainer}
@@ -141,7 +144,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
                 onDelete();
               }}
             >
-              <Ionicons name="trash-outline" size={18} color="red" />
+              <Ionicons name="trash-outline" size={18} color={colors.danger} />
               <Text style={styles.menuText}>Delete</Text>
             </TouchableOpacity>
           )}

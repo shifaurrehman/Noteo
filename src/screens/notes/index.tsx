@@ -86,9 +86,9 @@ const NotesScreen = () => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
       <View style={styles.container}>
-        <Header title={categoryName} showSettings={false} onBack={() => router.back()} />
+        <Header title={categoryName} backgroundColor={colors.background} showSettings={false} onBack={() => router.back()} />
 
         <View style={styles.content}>
           <FlatList

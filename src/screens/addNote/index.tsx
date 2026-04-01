@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Dimensions, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -78,7 +78,7 @@ const AddNoteScreen = () => {
   const handleCancel = () => router.back();
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.surface }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top"]}>
       {/* HEADER */}
       <View style={styles.header}>
         <Text style={[styles.headerTitle, { color: colors.textMain }]}>{noteId ? 'Edit Note' : 'New Note'}</Text>
@@ -93,45 +93,56 @@ const AddNoteScreen = () => {
         </IconPressable>
       </View>
 
-      <TextInput
-        ref={titleInputRef}
-        value={title}
-        onChangeText={setTitle}
-        placeholder="Title..."
-        placeholderTextColor={colors.textSecondary}
-        style={[styles.input, { backgroundColor: colors.background, color: colors.textMain }]}
-        autoFocus={true}
-      />
-      <TextInput
-        ref={contentInputRef}
-        value={content}
-        onChangeText={setContent}
-        placeholder="Write your note here..."
-        placeholderTextColor={colors.textSecondary}
-        multiline
-        textAlignVertical="top"
-        textAlign="left"
-        style={[styles.textArea, { backgroundColor: colors.background, color: colors.textMain }]}
-      />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        style={styles.keyboardContainer}
+      >
+        <ScrollView
+          keyboardShouldPersistTaps="always"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          <TextInput
+            ref={titleInputRef}
+            value={title}
+            onChangeText={setTitle}
+            placeholder="Title..."
+            placeholderTextColor={colors.textSecondary}
+            style={[styles.input, { backgroundColor: colors.surface, color: colors.textMain, borderColor: colors.border }]}
+            autoFocus={true}
+          />
+          <TextInput
+            ref={contentInputRef}
+            value={content}
+            onChangeText={setContent}
+            placeholder="Write your note here..."
+            placeholderTextColor={colors.textSecondary}
+            multiline
+            textAlignVertical="top"
+            textAlign="left"
+            style={[styles.textArea, { backgroundColor: colors.surface, color: colors.textMain, borderColor: colors.border }]}
+          />
 
-      <View style={styles.footer}>
-        <AppButton
-          title="Cancel"
-          variant="secondary"
-          onPress={handleCancel}
-          haptic="medium"
-          colors={colors}
-        />
+          <View style={styles.footer}>
+            <AppButton
+              title="Cancel"
+              variant="secondary"
+              onPress={handleCancel}
+              haptic="medium"
+              colors={colors}
+            />
 
-        <AppButton
-          title={isEditMode ? "Update" : "Save"}
-          variant="primary"
-          onPress={isEditMode ? handleUpdateNote : handleCreateNote}
-          haptic="medium"
-          colors={colors}
-        />
-      </View>
-
+            <AppButton
+              title={isEditMode ? "Update" : "Save"}
+              variant="primary"
+              onPress={isEditMode ? handleUpdateNote : handleCreateNote}
+              haptic="medium"
+              colors={colors}
+            />
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -154,21 +165,30 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700'
   },
+  keyboardContainer: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 20,
+  },
   input: {
     padding: 14,
     borderRadius: 10,
     fontSize: 17,
-    marginBottom: 16
+    marginBottom: 16,
+    borderWidth: 1,
   },
   textArea: {
     height: height / 2,
     padding: 14,
     borderRadius: 10,
-    fontSize: 16
+    fontSize: 16,
+    borderWidth: 1,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 16,
+    marginTop: 10,
   },
 });
