@@ -60,7 +60,7 @@ export const AddCategoryBottomSheet = forwardRef<BottomSheetModal, Props>(
       } else {
         showInfoToast({ message: "Category name is required" });
       }
-    }, [name, onSave, handleClose, ref]);
+    }, [name, onSave, handleClose]);
 
     useEffect(() => {
       const keyboardHideSubscription = Keyboard.addListener('keyboardDidHide', () => {

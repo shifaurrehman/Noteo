@@ -39,16 +39,17 @@ const HomeScreen: React.FC = () => {
     const [editCategory, setEditCategory] = useState<Category | null>(null);
     const [searchText, setSearchText] = useState("");
     const [showAddModal, setShowAddModal] = useState(false);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
     const [activeMenuId, setActiveMenuId] = React.useState<string | null>(null);
     const [containerWidth, setContainerWidth] = useState(0);
     const styles = createHomeScreenStyles(colors);
 
-    // Log initial state
+    // Log initial state - only run on mount
+    /* eslint-disable react-hooks/exhaustive-deps */
     React.useEffect(() => {
         console.log("=== HomeScreen mounted - initial showAddModal:", showAddModal, "initial editCategory:", editCategory);
     }, []);
+    /* eslint-enable react-hooks/exhaustive-deps */
 
     const { columns: numColumns, cardWidth, gap, sidePadding } = responsive.getGridLayout(containerWidth, deviceType); 
     const cardHeight = cardWidth;
@@ -81,6 +82,7 @@ const HomeScreen: React.FC = () => {
         console.log("After state update call - setting showAddModal to true");
         console.log("Bottom sheet ref:", bottomSheetRef);
         bottomSheetRef.current?.present();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleSaveEditedCategory = useCallback((newName: string) => {
@@ -262,10 +264,6 @@ const HomeScreen: React.FC = () => {
                     onSave={editCategory ? handleSaveEditedCategory : handleAddCategory}
                     initialValue={editCategory?.name}
                 />
-                {/* Debug log for bottom sheet props */}
-                <Text style={{ position: 'absolute', top: 0, left: 0, color: 'red', fontSize: 10, zIndex: 9999, backgroundColor: 'yellow', padding: 4 }}>
-                    DEBUG: showAddModal={showAddModal}, editCategory={JSON.stringify(editCategory)}
-                </Text>
 
                 {/* Delete Confirmation Bottom Sheet */}
                 <ConfirmationBottomSheet
