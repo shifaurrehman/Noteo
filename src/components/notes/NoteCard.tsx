@@ -60,7 +60,7 @@ export const NoteCard: React.FC<NoteCardProps> = memo(({ note, onPress, onDelete
           {note.content || 'No additional text...'}
         </Text>
 
-        <View style={styles.footer}>
+        <View style={[styles.footer, { borderTopColor: colors.border }]}>
           <View style={styles.metadata}>
             <Ionicons name="time-outline" size={12} color={colors.textSecondary} style={styles.metaIcon} />
             <Text style={[styles.date, { color: colors.textSecondary, fontSize: typography.caption }]}>
@@ -144,7 +144,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: 'rgba(150,150,150,0.08)',
     paddingTop: 5,
   },
   footerActions: {

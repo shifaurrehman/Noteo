@@ -36,7 +36,6 @@ export const Header: React.FC<HeaderProps> = ({
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      backgroundColor: backgroundColor || colors.headerBg,
       borderBottomWidth: 1,
       borderBottomColor: borderColor || colors.border,
     },
@@ -53,7 +52,7 @@ export const Header: React.FC<HeaderProps> = ({
   });
 
   return (
-    <View style={[styles.container, containerStyle]}>
+    <View style={[styles.container, { backgroundColor: backgroundColor || colors.headerBg }, containerStyle]}>
       {/* Left Icon */}
       {onBack && (
         <TouchableOpacity style={styles.icon} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} onPress={onBack}>
