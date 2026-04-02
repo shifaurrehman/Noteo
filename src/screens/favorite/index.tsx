@@ -51,12 +51,12 @@ const FavoriteScreen: React.FC = () => {
     }, []);
 
     const handleSaveEditedCategory = useCallback(
-        (newName: string) => {
+        (category: { name: string; color: string; icon: string }) => {
             if (!editCategory) return;
             dispatch(
                 updateCategory({
                     id: editCategory.id,
-                    updates: { name: newName },
+                    updates: { name: category.name },
                 })
             );
             setEditCategory(null);

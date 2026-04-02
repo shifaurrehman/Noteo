@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useTheme } from "@/hooks/useTheme";
 import { Category } from "@/types/category/category.types";
 
@@ -30,60 +30,83 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
   style,
 }) => {
   const { colors } = useTheme();
-
+  const isDarkMode = colors.background === "#101122";
+  
+  const categoryColor = category.color || colors.primary;
+  const categoryIcon = category.icon || "folder";
 
   const styles = StyleSheet.create({
     card: {
       backgroundColor: colors.cardBg,
-      borderRadius: 16,
-      borderWidth: 0.5,
-      borderColor: colors.border,
-      justifyContent: "center",
-      alignItems: "center",
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: isDarkMode ? colors.border + "33" : colors.border + "80",
+      padding: 16,
       width: width,
       height: height,
       position: "relative",
       overflow: "visible",
+      justifyContent: "space-between",
+    },
+    iconContainer: {
+      width: 44,
+      height: 44,
+      borderRadius: 14,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: categoryColor + "15",
     },
     text: {
-      fontSize: 16,
+      fontSize: 15,
       fontWeight: "600",
-      textAlign: "center",
       color: colors.textMain,
-      paddingHorizontal: 12,
+      marginTop: 8,
     },
     menuIconContainer: {
       position: "absolute",
-      top: 8,
-      right: 8,
-      padding: 6,
+      top: 12,
+      right: 12,
+      padding: 4,
       zIndex: 20,
     },
     popupContainer: {
       position: "absolute",
-      top: 35,
-      right: 40,
-      backgroundColor: colors.cardBg,
-      paddingVertical: 4,
-      borderRadius: 10,
-      elevation: 5,
+      top: 40,
+      right: 12,
+      backgroundColor: isDarkMode ? colors.surface : "#FFFFFF",
+      paddingVertical: 6,
+      borderRadius: 12,
+      elevation: 8,
       shadowColor: "#000",
       shadowOpacity: 0.15,
-      shadowRadius: 6,
+      shadowRadius: 10,
+      shadowOffset: { width: 0, height: 4 },
       zIndex: 999,
-      width: 100,
+      width: 120,
+      borderWidth: 1,
+      borderColor: colors.border + "33",
     },
     menuItem: {
-      paddingVertical: 4,
-      paddingHorizontal: 14,
+      paddingVertical: 8,
+      paddingHorizontal: 12,
       flexDirection: "row",
       alignItems: "center",
-      gap: 8,
+      gap: 10,
     },
     menuText: {
       color: colors.textMain,
       fontSize: 14,
+      fontWeight: "500",
     },
+    footer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    noteCount: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    }
   });
 
   return (
@@ -91,23 +114,32 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
       <TouchableOpacity
         style={[styles.card, style]}
         onPress={onPress}
-        activeOpacity={1}
-        onPressIn={() => {}}
-        onPressOut={() => {}}
+        activeOpacity={0.7}
       >
-        {/* 3-dot Menu Button */}
-        <TouchableOpacity
-          style={styles.menuIconContainer}
-          onPress={onToggleMenu}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-        >
-          <Ionicons name="ellipsis-vertical" size={20} color={colors.textMain} />
-        </TouchableOpacity>
+        <View>
+          <View style={styles.iconContainer}>
+            <MaterialIcons name={categoryIcon as any} size={24} color={categoryColor} />
+          </View>
+          
+          {/* 3-dot Menu Button */}
+          <TouchableOpacity
+            style={styles.menuIconContainer}
+            onPress={onToggleMenu}
+            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+          >
+            <Ionicons name="ellipsis-vertical" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+        </View>
 
-        <Text style={styles.text}>{category.name}</Text>
+        <View style={styles.footer}>
+          <Text style={styles.text} numberOfLines={1}>{category.name}</Text>
+          {category.isFavorite && (
+            <Ionicons name="star" size={14} color={colors.primary} />
+          )}
+        </View>
       </TouchableOpacity>
 
-      {/* Popup Menu — Now Attached to Card Itself */}
+      {/* Popup Menu */}
       {isMenuVisible && (
         <View style={styles.popupContainer}>
           {onEdit && (
@@ -131,10 +163,16 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
                 onFavorite();
               }}
             >
-              <Ionicons name={category.isFavorite ? "star" : "star-outline"} size={18} color={category.isFavorite ? colors.primary : colors.textMain} />
+              <Ionicons 
+                name={category.isFavorite ? "star" : "star-outline"} 
+                size={18} 
+                color={category.isFavorite ? colors.primary : colors.textMain} 
+              />
               <Text style={styles.menuText}>Favorite</Text>
             </TouchableOpacity>
           )}
+
+          <View style={{ height: 1, backgroundColor: colors.border + "33", marginVertical: 4 }} />
 
           {onDelete && (
             <TouchableOpacity
@@ -145,7 +183,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
               }}
             >
               <Ionicons name="trash-outline" size={18} color={colors.danger} />
-              <Text style={styles.menuText}>Delete</Text>
+              <Text style={[styles.menuText, { color: colors.danger }]}>Delete</Text>
             </TouchableOpacity>
           )}
         </View>

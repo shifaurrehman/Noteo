@@ -6,7 +6,7 @@ import { ConfirmationBottomSheet } from "@/components/modal/ConfirmationBottomSh
 import { SearchBar } from "@/components/searchbar/SearchBar";
 import { EmptyCategoryText } from "@/constants/categories";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectCategories, selectCategoriesLoading, selectIsConnected, selectUser } from "@/store/selectors";
+import { selectCategories, selectCategoriesLoading, selectIsConnected } from "@/store/selectors";
 import { useTheme } from "@/hooks/useTheme";
 import { addCategory, deleteCategory, fetchCategories, updateCategory } from "@/store/slices/categoriesSlice";
 import { deleteNotesByCategory } from "@/store/slices/notesSlice";
@@ -17,7 +17,8 @@ import { CreateNewCategory } from "@/utilities/category/CategoryUtils";
 import { filterCategories } from "@/utilities/home/HomeScreenUtils";
 import responsive, { useResponsive } from "@/utilities/responsive";
 import { useNavigation } from "@/utilities/routes/Routes";
-import { showErrorToast } from "@/utilities/toast/message-toast";
+import { showErrorToast, showSuccessToast } from "@/utilities/toast/message-toast";
+
 import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useMemo, useState, useRef } from "react";
 import { FlatList, RefreshControl, Text, View } from "react-native";
@@ -28,7 +29,6 @@ const HomeScreen: React.FC = () => {
     const { deviceType } = useResponsive();
     const dispatch = useAppDispatch();
     const categories = useAppSelector(selectCategories);
-    const user = useAppSelector(selectUser);
     const { colors } = useTheme();
     const isConnected = useAppSelector(selectIsConnected);
     const isLoading = useAppSelector(selectCategoriesLoading);
@@ -58,13 +58,15 @@ const HomeScreen: React.FC = () => {
         return filterCategories(categories, { searchText });
     }, [categories, searchText]);
 
-    const handleAddCategory = useCallback((name: string) => {
-        if (!user?.id) return;
-        const newCategory: CategoryApi = CreateNewCategory({ name: name });
+    const handleAddCategory = useCallback(({ name, color, icon }: { name: string; color: string; icon: string }) => {
+        const newCategory: CategoryApi = CreateNewCategory({ name, color, icon });
         dispatch(addCategory(newCategory));
+        showSuccessToast({ message: "Category created successfully" });
         setShowAddModal(false);
         bottomSheetRef.current?.dismiss();
-    }, [dispatch, user?.id]);
+    }, [dispatch]);
+
+
 
     const handleEditCategory = useCallback((category: Category) => {
         setEditCategory(category);
@@ -85,26 +87,36 @@ const HomeScreen: React.FC = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const handleSaveEditedCategory = useCallback((newName: string) => {
-        if (editCategory?.name === newName) {
+    const handleSaveEditedCategory = useCallback(({ name, color, icon }: { name: string; color: string; icon: string }) => {
+        if (!editCategory) return;
+        
+        const isUnchanged = editCategory.name === name && 
+                           editCategory.color === color && 
+                           editCategory.icon === icon;
+
+        if (isUnchanged) {
             showErrorToast({ message: "Nothing to update!" })
             return;
         }
-        console.log("New name in edit category...", newName);
-        if (!editCategory) return;
+
         dispatch(
             updateCategory({
                 id: editCategory.id,
                 updates: {
-                    name: newName,
+                    name,
+                    color,
+                    icon,
                     updatedAt: new Date().toISOString(),
                 },
             })
         );
+        showSuccessToast({ message: "Category updated successfully" });
         setEditCategory(null);
         setShowAddModal(false);
         bottomSheetRef.current?.dismiss();
     }, [dispatch, editCategory]);
+
+
 
     const handleDeleteCategory = useCallback(
         (id: string) => {
@@ -256,13 +268,14 @@ const HomeScreen: React.FC = () => {
                     <Text style={commonStyles.floatingButtonText}>+</Text>
                 </IconPressable>
 
-                {/* Add/Edit Category Bottom Sheet */}
                 <AddCategoryBottomSheet
                     ref={bottomSheetRef}
                     visible={showAddModal}
                     onClose={handleCloseModal}
                     onSave={editCategory ? handleSaveEditedCategory : handleAddCategory}
                     initialValue={editCategory?.name}
+                    initialColor={editCategory?.color}
+                    initialIcon={editCategory?.icon}
                 />
 
                 {/* Delete Confirmation Bottom Sheet */}
