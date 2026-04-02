@@ -21,7 +21,7 @@ export const WebSidebar: React.FC<SidebarProps> = ({
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.appName}>Ai Note Taker</Text>
+                <Text style={styles.appName}>Noteo</Text>
             </View>
 
             <Text style={styles.sectionTitle}>Categories</Text>

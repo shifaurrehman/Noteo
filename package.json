@@ -1,5 +1,5 @@
 {
-  "name": "ai-note-taker",
+  "name": "noteo",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {

@@ -60,7 +60,7 @@ export default function SplashScreen() {
         />
       </Animated.View>
 
-      <Text style={[styles.appName, { color: colors.primary }]}>Simple Note Taker</Text>
+      <Text style={[styles.appName, { color: colors.primary }]}>Noteo</Text>
       <Text style={[styles.tagline, { color: "#ccc" }]}>Your smart notes companion</Text>
     </LinearGradient>
   );

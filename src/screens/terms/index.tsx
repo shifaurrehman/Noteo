@@ -23,7 +23,7 @@ export default function TermsOfServiceScreen() {
                 <View style={styles.section}>
                     <Text style={[styles.sectionTitle, { color: colors.textMain, fontSize: typography.h3 }]}>1. Acceptance of Terms</Text>
                     <Text style={[styles.text, { color: colors.textSecondary, fontSize: typography.body }]}>
-                        By accessing and using AI Note Taker, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the application.
+                        By accessing and using Noteo, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the application.
                     </Text>
                 </View>
 
@@ -44,14 +44,14 @@ export default function TermsOfServiceScreen() {
                 <View style={styles.section}>
                     <Text style={[styles.sectionTitle, { color: colors.textMain, fontSize: typography.h3 }]}>4. Intellectual Property</Text>
                     <Text style={[styles.text, { color: colors.textSecondary, fontSize: typography.body }]}>
-                        The service and its original content, features, and functionality are and will remain the exclusive property of AI Note Taker and its licensors.
+                        The service and its original content, features, and functionality are and will remain the exclusive property of Noteo and its licensors.
                     </Text>
                 </View>
 
                 <View style={styles.section}>
                     <Text style={[styles.sectionTitle, { color: colors.textMain, fontSize: typography.h3 }]}>5. Limitation of Liability</Text>
                     <Text style={[styles.text, { color: colors.textSecondary, fontSize: typography.body }]}>
-                        In no event shall AI Note Taker be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses.
+                        In no event shall Noteo be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses.
                     </Text>
                 </View>
 
