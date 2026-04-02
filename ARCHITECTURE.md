@@ -1,4 +1,4 @@
-# AI Note Taker - Architecture Documentation
+# Noteo - Architecture Documentation
 
 ## Overview
 This note-taking app is built with scalability and maintainability in mind, using React Native with Expo and TypeScript.

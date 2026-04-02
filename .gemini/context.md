@@ -1,4 +1,4 @@
-# Project Context: AI Note Taker
+# Project Context: Noteo
 
 ## Features
 - **Notes**: CRUD operations on text-based notes.

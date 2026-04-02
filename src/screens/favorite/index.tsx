@@ -155,7 +155,7 @@ const FavoriteScreen: React.FC = () => {
         <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
             <View style={styles.container}>
                 {/* header */}
-                <Header title={"Ai Note Taker"} backgroundColor={colors.background} titleStyle={{ color: colors.primary }} />
+                <Header title={"Noteo"} backgroundColor={colors.background} titleStyle={{ color: colors.primary }} />
 
                 {/* search bar */}
                 <SearchBar
