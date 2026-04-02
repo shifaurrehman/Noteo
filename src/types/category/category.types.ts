@@ -16,6 +16,8 @@ export interface Category {
   syncStatus: SyncStatus;
   version: number;
   isLocal?: boolean;
+  color?: string;
+  icon?: string;
 }
 
 export type CategoryApi = {
@@ -27,4 +29,7 @@ export type CategoryApi = {
   isDeleted: boolean;
   version: number;
   isLocal?: boolean;
+  color?: string;
+  icon?: string;
 };
+
