@@ -40,11 +40,11 @@ export const useNavigation = () => {
   };
 
   const redirectLogin = () => {
-    router.replace("/login");
+    router.replace("/(auth)/login");
   };
 
   const redirectHome = () => {
-    router.replace("/home");
+    router.replace("/(app)/(tabs)/home");
   };
 
   const openSettings = () => {
