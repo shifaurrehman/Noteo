@@ -27,7 +27,7 @@ function* loginSaga(action: PayloadAction<{ email: string; password: string }>) 
 
     if (message.toLowerCase().includes("not verified") || message.toLowerCase().includes("unverified")) {
       showErrorToast({ message: "Email not verified. Redirecting to verification..." });
-      router.push(`/auth/verify-email?email=${encodeURIComponent(action.payload.email)}` as any);
+      router.push(`/(auth)/verify-email?email=${encodeURIComponent(action.payload.email)}` as any);
     } else {
       showErrorToast({ message: message });
     }

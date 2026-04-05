@@ -36,7 +36,7 @@ export default function AppLayout() {
     }, []);
 
     if (!isAuthenticated) {
-        return <Redirect href="/login" />;
+        return <Redirect href="/(auth)/login" />;
     }
 
     return (
