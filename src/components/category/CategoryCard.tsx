@@ -14,6 +14,7 @@ interface CategoryCardProps {
   onToggleMenu?: () => void;
   width: number;
   height: number;
+  noteCount?: number;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -27,6 +28,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
   onToggleMenu,
   width,
   height,
+  noteCount,
   style,
 }) => {
   const { colors } = useTheme();
@@ -98,15 +100,24 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
       fontSize: 14,
       fontWeight: "500",
     },
-    footer: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
+    noteTitle: {
+      fontSize: 17,
+      fontWeight: "700",
+      color: colors.textMain,
+      marginTop: "auto",
+      marginBottom: 6,
     },
     noteCount: {
-      fontSize: 12,
+      fontSize: 13,
+      fontWeight: "500",
       color: colors.textSecondary,
-    }
+    },
+    topRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+      width: "100%",
+    },
   });
 
   return (
@@ -114,28 +125,29 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
       <TouchableOpacity
         style={[styles.card, style]}
         onPress={onPress}
+        onLongPress={onToggleMenu}
         activeOpacity={0.7}
       >
-        <View>
+        <View style={styles.topRow}>
           <View style={styles.iconContainer}>
             <MaterialIcons name={categoryIcon as any} size={24} color={categoryColor} />
           </View>
           
-          {/* 3-dot Menu Button */}
-          <TouchableOpacity
-            style={styles.menuIconContainer}
-            onPress={onToggleMenu}
+          <TouchableOpacity 
+            onPress={onFavorite}
             hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
           >
-            <Ionicons name="ellipsis-vertical" size={20} color={colors.textSecondary} />
+            <Ionicons 
+              name="heart" 
+              size={18} 
+              color={category.isFavorite ? "#ff3b30" : colors.border} 
+            />
           </TouchableOpacity>
         </View>
 
-        <View style={styles.footer}>
-          <Text style={styles.text} numberOfLines={1}>{category.name}</Text>
-          {category.isFavorite && (
-            <Ionicons name="star" size={14} color={colors.primary} />
-          )}
+        <View>
+          <Text style={styles.noteTitle} numberOfLines={1}>{category.name}</Text>
+          <Text style={styles.noteCount}>{noteCount || 0} notes</Text>
         </View>
       </TouchableOpacity>
 
