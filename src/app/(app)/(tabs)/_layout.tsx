@@ -3,12 +3,12 @@ import { useTheme } from "@/hooks/useTheme";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs } from "expo-router";
 
-const HomeIcon = ({ color }: { color: string }) => (
-  <FontAwesome size={28} name="home" color={color} />
+const CategoriesIcon = ({ color }: { color: string }) => (
+  <FontAwesome size={28} name="folder" color={color} />
 );
 
-const HeartIcon = ({ color }: { color: string }) => (
-  <FontAwesome size={28} name="heart" color={color} />
+const NotesIcon = ({ color }: { color: string }) => (
+  <FontAwesome size={28} name="file-text" color={color} />
 );
 
 const SettingsIcon = ({ color }: { color: string }) => (
@@ -31,16 +31,16 @@ export default function TabLayout() {
         <Tabs.Screen
           name="home"
           options={{
-            title: "Home",
-            tabBarIcon: HomeIcon,
+            title: "Categories",
+            tabBarIcon: CategoriesIcon,
           }}
         />
 
         <Tabs.Screen
           name="favorites"
           options={{
-            title: "Favorites",
-            tabBarIcon: HeartIcon,
+            title: "Notes",
+            tabBarIcon: NotesIcon,
           }}
         />
 
