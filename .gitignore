@@ -45,3 +45,6 @@ app-example
 
 # gemini
 .gemini/
+
+# env
+.env

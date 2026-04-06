@@ -6,7 +6,7 @@ import { ConfirmationBottomSheet } from "@/components/modal/ConfirmationBottomSh
 import { SearchBar } from "@/components/searchbar/SearchBar";
 import { EmptyCategoryText } from "@/constants/categories";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectCategories, selectCategoriesLoading, selectIsConnected } from "@/store/selectors";
+import { selectCategories, selectCategoriesLoading, selectIsConnected, selectNotes } from "@/store/selectors";
 import { useTheme } from "@/hooks/useTheme";
 import { addCategory, deleteCategory, fetchCategories, updateCategory } from "@/store/slices/categoriesSlice";
 import { deleteNotesByCategory } from "@/store/slices/notesSlice";
@@ -29,6 +29,7 @@ const HomeScreen: React.FC = () => {
     const { deviceType } = useResponsive();
     const dispatch = useAppDispatch();
     const categories = useAppSelector(selectCategories);
+    const notes = useAppSelector(selectNotes);
     const { colors } = useTheme();
     const isConnected = useAppSelector(selectIsConnected);
     const isLoading = useAppSelector(selectCategoriesLoading);
@@ -181,6 +182,8 @@ const HomeScreen: React.FC = () => {
 
     const renderItem = ({ item, index }: { item: Category; index: number }) => {
         const isLastInRow = (index + 1) % numColumns === 0;
+        const noteCount = notes.filter((n) => n.categoryId === item.id && !n.isDeleted).length;
+
         return (
             <CategoryCard
                 category={item}
@@ -195,6 +198,7 @@ const HomeScreen: React.FC = () => {
                 onToggleMenu={() => setActiveMenuId(activeMenuId === item.id ? null : item.id)}
                 width={cardWidth}
                 height={cardHeight}
+                noteCount={noteCount}
                 style={{
                     marginRight: isLastInRow ? 0 : gap,
                     marginBottom: gap,
