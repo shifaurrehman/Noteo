@@ -226,7 +226,6 @@ const HomeScreen: React.FC = () => {
                 <SearchBar
                     value={searchText}
                     onChangeText={setSearchText}
-                    onClear={() => setSearchText("")}
                     placeholder={"Search categories..."}
                     colors={{
                         surface: colors.surface,
