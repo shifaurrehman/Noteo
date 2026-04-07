@@ -78,7 +78,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = memo(({
                     )}
 
                     <TouchableWithoutFeedback>
-                        <View style={[styles.modalContainer, { backgroundColor: colors.cardBg, shadowColor: colors.shadow }]}>
+                        <View style={[styles.modalContainer, { backgroundColor: colors.background, shadowColor: colors.shadow }]}>
                             {/* Icon Header */}
                             <View style={[styles.iconContainer, { backgroundColor: getIconColor() + "15" }]}>
                                 <Ionicons name={getIconName()} size={32} color={getIconColor()} />

@@ -7,7 +7,6 @@ import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 interface SearchBarProps {
     value: string;
     onChangeText: (text: string) => void;
-    onClear?: () => void;
     placeholder?: string;
     colors: {
         surface: string;
@@ -20,93 +19,47 @@ interface SearchBarProps {
 export const SearchBar: React.FC<SearchBarProps> = ({
     value,
     onChangeText,
-    onClear,
     placeholder = 'Search...',
     colors,
 }) => {
     const [isFocused, setIsFocused] = useState(false);
-    const { width } = useResponsive();
-    const deviceType = useDeviceType();
-
-    // Dynamically calculate the dimensions based on the device type and screen size
-    const { mainHeight, borderRadius, fontSize, iconSize } = useMemo(() => {
-        // Base heights depending on device
-        const heightMapping = {
-            mobile: Math.max(48, responsive.height(52)), // between 48 and scale
-            tablet: 56,
-            desktop: 60,
-            web: 60,
-        };
-
-        const calculatedHeight = heightMapping[deviceType] || 48;
-
-        return {
-            mainHeight: calculatedHeight,
-            borderRadius: calculatedHeight / 2,
-            fontSize: responsive.fontSizeAdvanced(16, width),
-            iconSize: responsive.iconSize(24, width),
-        };
-    }, [deviceType, width]);
 
     return (
-        <View style={[styles.container, { height: mainHeight + responsive.padding(20) }]}>
-            <View
-                style={[
-                    styles.inputWrapper,
-                    {
-                        backgroundColor: colors.surface,
-                        borderColor: isFocused ? colors.primary : colors.border,
-                        height: mainHeight,
-                        borderRadius: borderRadius,
-                    }
-                ]}
-            >
+            <View style={[styles.searchContainer, { backgroundColor: colors.surface, borderColor: isFocused ? colors.primary : colors.border + "60", }]}>
+                <Ionicons name="search-outline" size={18} color={colors.textSecondary} />
                 <TextInput
+                    style={[styles.searchInput, { color: colors.textMain }]}
                     placeholder={placeholder}
                     placeholderTextColor={colors.textSecondary}
                     value={value}
                     onChangeText={onChangeText}
-                    style={[styles.input, { color: colors.textMain, fontSize }]}
+                    returnKeyType="search"
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
                 />
-
                 {value.length > 0 && (
-                    <TouchableOpacity
-                        style={styles.clearButton}
-                        onPress={onClear ? onClear : () => onChangeText('')}
-                    >
-                        <Ionicons name="close-circle" size={iconSize} color={colors.textSecondary} />
+                    <TouchableOpacity onPress={() => onChangeText("")} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                        <Ionicons name="close-circle" size={18} color={colors.textSecondary} />
                     </TouchableOpacity>
                 )}
             </View>
-        </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        paddingHorizontal: responsive.padding(16),
-        alignSelf: "center",
-        width: "100%",
-        maxWidth: 1200,
-        justifyContent: "center",
+    searchInput: {
+        flex: 1,
+        fontSize: 15,
+        padding: 0,
     },
-    inputWrapper: {
-        position: 'relative',
+    searchContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginHorizontal: 16,
+        paddingHorizontal: 14,
+        paddingVertical: 10,
+        borderRadius: 999,
         borderWidth: 1,
-        width: "100%",
-        justifyContent: "center",
-    },
-    input: {
-        paddingHorizontal: responsive.padding(20),
-        height: "100%",
-    },
-    clearButton: {
-        position: 'absolute',
-        right: responsive.padding(12),
-        height: "100%",
-        justifyContent: "center",
-        paddingHorizontal: responsive.padding(4),
+        gap: 10,
     },
 });
