@@ -17,7 +17,6 @@ const AddNoteScreen = () => {
   const { categoryId, noteId } = useLocalSearchParams<{ categoryId: string; noteId?: string }>();
   const dispatch = useDispatch();
   const { colors } = useTheme();
-  const user = useAppSelector((state) => state.auth.user);
   const note = useAppSelector(state => noteId ? selectNoteById(state, noteId) : undefined);
   const isEditMode = Boolean(noteId);
 
@@ -54,13 +53,13 @@ const AddNoteScreen = () => {
   };
 
   const handleCreateNote = () => {
-    if (!user || !validateNote()) return;
+    if (!validateNote()) return;
     const newNote = createNewNote({title, content, categoryId});
     dispatch(addNote(newNote));
     router.back();
   };
   const handleUpdateNote = () => {
-    if (!user || !noteId || !validateNote()) return;
+    if (!noteId || !validateNote()) return;
     if (!hasChanges) {
       showValidationToast("No changes detected");
       return;

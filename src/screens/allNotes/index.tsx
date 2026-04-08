@@ -19,6 +19,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@/utilities/routes/Routes";
 import { SearchBar } from "@/components/searchbar/SearchBar";
+import { Header } from "@/components/header/Header";
 
 type FilterTab = "all" | "recent" | "pinned" | "drafts";
 
@@ -146,6 +147,7 @@ const AllNotesScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
+      <Header title={"Notes"} backgroundColor={colors.background} titleStyle={{ color: colors.primary, textAlign: "left" }} />
       <View style={styles.container}>
 
         {/* search bar */}
