@@ -218,7 +218,7 @@ const HomeScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
-            <Header title={"Noteo"} backgroundColor={colors.background} titleStyle={{ color: colors.primary }} />
+            <Header title={"Noteo"} backgroundColor={colors.background} titleStyle={{ color: colors.primary, textAlign: "left" }} />
             <View style={styles.container}>
                 {/* header */}
 
