@@ -1,17 +1,126 @@
 import AuthInput from "@/components/auth/AuthEmail";
-import GradientButton from "@/components/auth/CustomButton";
+import PrimaryButton from "@/components/button/PrimaryButton";
 import { useAuth } from "@/hooks/useAuth";
 import { validateEmail, validateName, validatePassword, } from "@/utilities/auth";
 import { useNavigation } from "@/utilities/routes/Routes";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View, } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useTheme } from "@/hooks/useTheme";
+import type { ThemeColors } from "@/theme/colors";
 
+const createRegisterStyles = (colors: ThemeColors) => {
+  return {
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollContainer: {
+      flexGrow: 1,
+      paddingHorizontal: 24,
+      paddingTop: Platform.OS === "ios" ? 60 : 40,
+      paddingBottom: 40,
+    },
+    header: {
+      alignItems: "center" as const,
+      marginBottom: 30,
+    },
+    backButton: {
+      position: "absolute" as const,
+      left: 0,
+      top: 0,
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: colors.primary + "20",
+      justifyContent: "center" as const,
+      alignItems: "center" as const,
+    },
+    iconContainer: {
+      marginBottom: 20,
+    },
+    iconWrapper: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      justifyContent: "center" as const,
+      alignItems: "center" as const,
+      backgroundColor: colors.primary + "20",
+      ...Platform.select({
+        ios: {
+          shadowColor: colors.primary,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.2,
+          shadowRadius: 8,
+        },
+        android: {
+          elevation: 4,
+        },
+      }),
+    },
+    title: {
+      fontSize: 32,
+      fontWeight: "700" as const,
+      color: colors.textMain,
+      marginBottom: 8,
+      textAlign: "center" as const,
+    },
+    subtitle: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      textAlign: "center" as const,
+    },
+    formContainer: {
+      backgroundColor: colors.surface,
+      borderRadius: 24,
+      padding: 24,
+      ...Platform.select({
+        ios: {
+          shadowColor: colors.shadow,
+          shadowOffset: { width: 0, height: 10 },
+          shadowOpacity: 0.1,
+          shadowRadius: 20,
+        },
+        android: {
+          elevation: 10,
+        },
+      }),
+    },
+    termsText: {
+      fontSize: 13,
+      color: colors.textSecondary,
+      textAlign: "center" as const,
+      marginTop: 16,
+      lineHeight: 18,
+    },
+    termsLink: {
+      color: colors.primary,
+      fontWeight: "600" as const,
+    },
+    loginContainer: {
+      flexDirection: "row" as const,
+      justifyContent: "center" as const,
+      alignItems: "center" as const,
+      marginTop: 24,
+    },
+    loginPrompt: {
+      color: colors.textSecondary,
+      fontSize: 15,
+    },
+    loginLink: {
+      color: colors.primary,
+      fontSize: 15,
+      fontWeight: "700" as const,
+    },
+  };
+};
 
 export default function RegisterScreen() {
     const router = useRouter();
+    const { colors } = useTheme();
+    const styles = createRegisterStyles(colors);
     const { redirectVerifyEmail } = useNavigation();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -84,8 +193,8 @@ export default function RegisterScreen() {
     };
 
     return (
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
-            <LinearGradient colors={["#667eea", "#764ba2", "#f093fb"]} style={styles.gradient}>
+        <SafeAreaView style={styles.container} edges={["top"]}>
+            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
                 <ScrollView
                     contentContainerStyle={styles.scrollContainer}
                     showsVerticalScrollIndicator={false}
@@ -94,12 +203,12 @@ export default function RegisterScreen() {
                     {/* Header Section */}
                     <View style={styles.header}>
                         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-                            <Ionicons name="arrow-back" size={24} color="#fff" />
+                            <Ionicons name="arrow-back" size={24} color={colors.primary} />
                         </TouchableOpacity>
                         <View style={styles.iconContainer}>
-                            <LinearGradient colors={["#ff6b9d", "#c86dd7"]} style={styles.iconGradient}>
-                                <Ionicons name="person-add" size={40} color="#fff" />
-                            </LinearGradient>
+                            <View style={styles.iconWrapper}>
+                                <Ionicons name="person-add" size={40} color={colors.primary} />
+                            </View>
                         </View>
                         <Text style={styles.title}>Create Account</Text>
                         <Text style={styles.subtitle}>Sign up to get started</Text>
@@ -115,6 +224,7 @@ export default function RegisterScreen() {
                             error={errors.name}
                             iconName="person-outline"
                             autoCapitalize="words"
+                            colors={colors}
                         />
                         {/* Email Input */}
                         <AuthInput
@@ -124,6 +234,7 @@ export default function RegisterScreen() {
                             error={errors.email}
                             iconName="mail-outline"
                             keyboardType="email-address"
+                            colors={colors}
                         />
                         {/* Password Input */}
                         <AuthInput
@@ -133,6 +244,7 @@ export default function RegisterScreen() {
                             error={errors.password}
                             iconName="lock-closed-outline"
                             secureTextEntry
+                            colors={colors}
                         />
                         {/* Confirm Password Input */}
                         <AuthInput
@@ -142,9 +254,10 @@ export default function RegisterScreen() {
                             error={errors.confirmPassword}
                             iconName="shield-checkmark-outline"
                             secureTextEntry
+                            colors={colors}
                         />
                         {/* Register Button */}
-                        <GradientButton title="Sign Up" loading={loading} onPress={handleRegister} />
+                        <PrimaryButton title="Sign Up" loading={loading} onPress={handleRegister} colors={colors} />
                         {/* Terms and Privacy */}
                         <Text style={styles.termsText}>
                             By signing up, you agree to our <Text style={styles.termsLink}>Terms of Service</Text> and{" "}
@@ -159,147 +272,7 @@ export default function RegisterScreen() {
                         </View>
                     </View>
                 </ScrollView>
-            </LinearGradient>
-        </KeyboardAvoidingView>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
     );
 }
-
-const styles = StyleSheet.create({
-    gradient: {
-        flex: 1,
-    },
-    scrollContainer: {
-        flexGrow: 1,
-        paddingHorizontal: 24,
-        paddingTop: Platform.OS === "ios" ? 60 : 40,
-        paddingBottom: 40,
-    },
-    header: {
-        alignItems: "center",
-        marginBottom: 30,
-    },
-    backButton: {
-        position: "absolute",
-        left: 0,
-        top: 0,
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: "rgba(255, 255, 255, 0.2)",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    iconContainer: {
-        marginBottom: 20,
-    },
-    iconGradient: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        justifyContent: "center",
-        alignItems: "center",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 8,
-    },
-    title: {
-        fontSize: 32,
-        fontWeight: "700",
-        color: "#fff",
-        marginBottom: 8,
-        textAlign: "center",
-    },
-    subtitle: {
-        fontSize: 16,
-        color: "rgba(255, 255, 255, 0.85)",
-        textAlign: "center",
-    },
-    formContainer: {
-        backgroundColor: "#fff",
-        borderRadius: 24,
-        padding: 24,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.15,
-        shadowRadius: 20,
-        elevation: 10,
-    },
-    inputWrapper: {
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: "#f8f9fa",
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: "#e9ecef",
-        paddingHorizontal: 16,
-        height: 56,
-    },
-    inputIconContainer: {
-        marginRight: 12,
-    },
-    input: {
-        flex: 1,
-        fontSize: 16,
-        color: "#1a1a1a",
-    },
-    inputError: {
-        borderColor: "#ff6b6b",
-    },
-    eyeIcon: {
-        padding: 4,
-    },
-    errorText: {
-        color: "#ff6b6b",
-        fontSize: 13,
-        marginTop: 6,
-        marginLeft: 4,
-    },
-    strengthContainer: {
-        marginTop: 8,
-        marginBottom: 4,
-    },
-    strengthBarContainer: {
-        height: 4,
-        backgroundColor: "#e9ecef",
-        borderRadius: 2,
-        overflow: "hidden",
-    },
-    strengthBar: {
-        height: "100%",
-        borderRadius: 2,
-    },
-    strengthText: {
-        fontSize: 12,
-        fontWeight: "600",
-        marginTop: 4,
-        marginLeft: 4,
-    },
-    termsText: {
-        fontSize: 13,
-        color: "#6c757d",
-        textAlign: "center",
-        marginTop: 16,
-        lineHeight: 18,
-    },
-    termsLink: {
-        color: "#667eea",
-        fontWeight: "600",
-    },
-    loginContainer: {
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 24,
-    },
-    loginPrompt: {
-        color: "#6c757d",
-        fontSize: 15,
-    },
-    loginLink: {
-        color: "#667eea",
-        fontSize: 15,
-        fontWeight: "700",
-    },
-});

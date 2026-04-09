@@ -1,7 +1,5 @@
-// src/components/common/SearchBar.tsx
-import responsive, { useDeviceType, useResponsive } from '@/utilities/responsive';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 
 interface SearchBarProps {

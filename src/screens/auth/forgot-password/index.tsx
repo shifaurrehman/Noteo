@@ -1,25 +1,114 @@
 import AuthInput from "@/components/auth/AuthEmail";
-import GradientButton from "@/components/auth/CustomButton";
+import PrimaryButton from "@/components/button/PrimaryButton";
 import { forgotPasswordApi } from "@/services/api/services/authService";
 import { validateEmail } from "@/utilities/auth";
 import { useNavigation } from "@/utilities/routes/Routes";
 import { showErrorToast, showSuccessToast } from "@/utilities/toast/message-toast";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
     KeyboardAvoidingView,
     Platform,
     ScrollView,
-    StyleSheet,
     Text,
     TouchableOpacity,
     View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useTheme } from "@/hooks/useTheme";
+import type { ThemeColors } from "@/theme/colors";
+
+const createForgotPasswordStyles = (colors: ThemeColors) => {
+  return {
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollContainer: {
+      flexGrow: 1,
+      paddingHorizontal: 24,
+      paddingTop: Platform.OS === "ios" ? 60 : 40,
+      paddingBottom: 40,
+    },
+    header: {
+      alignItems: "center" as const,
+      marginBottom: 40,
+      marginTop: 20,
+    },
+    backButton: {
+      position: "absolute" as const,
+      left: 0,
+      top: 0,
+      padding: 8,
+    },
+    iconContainer: {
+      marginBottom: 20,
+      marginTop: 20,
+    },
+    iconWrapper: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      justifyContent: "center" as const,
+      alignItems: "center" as const,
+      backgroundColor: colors.primary + "20",
+      ...Platform.select({
+        ios: {
+          shadowColor: colors.primary,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.2,
+          shadowRadius: 8,
+        },
+        android: {
+          elevation: 4,
+        },
+      }),
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: "700" as const,
+      color: colors.textMain,
+      marginBottom: 8,
+      textAlign: "center" as const,
+    },
+    subtitle: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      textAlign: "center" as const,
+    },
+    formContainer: {
+      backgroundColor: colors.surface,
+      borderRadius: 24,
+      padding: 24,
+      ...Platform.select({
+        ios: {
+          shadowColor: colors.shadow,
+          shadowOffset: { width: 0, height: 10 },
+          shadowOpacity: 0.1,
+          shadowRadius: 20,
+        },
+        android: {
+          elevation: 10,
+        },
+      }),
+    },
+    backLinkContainer: {
+      alignItems: "center" as const,
+      marginTop: 20,
+    },
+    backLinkText: {
+      color: colors.primary,
+      fontSize: 16,
+      fontWeight: "600" as const,
+    }
+  };
+};
 
 export default function ForgotPasswordScreen() {
     const router = useRouter();
+    const { colors } = useTheme();
+    const styles = createForgotPasswordStyles(colors);
     const { redirectResetPassword } = useNavigation();
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
@@ -51,8 +140,8 @@ export default function ForgotPasswordScreen() {
     };
 
     return (
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
-            <LinearGradient colors={["#667eea", "#764ba2", "#f093fb"]} style={styles.gradient}>
+        <SafeAreaView style={styles.container} edges={["top"]}>
+            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
                 <ScrollView
                     contentContainerStyle={styles.scrollContainer}
                     showsVerticalScrollIndicator={false}
@@ -61,12 +150,12 @@ export default function ForgotPasswordScreen() {
                     {/* Header Section */}
                     <View style={styles.header}>
                         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                            <Ionicons name="arrow-back" size={24} color="#fff" />
+                            <Ionicons name="arrow-back" size={24} color={colors.textMain} />
                         </TouchableOpacity>
                         <View style={styles.iconContainer}>
-                            <LinearGradient colors={["#ff6b9d", "#c86dd7"]} style={styles.iconGradient}>
-                                <Ionicons name="key-outline" size={40} color="#fff" />
-                            </LinearGradient>
+                            <View style={styles.iconWrapper}>
+                                <Ionicons name="key-outline" size={40} color={colors.primary} />
+                            </View>
                         </View>
                         <Text style={styles.title}>Forgot Password?</Text>
                         <Text style={styles.subtitle}>Enter your email to receive a verification code.</Text>
@@ -85,10 +174,11 @@ export default function ForgotPasswordScreen() {
                             error={error}
                             iconName="mail-outline"
                             keyboardType="email-address"
+                            colors={colors}
                         />
 
                         {/* Send Code Button */}
-                        <GradientButton title="Send Code" loading={loading} onPress={handleSendCode} />
+                        <PrimaryButton title="Send Code" loading={loading} onPress={handleSendCode} colors={colors} />
 
                         {/* Back to Login */}
                         <TouchableOpacity onPress={() => router.back()} style={styles.backLinkContainer}>
@@ -96,77 +186,7 @@ export default function ForgotPasswordScreen() {
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
-            </LinearGradient>
-        </KeyboardAvoidingView>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
     );
 }
-
-const styles = StyleSheet.create({
-    gradient: {
-        flex: 1,
-    },
-    scrollContainer: {
-        flexGrow: 1,
-        paddingHorizontal: 24,
-        paddingTop: Platform.OS === "ios" ? 60 : 40,
-        paddingBottom: 40,
-    },
-    header: {
-        alignItems: "center",
-        marginBottom: 40,
-        marginTop: 20,
-    },
-    backButton: {
-        position: 'absolute',
-        left: 0,
-        top: 0,
-        padding: 8,
-    },
-    iconContainer: {
-        marginBottom: 20,
-        marginTop: 20,
-    },
-    iconGradient: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        justifyContent: "center",
-        alignItems: "center",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 8,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: "700",
-        color: "#fff",
-        marginBottom: 8,
-        textAlign: "center",
-    },
-    subtitle: {
-        fontSize: 16,
-        color: "rgba(255, 255, 255, 0.85)",
-        textAlign: "center",
-    },
-    formContainer: {
-        backgroundColor: "#fff",
-        borderRadius: 24,
-        padding: 24,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.15,
-        shadowRadius: 20,
-        elevation: 10,
-    },
-    backLinkContainer: {
-        alignItems: 'center',
-        marginTop: 20,
-    },
-    backLinkText: {
-        color: "#667eea",
-        fontSize: 16,
-        fontWeight: "600",
-    }
-});

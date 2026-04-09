@@ -165,7 +165,6 @@ const FavoriteScreen: React.FC = () => {
                 <SearchBar
                     value={searchText}
                     onChangeText={setSearchText}
-                    onClear={() => setSearchText("")}
                     placeholder={"Search favorites..."}
                     colors={{
                         surface: colors.surface,
