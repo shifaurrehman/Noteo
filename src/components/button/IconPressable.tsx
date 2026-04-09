@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect } from "react";
-import { Pressable, StyleSheet, ViewStyle } from "react-native";
+import { Pressable, StyleSheet, ViewStyle, StyleProp } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -13,7 +13,7 @@ interface IconPressableProps {
   size?: number;
   backgroundColor?: string;
   pressedColor?: string;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   haptic?: "light" | "medium" | "heavy";
 }
 

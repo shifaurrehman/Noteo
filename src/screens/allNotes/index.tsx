@@ -16,15 +16,12 @@ import {
   Text,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@/utilities/routes/Routes";
 import { SearchBar } from "@/components/searchbar/SearchBar";
 import { Header } from "@/components/header/Header";
 import { IconPressable } from "@/components/button/IconPressable";
 import { commonStyles } from "@/styles/global";
-import { addCategory } from "@/store/slices/categoriesSlice";
-import { selectCategories, selectIsAuthenticated } from "@/store/selectors";
-import { CreateNewCategory } from "@/utilities/category/CategoryUtils";
 
 type FilterTab = "all" | "recent" | "pinned" | "drafts";
 
@@ -41,8 +38,6 @@ const AllNotesScreen: React.FC = () => {
   const isLoading = useAppSelector(selectNotesLoading);
   const { colors } = useTheme();
   const { openEditNote, openAddNote } = useNavigation();
-  const categories = useAppSelector(selectCategories);
-  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   const [searchText, setSearchText] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
@@ -156,6 +151,8 @@ const AllNotesScreen: React.FC = () => {
     )
   }, [isLoading, colors.primary, dispatch])
 
+  const insets = useSafeAreaInsets();
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
       <Header title={"Notes"} backgroundColor={colors.background} titleStyle={{ color: colors.primary, textAlign: "left" }} />
@@ -226,7 +223,10 @@ const AllNotesScreen: React.FC = () => {
           haptic="heavy"
           backgroundColor={colors.primary}
           pressedColor={colors.primaryPressed}
-          style={commonStyles.floatingButton}
+          style={[
+            commonStyles.floatingButton,
+            { bottom: insets.bottom + 10, right: 30 }
+          ]}
         >
           <Text style={commonStyles.floatingButtonText}>+</Text>
         </IconPressable>

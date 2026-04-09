@@ -16,10 +16,11 @@ import {
 import { useTheme } from "@/hooks/useTheme";
 import { deleteNote, fetchNotes, updateNote } from "@/store/slices/notesSlice";
 import { Note } from "@/types/notes/notes.types";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@/utilities/routes/Routes";
 
 const NotesScreen = () => {
+  const insets = useSafeAreaInsets();
   const { categoryId, name, isFavorite } = useLocalSearchParams<{ categoryId: string; name?: string; isFavorite?: string }>();
   // selectors
   const category = useAppSelector((state) => (categoryId ? selectCategoryById(state, categoryId) : null));
@@ -101,18 +102,19 @@ const NotesScreen = () => {
         </View>
 
         {/* Floating Add Button */}
-        {isFavorite === "true" ? null : (
-          <IconPressable
-            onPress={() => handleOpenAddNote(categoryId)}
-            size={60}
-            haptic="heavy"
-            backgroundColor={colors.primary}
-            pressedColor={colors.primaryPressed}
-            style={styles.floatingButton}
-          >
-            <Text style={styles.floatingButtonText}>+</Text>
-          </IconPressable>
-        )}
+        <IconPressable
+          onPress={() => handleOpenAddNote(categoryId)}
+          size={60}
+          haptic="heavy"
+          backgroundColor={colors.primary}
+          pressedColor={colors.primaryPressed}
+          style={[
+            styles.floatingButton,
+            { bottom: insets.bottom + 30, right: 30 }
+          ]}
+        >
+          <Text style={styles.floatingButtonText}>+</Text>
+        </IconPressable>
 
         {/* Delete Confirmation Modal */}
         <ConfirmationModal
