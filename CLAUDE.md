@@ -351,3 +351,11 @@ that strictly follows this architecture.
 3. **Type Safety**: Never use `any`. Always use or extend proper TypeScript interfaces.
 4. **No Placeholder Code**: Provide complete, working code instead of comments like `// implement later`.
 5. **Read Before Writing**: Always read related files completely before suggesting significant modifications.
+
+## 🎨 UI & STYLING PITFALLS (CRITICAL)
+
+### Dark Mode Visual Depth (The "Haze" Bug)
+- **Problem**: Using semi-transparent `rgba` or `surface` colors (e.g., `rgba(255, 255, 255, 0.05)`) on top of dark backgrounds creates a **"hazy" or "weirdly bright"** look that washes out contrast.
+- **Root Cause**: Transparent light overlays in React Native/Expo on dark backgrounds don't create "depth"; they create "fog".
+- **Solution**: ALWAYS use **solid, deep-navy or black colors** for cards and modals in dark mode (e.g., use `#15172A` or `#0F1121`). Avoid semi-transparent white/blue overlays for primary card backgrounds.
+- **Reference**: This was a major UX bug fixed in April 2026. Do not reintroduce transparent haze on cards.

@@ -48,6 +48,7 @@ This repository is an Expo React Native application for an offline-first AI note
 - **No Placeholders**: Never generate `// ... existing code` or `// implement later`. Write the complete function or file if regenerating.
 - **Atomic Responses**: Keep code diffs focused and atomic.
 - **Check Connections**: When altering Redux or Sagas, verify selector usage in components.
+- **Dark Mode Visual Depth**: NEVER use semi-transparent `rgba` or `surface` overlays for main card backgrounds in dark mode. This creates a "hazy" effect. Always use solid, deep colors (e.g., `#15172A`).
 
 ## When Generating Code
 - Follow Expo best practices.
