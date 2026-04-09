@@ -20,6 +20,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@/utilities/routes/Routes";
 import { SearchBar } from "@/components/searchbar/SearchBar";
 import { Header } from "@/components/header/Header";
+import { IconPressable } from "@/components/button/IconPressable";
+import { commonStyles } from "@/styles/global";
+import { addCategory } from "@/store/slices/categoriesSlice";
+import { selectCategories, selectIsAuthenticated } from "@/store/selectors";
+import { CreateNewCategory } from "@/utilities/category/CategoryUtils";
 
 type FilterTab = "all" | "recent" | "pinned" | "drafts";
 
@@ -35,7 +40,9 @@ const AllNotesScreen: React.FC = () => {
   const allNotes = useAppSelector(selectNotes);
   const isLoading = useAppSelector(selectNotesLoading);
   const { colors } = useTheme();
-  const { openEditNote } = useNavigation();
+  const { openEditNote, openAddNote } = useNavigation();
+  const categories = useAppSelector(selectCategories);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
   const [searchText, setSearchText] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
@@ -110,6 +117,10 @@ const AllNotesScreen: React.FC = () => {
     },
     [openEditNote]
   );
+
+  const handleCreateNote = useCallback(() => {
+    openAddNote();
+  }, [openAddNote]);
 
   const renderItem = ({ item }: { item: Note }) => (
     <NoteCard
@@ -208,6 +219,17 @@ const AllNotesScreen: React.FC = () => {
           showsVerticalScrollIndicator={false}
           refreshControl={refreshControl()}
         />
+
+        <IconPressable
+          onPress={handleCreateNote}
+          size={60}
+          haptic="heavy"
+          backgroundColor={colors.primary}
+          pressedColor={colors.primaryPressed}
+          style={commonStyles.floatingButton}
+        >
+          <Text style={commonStyles.floatingButtonText}>+</Text>
+        </IconPressable>
 
         {/* Delete Confirmation Modal */}
         <ConfirmationModal

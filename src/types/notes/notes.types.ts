@@ -3,7 +3,7 @@ import { SyncStatus } from "../category/category.types";
 export interface CreateNewNoteParams {
   title: string;
   content: string;
-  categoryId: string;
+  categoryId?: string;
   isFavorite?: boolean;
 }
 
@@ -15,7 +15,8 @@ export interface ViewCategoryNotesParams {
 
 export interface NoteApi {
   id: string;
-  categoryId: string;
+  categoryId?: string;
+  isOrphan: boolean;
   title: string;
   content: string;
   isFavorite: boolean;

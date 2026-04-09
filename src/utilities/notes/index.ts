@@ -10,6 +10,7 @@ export const createNewNote = ({
   return {
     id: uuidv4(),
     categoryId,
+    isOrphan: !categoryId,
     title: title.trim() || "Untitled Note",
     content: content.trim(),
     isFavorite: isFavorite,
