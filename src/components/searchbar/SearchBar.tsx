@@ -23,24 +23,24 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     const [isFocused, setIsFocused] = useState(false);
 
     return (
-            <View style={[styles.searchContainer, { backgroundColor: colors.surface, borderColor: isFocused ? colors.primary : colors.border + "60", }]}>
-                <Ionicons name="search-outline" size={18} color={colors.textSecondary} />
-                <TextInput
-                    style={[styles.searchInput, { color: colors.textMain }]}
-                    placeholder={placeholder}
-                    placeholderTextColor={colors.textSecondary}
-                    value={value}
-                    onChangeText={onChangeText}
-                    returnKeyType="search"
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
-                />
-                {value.length > 0 && (
-                    <TouchableOpacity onPress={() => onChangeText("")} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                        <Ionicons name="close-circle" size={18} color={colors.textSecondary} />
-                    </TouchableOpacity>
-                )}
-            </View>
+        <View style={[styles.searchContainer, { backgroundColor: colors.surface, borderColor: isFocused ? colors.primary : colors.border + "80", }]}>
+            <Ionicons name="search-outline" size={18} color={colors.textSecondary} />
+            <TextInput
+                style={[styles.searchInput, { color: colors.textMain }]}
+                placeholder={placeholder}
+                placeholderTextColor={colors.textSecondary}
+                value={value}
+                onChangeText={onChangeText}
+                returnKeyType="search"
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+            />
+            {value.length > 0 && (
+                <TouchableOpacity onPress={() => onChangeText("")} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                    <Ionicons name="close-circle" size={18} color={colors.textSecondary} />
+                </TouchableOpacity>
+            )}
+        </View>
     );
 };
 

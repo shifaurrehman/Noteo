@@ -73,6 +73,7 @@ const HomeScreen: React.FC = () => {
 
     const handleEditCategory = useCallback((category: Category) => {
         setEditCategory(category);
+        setShowAddModal(true);
         bottomSheetRef.current?.present();
     }, []);
 

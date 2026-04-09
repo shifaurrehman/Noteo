@@ -16,7 +16,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@/utilities/routes/Routes";
 import { SearchBar } from "@/components/searchbar/SearchBar";
 import { Header } from "@/components/header/Header";
@@ -151,8 +151,6 @@ const AllNotesScreen: React.FC = () => {
     )
   }, [isLoading, colors.primary, dispatch])
 
-  const insets = useSafeAreaInsets();
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
       <Header title={"Notes"} backgroundColor={colors.background} titleStyle={{ color: colors.primary, textAlign: "left" }} />
@@ -223,10 +221,7 @@ const AllNotesScreen: React.FC = () => {
           haptic="heavy"
           backgroundColor={colors.primary}
           pressedColor={colors.primaryPressed}
-          style={[
-            commonStyles.floatingButton,
-            { bottom: insets.bottom + 10, right: 30 }
-          ]}
+          style={commonStyles.floatingButton}
         >
           <Text style={commonStyles.floatingButtonText}>+</Text>
         </IconPressable>

@@ -87,10 +87,12 @@ export const AddCategoryBottomSheet = forwardRef<BottomSheetModal, Props>(
 
     const handleClose = useCallback(() => {
       setName("");
+      setSelectedColor(initialColor || defaultColor);
+      setSelectedIcon(initialIcon || SYMBOLS[0]);
       setError(false);
       onClose();
       (ref as any)?.current?.dismiss();
-    }, [onClose, ref]);
+    }, [onClose, ref, initialColor, initialIcon, defaultColor]);
 
     const handleSave = useCallback(() => {
       const trimmedName = name.trim();
