@@ -26,4 +26,26 @@ export const createHomeScreenStyles = (colors: any) =>
       fontSize: 16,
       textAlign: "center",
     },
+    guestBanner: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.primary + "10",
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      marginTop: 12,
+      marginBottom: 8,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.primary + "30",
+    },
+    guestBannerTextContainer: {
+      flex: 1,
+      marginLeft: 12,
+      marginRight: 8,
+    },
+    guestBannerText: {
+      color: colors.textMain,
+      fontSize: 14,
+      fontWeight: "500",
+    },
   });

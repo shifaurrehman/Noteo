@@ -71,8 +71,6 @@ export default function LoginScreen() {
         }
     }, [isAuthenticated, loginAttempted, redirectHome, dispatch]);
 
-    const handleGuest = async () => { };
-
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
             <LinearGradient colors={["#667eea", "#764ba2", "#f093fb"]} style={styles.gradient}>
@@ -124,24 +122,6 @@ export default function LoginScreen() {
 
                         {/* Login Button */}
                         <GradientButton title="Sign In" loading={loading} onPress={handleLogin} />
-
-                        {/* Divider */}
-                        <View style={styles.dividerContainer}>
-                            <View style={styles.divider} />
-                            <Text style={styles.dividerText}>or</Text>
-                            <View style={styles.divider} />
-                        </View>
-
-                        {/* Guest Button */}
-                        <TouchableOpacity
-                            onPress={handleGuest}
-                            style={styles.guestButton}
-                            disabled={loading}
-                            activeOpacity={0.8}
-                        >
-                            <Ionicons name="person-outline" size={20} color="#667eea" />
-                            <Text style={styles.guestText}>Continue as Guest</Text>
-                        </TouchableOpacity>
 
                         {/* Register Link */}
                         <View style={styles.registerContainer}>
@@ -256,22 +236,6 @@ const styles = StyleSheet.create({
         color: "#6c757d",
         fontSize: 14,
         fontWeight: "500",
-    },
-    guestButton: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#f8f9fa",
-        borderRadius: 12,
-        paddingVertical: 16,
-        borderWidth: 2,
-        borderColor: "#667eea",
-    },
-    guestText: {
-        color: "#667eea",
-        fontSize: 16,
-        fontWeight: "600",
-        marginLeft: 8,
     },
     registerContainer: {
         flexDirection: "row",

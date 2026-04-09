@@ -11,8 +11,15 @@ export function* syncPendingNotesSaga() {
   try {
     console.log("[Sync Saga] Starting smart sync of notes...");
 
-    // 1. Combine PENDING + ERROR notes from Redux
+    // 1. Check settings first
     const state: RootState = yield select();
+    const settings = state.settings;
+    if (!settings.backupEnabled) {
+      console.log("[Sync Saga] Backup disabled locally, aborting sync.");
+      return;
+    }
+
+    // 2. Combine PENDING + ERROR notes from Redux
     const notes: Note[] = state.notes.notes;
     const notesToSync = notes.filter(
       (note: Note) => note.syncStatus === SYNC_STATUS.PENDING || note.syncStatus === SYNC_STATUS.ERROR

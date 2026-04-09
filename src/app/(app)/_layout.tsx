@@ -1,13 +1,11 @@
 import { WebSidebar } from "@/components/web/WebSidebar";
-import { useAppSelector } from "@/store/hooks";
-import { selectIsAuthenticated } from "@/store/selectors";
 import { logout } from "@/store/slices/authSlice";
 import { setNetworkState } from "@/store/slices/networkSlice";
 import { store } from "@/store/store";
 import { authEvents, FORCE_LOGOUT_EVENT } from "@/utilities/events";
 import { isWeb } from "@/utilities/global";
 import NetInfo from '@react-native-community/netinfo';
-import { Redirect, Stack } from "expo-router";
+import {  Stack } from "expo-router";
 import React, { useEffect } from "react";
 import { useWindowDimensions, View } from "react-native";
 import { useDispatch } from "react-redux";
@@ -16,7 +14,6 @@ export default function AppLayout() {
     const dispatch = useDispatch();
     const { width } = useWindowDimensions();
     const showSideBar = isWeb && width >= 768;
-    const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
     useEffect(() => {
         const unsubscribe = NetInfo.addEventListener(state => {
@@ -35,9 +32,6 @@ export default function AppLayout() {
         }
     }, []);
 
-    if (!isAuthenticated) {
-        return <Redirect href="/(auth)/login" />;
-    }
 
     return (
         <View style={{ flex: 1, flexDirection: isWeb ? "row" : "column" }}>

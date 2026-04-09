@@ -6,7 +6,7 @@ import { ConfirmationBottomSheet } from "@/components/modal/ConfirmationBottomSh
 import { SearchBar } from "@/components/searchbar/SearchBar";
 import { EmptyCategoryText } from "@/constants/categories";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectCategories, selectCategoriesLoading, selectIsConnected, selectNotes } from "@/store/selectors";
+import { selectCategories, selectCategoriesLoading, selectIsConnected, selectIsAuthenticated, selectNotes } from "@/store/selectors";
 import { useTheme } from "@/hooks/useTheme";
 import { addCategory, deleteCategory, fetchCategories, updateCategory } from "@/store/slices/categoriesSlice";
 import { deleteNotesByCategory } from "@/store/slices/notesSlice";
@@ -32,6 +32,7 @@ const HomeScreen: React.FC = () => {
     const notes = useAppSelector(selectNotes);
     const { colors } = useTheme();
     const isConnected = useAppSelector(selectIsConnected);
+    const isAuthenticated = useAppSelector(selectIsAuthenticated);
     const isLoading = useAppSelector(selectCategoriesLoading);
     console.log("Categories in home screen: ", JSON.stringify(categories, null, 2))
 
@@ -61,11 +62,12 @@ const HomeScreen: React.FC = () => {
 
     const handleAddCategory = useCallback(({ name, color, icon }: { name: string; color: string; icon: string }) => {
         const newCategory: CategoryApi = CreateNewCategory({ name, color, icon });
-        dispatch(addCategory(newCategory));
+        const categoryWithLocalFlag = { ...newCategory, isLocal: !isAuthenticated };
+        dispatch(addCategory(categoryWithLocalFlag));
         showSuccessToast({ message: "Category created successfully" });
         setShowAddModal(false);
         bottomSheetRef.current?.dismiss();
-    }, [dispatch]);
+    }, [dispatch, isAuthenticated]);
 
 
 

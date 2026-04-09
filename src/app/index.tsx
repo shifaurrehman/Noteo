@@ -29,13 +29,7 @@ export default function SplashScreen() {
     }).start();
 
     const timer = setTimeout(() => {
-      let nextRoute: string = "/(auth)/login";
-
-      if (isAuthenticated) {
-        nextRoute = "/(app)/(tabs)/home";
-      }
-
-      router.replace(nextRoute as any);
+      router.replace("/(app)/(tabs)/home");
     }, 3000);
 
     return () => clearTimeout(timer);

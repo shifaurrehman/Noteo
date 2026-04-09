@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useAppSelector } from '@/store/hooks';
-import { selectNoteById } from '@/store/selectors';
+import { selectNoteById, selectIsAuthenticated } from '@/store/selectors';
 import { useTheme } from '@/hooks/useTheme';
 import { IconPressable } from '@/components/button/IconPressable';
 import { AppButton } from '@/components/button/AppButton';
@@ -18,6 +18,7 @@ const AddNoteScreen = () => {
   const dispatch = useDispatch();
   const { colors } = useTheme();
   const note = useAppSelector(state => noteId ? selectNoteById(state, noteId) : undefined);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const isEditMode = Boolean(noteId);
 
   const [title, setTitle] = useState(note?.title || '');
@@ -55,7 +56,9 @@ const AddNoteScreen = () => {
   const handleCreateNote = () => {
     if (!validateNote()) return;
     const newNote = createNewNote({title, content, categoryId});
-    dispatch(addNote(newNote));
+    // Set isLocal based on guest mode status
+    const noteWithLocalFlag = { ...newNote, isLocal: !isAuthenticated };
+    dispatch(addNote(noteWithLocalFlag));
     router.back();
   };
   const handleUpdateNote = () => {
