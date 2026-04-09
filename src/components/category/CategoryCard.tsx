@@ -73,32 +73,40 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
     },
     popupContainer: {
       position: "absolute",
-      top: 40,
-      right: 12,
-      backgroundColor: isDarkMode ? colors.surface : "#FFFFFF",
-      paddingVertical: 6,
+      top: 32,
+      right: 18,
+      backgroundColor: isDarkMode ? "#0F1121" : colors.background, // Match theme background
+      paddingVertical: 3,
       borderRadius: 12,
-      elevation: 8,
+      elevation: 10,
       shadowColor: "#000",
-      shadowOpacity: 0.15,
-      shadowRadius: 10,
-      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.25,
+      shadowRadius: 12,
+      shadowOffset: { width: 0, height: 6 },
       zIndex: 999,
-      width: 120,
+      width: width * 0.6,
+      minWidth: 100,
+      maxWidth: 120,
       borderWidth: 1,
-      borderColor: colors.border + "33",
+      borderColor: isDarkMode ? colors.border + "30" : colors.border + "40",
     },
     menuItem: {
       paddingVertical: 8,
-      paddingHorizontal: 12,
+      paddingHorizontal: 10,
       flexDirection: "row",
       alignItems: "center",
-      gap: 10,
+      gap: 8,
     },
     menuText: {
       color: colors.textMain,
-      fontSize: 14,
-      fontWeight: "500",
+      fontSize: 12.5,
+      fontWeight: "600",
+    },
+    separator: {
+      height: 1,
+      backgroundColor: colors.border + "20",
+      marginVertical: 1,
+      marginHorizontal: 8,
     },
     noteTitle: {
       fontSize: 17,
@@ -132,15 +140,15 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
           <View style={styles.iconContainer}>
             <MaterialIcons name={categoryIcon as any} size={24} color={categoryColor} />
           </View>
-          
-          <TouchableOpacity 
-            onPress={onFavorite}
+
+          <TouchableOpacity
+            onPress={onToggleMenu}
             hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
           >
-            <Ionicons 
-              name="heart" 
-              size={18} 
-              color={category.isFavorite ? "#ff3b30" : colors.border} 
+            <Ionicons
+              name="ellipsis-vertical"
+              size={18}
+              color={colors.textSecondary}
             />
           </TouchableOpacity>
         </View>
@@ -154,37 +162,41 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
       {/* Popup Menu */}
       {isMenuVisible && (
         <View style={styles.popupContainer}>
-          {onEdit && (
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => {
-                onToggleMenu?.();
-                onEdit();
-              }}
-            >
-              <Ionicons name="create-outline" size={18} color={colors.textMain} />
-              <Text style={styles.menuText}>Edit</Text>
-            </TouchableOpacity>
-          )}
-
           {onFavorite && (
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => {
-                onToggleMenu?.();
-                onFavorite();
-              }}
-            >
-              <Ionicons 
-                name={category.isFavorite ? "star" : "star-outline"} 
-                size={18} 
-                color={category.isFavorite ? colors.primary : colors.textMain} 
-              />
-              <Text style={styles.menuText}>Favorite</Text>
-            </TouchableOpacity>
+            <>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  onToggleMenu?.();
+                  onFavorite();
+                }}
+              >
+                <Ionicons
+                  name={category.isFavorite ? "heart" : "heart-outline"}
+                  size={18}
+                  color={category.isFavorite ? "#ff3b30" : colors.textMain}
+                />
+                <Text style={styles.menuText}>Favorite</Text>
+              </TouchableOpacity>
+              <View style={styles.separator} />
+            </>
           )}
 
-          <View style={{ height: 1, backgroundColor: colors.border + "33", marginVertical: 4 }} />
+          {onEdit && (
+            <>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  onToggleMenu?.();
+                  onEdit();
+                }}
+              >
+                <Ionicons name="create-outline" size={18} color={colors.textMain} />
+                <Text style={styles.menuText}>Edit</Text>
+              </TouchableOpacity>
+              <View style={styles.separator} />
+            </>
+          )}
 
           {onDelete && (
             <TouchableOpacity
