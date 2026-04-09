@@ -15,18 +15,29 @@ export const useNavigation = () => {
     });
   };
 
-  const openAddNote = (categoryId: string) => {
-    router.push({
-      pathname: "/notes/[categoryId]/add-note",
-      params: { categoryId },
-    });
+  const openAddNote = (categoryId?: string) => {
+    if (categoryId) {
+      router.push({
+        pathname: "/notes/[categoryId]/add-note",
+        params: { categoryId },
+      });
+    } else {
+      router.push("/new-note");
+    }
   };
 
-  const openEditNote = (categoryId: string, noteId: string) => {
-    router.push({
-      pathname: "/notes/[categoryId]/add-note",
-      params: { categoryId, noteId },
-    });
+  const openEditNote = (categoryId: string | undefined, noteId: string) => {
+    if (categoryId) {
+      router.push({
+        pathname: "/notes/[categoryId]/add-note",
+        params: { categoryId, noteId },
+      });
+    } else {
+      router.push({
+        pathname: "/new-note",
+        params: { noteId },
+      });
+    }
   };
 
   const openFavoriteNotes = (categoryId: string, categoryName: string) => {

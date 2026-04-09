@@ -14,7 +14,7 @@ import { addNote, updateNote } from '@/store/slices/notesSlice';
 import { showValidationToast } from '@/utilities/toast';
 const { height } = Dimensions.get('window');
 const AddNoteScreen = () => {
-  const { categoryId, noteId } = useLocalSearchParams<{ categoryId: string; noteId?: string }>();
+  const { categoryId, noteId } = useLocalSearchParams<{ categoryId?: string; noteId?: string }>();
   const dispatch = useDispatch();
   const { colors } = useTheme();
   const note = useAppSelector(state => noteId ? selectNoteById(state, noteId) : undefined);
