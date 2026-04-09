@@ -51,8 +51,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "e45c38a5-1cd3-4e94-85c0-e9e589926c95"
+        "projectId": "e0fa9074-518e-47b4-836a-ca2647c587f5"
       }
-    }
+    },
+    "owner": "shifaurrehman"
   }
 }
