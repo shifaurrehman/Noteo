@@ -21,7 +21,7 @@ import { showErrorToast, showSuccessToast } from "@/utilities/toast/message-toas
 
 import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useMemo, useState, useRef } from "react";
-import { FlatList, RefreshControl, Text, View } from "react-native";
+import { FlatList, RefreshControl, Text, View, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const HomeScreen: React.FC = () => {
@@ -221,9 +221,14 @@ const HomeScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
-            <Header title={"Noteo"} backgroundColor={colors.background} titleStyle={{ color: colors.primary, textAlign: "left" }} />
-            <View style={styles.container}>
-                {/* header */}
+            <Pressable 
+                style={{ flex: 1 }} 
+                onPress={() => setActiveMenuId(null)}
+                accessible={false}
+            >
+                <Header title={"Noteo"} backgroundColor={colors.background} titleStyle={{ color: colors.primary, textAlign: "left" }} />
+                <View style={styles.container}>
+                    {/* header */}
 
                 {/* search bar */}
                 <SearchBar
@@ -295,6 +300,7 @@ const HomeScreen: React.FC = () => {
                     type="danger"
                 />
             </View>
+          </Pressable>
         </SafeAreaView>
     );
 };

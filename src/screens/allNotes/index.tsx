@@ -22,6 +22,9 @@ import { SearchBar } from "@/components/searchbar/SearchBar";
 import { Header } from "@/components/header/Header";
 import { IconPressable } from "@/components/button/IconPressable";
 import { commonStyles } from "@/styles/global";
+import { selectCategories } from "@/store/selectors";
+import { SelectionBottomSheet } from "@/components/modal/SelectionBottomSheet";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 
 type FilterTab = "all" | "recent" | "pinned" | "drafts";
 
@@ -35,6 +38,7 @@ const FILTER_TABS: { key: FilterTab; label: string }[] = [
 const AllNotesScreen: React.FC = () => {
   const dispatch = useAppDispatch();
   const allNotes = useAppSelector(selectNotes);
+  const categories = useAppSelector(selectCategories);
   const isLoading = useAppSelector(selectNotesLoading);
   const { colors } = useTheme();
   const { openEditNote, openAddNote } = useNavigation();
@@ -43,6 +47,10 @@ const AllNotesScreen: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
   const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [activeNoteMenuId, setActiveNoteMenuId] = useState<string | null>(null);
+  const [noteToMove, setNoteToMove] = useState<Note | null>(null);
+
+  const selectionSheetRef = React.useRef<BottomSheetModal>(null);
 
   useEffect(() => {
     dispatch(fetchNotes());
@@ -117,14 +125,47 @@ const AllNotesScreen: React.FC = () => {
     openAddNote();
   }, [openAddNote]);
 
-  const renderItem = ({ item }: { item: Note }) => (
-    <NoteCard
-      note={item}
-      onPress={() => handleEditNote(item)}
-      onDelete={() => handleDeleteNote(item)}
-      onToggleFavorite={() => handleToggleFavorite(item)}
-    />
-  );
+  const handleMoveNote = useCallback((note: Note) => {
+    setNoteToMove(note);
+    selectionSheetRef.current?.present();
+  }, []);
+
+  const handleSelectCategory = useCallback((categoryId: string) => {
+    if (noteToMove) {
+      dispatch(updateNote({ id: noteToMove.id, updates: { categoryId } }));
+      setNoteToMove(null);
+    }
+  }, [dispatch, noteToMove]);
+
+  const categoryOptions = useMemo(() => {
+    return categories.map(cat => ({
+      id: cat.id,
+      label: cat.name,
+      icon: (cat.icon || 'folder') as any
+    }));
+  }, [categories]);
+
+  const renderItem = ({ item }: { item: Note }) => {
+    const category = categories.find(c => c.id === item.categoryId);
+    
+    return (
+      <NoteCard
+        note={item}
+        onPress={() => {
+          setActiveNoteMenuId(null);
+          handleEditNote(item);
+        }}
+        onEdit={() => handleEditNote(item)}
+        onDelete={() => handleDeleteNote(item)}
+        onPin={() => handleToggleFavorite(item)}
+        onMove={() => handleMoveNote(item)}
+        isMenuVisible={activeNoteMenuId === item.id}
+        onToggleMenu={() => setActiveNoteMenuId(activeNoteMenuId === item.id ? null : item.id)}
+        categoryName={category?.name}
+        categoryColor={category?.color}
+      />
+    );
+  };
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
@@ -153,93 +194,113 @@ const AllNotesScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
-      <Header title={"Notes"} backgroundColor={colors.background} titleStyle={{ color: colors.primary, textAlign: "left" }} />
-      <View style={styles.container}>
+      <Pressable 
+        style={{ flex: 1 }} 
+        onPress={() => setActiveNoteMenuId(null)}
+        accessible={false}
+      >
+        <Header title={"Notes"} backgroundColor={colors.background} titleStyle={{ color: colors.primary, textAlign: "left" }} />
+        <View style={styles.container}>
 
-        {/* search bar */}
-        <SearchBar
-          value={searchText}
-          onChangeText={setSearchText}
-          placeholder={"Search notes..."}
-          colors={{
-            surface: colors.surface,
-            textMain: colors.textMain,
-            textSecondary: colors.textSecondary,
-            border: colors.border,
-            primary: colors.primary,
-          }}
-        />
+          {/* search bar */}
+          <SearchBar
+            value={searchText}
+            onChangeText={setSearchText}
+            placeholder={"Search notes..."}
+            colors={{
+              surface: colors.surface,
+              textMain: colors.textMain,
+              textSecondary: colors.textSecondary,
+              border: colors.border,
+              primary: colors.primary,
+            }}
+          />
 
-        {/* Filter Tabs */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.tabsWrapper}
-          contentContainerStyle={styles.tabsContent}
-        >
-          {FILTER_TABS.map((tab) => {
-            const isActive = activeFilter === tab.key;
-            return (
-              <Pressable
-                key={tab.key}
-                onPress={() => setActiveFilter(tab.key)}
-                style={[
-                  styles.filterTab,
-                  {
-                    backgroundColor: isActive ? colors.primary : "transparent",
-                    borderColor: isActive ? colors.primary : colors.border + "80",
-                  },
-                ]}
-              >
-                <Text
+          {/* Filter Tabs */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.tabsWrapper}
+            contentContainerStyle={styles.tabsContent}
+          >
+            {FILTER_TABS.map((tab) => {
+              const isActive = activeFilter === tab.key;
+              return (
+                <Pressable
+                  key={tab.key}
+                  onPress={() => {
+                    setActiveNoteMenuId(null);
+                    setActiveFilter(tab.key);
+                  }}
                   style={[
-                    styles.filterTabText,
-                    { color: isActive ? "#fff" : colors.textSecondary },
+                    styles.filterTab,
+                    {
+                      backgroundColor: isActive ? colors.primary : "transparent",
+                      borderColor: isActive ? colors.primary : colors.border + "80",
+                    },
                   ]}
                 >
-                  {tab.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
+                  <Text
+                    style={[
+                      styles.filterTabText,
+                      { color: isActive ? "#fff" : colors.textSecondary },
+                    ]}
+                  >
+                    {tab.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
 
-        {/* Notes List */}
-        <FlatList
-          data={filteredNotes}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          contentContainerStyle={styles.listContainer}
-          ListEmptyComponent={renderEmpty}
-          showsVerticalScrollIndicator={false}
-          refreshControl={refreshControl()}
-        />
+          {/* Notes List */}
+          <FlatList
+            data={filteredNotes}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+            contentContainerStyle={styles.listContainer}
+            ListEmptyComponent={renderEmpty}
+            showsVerticalScrollIndicator={false}
+            refreshControl={refreshControl()}
+          />
 
-        <IconPressable
-          onPress={handleCreateNote}
-          size={60}
-          haptic="heavy"
-          backgroundColor={colors.primary}
-          pressedColor={colors.primaryPressed}
-          style={commonStyles.floatingButton}
-        >
-          <Text style={commonStyles.floatingButtonText}>+</Text>
-        </IconPressable>
+          <IconPressable
+            onPress={handleCreateNote}
+            size={60}
+            haptic="heavy"
+            backgroundColor={colors.primary}
+            pressedColor={colors.primaryPressed}
+            style={commonStyles.floatingButton}
+          >
+            <Text style={commonStyles.floatingButtonText}>+</Text>
+          </IconPressable>
 
-        {/* Delete Confirmation Modal */}
-        <ConfirmationModal
-          visible={showDeleteModal}
-          onClose={() => {
-            setShowDeleteModal(false);
-            setNoteToDelete(null);
-          }}
-          onConfirm={confirmDeleteNote}
-          title="Delete Note?"
-          message="Are you sure you want to delete this note? This action cannot be undone."
-          confirmText="Delete"
-          type="danger"
-        />
-      </View>
+          {/* Delete Confirmation Modal */}
+          <ConfirmationModal
+            visible={showDeleteModal}
+            onClose={() => {
+              setShowDeleteModal(false);
+              setNoteToDelete(null);
+            }}
+            onConfirm={confirmDeleteNote}
+            title="Delete Note?"
+            message="Are you sure you want to delete this note? This action cannot be undone."
+            confirmText="Delete"
+            type="danger"
+          />
+
+          {/* Move Note Modal */}
+          <SelectionBottomSheet
+            ref={selectionSheetRef}
+            title="Move Note"
+            description="Select a category to move this note to."
+            options={categoryOptions}
+            selectedValue={noteToMove?.categoryId || ""}
+            onSelect={handleSelectCategory}
+            colors={colors}
+          />
+        </View>
+      </Pressable>
     </SafeAreaView>
   );
 };
