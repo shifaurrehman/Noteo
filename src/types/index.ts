@@ -6,7 +6,7 @@ export type SyncStatus = 'synced' | 'syncing' | 'error';
 
 export interface AppSettings {
   theme: ThemeMode;
-  fontSize?: FontSize;
+  fontSize: FontSize;
   gridDensity: GridDensity;
   backupEnabled: boolean;
   syncStatus?: SyncStatus;
