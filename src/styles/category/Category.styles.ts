@@ -1,11 +1,6 @@
 import { StyleSheet } from "react-native";
 
-export const createCategoryStyles = (colors:{
-    background: string,
-    textSecondary: string,
-    primary: string,
-    shadow: string,
-}) => StyleSheet.create({
+export const createCategoryStyles = (colors: any) => StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: colors.background,

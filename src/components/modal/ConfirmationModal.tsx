@@ -1,5 +1,4 @@
-import { useAppSelector } from "@/store/hooks";
-import { selectColors } from "@/store/selectors";
+import { useTheme } from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import React, { memo } from "react";
@@ -35,7 +34,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = memo(({
     cancelText = "Cancel",
     type = "danger",
 }) => {
-    const colors = useAppSelector(selectColors);
+    const { colors } = useTheme();
 
     const getIconName = () => {
         switch (type) {
@@ -79,7 +78,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = memo(({
                     )}
 
                     <TouchableWithoutFeedback>
-                        <View style={[styles.modalContainer, { backgroundColor: colors.cardBg, shadowColor: colors.shadow }]}>
+                        <View style={[styles.modalContainer, { backgroundColor: colors.background, shadowColor: colors.shadow }]}>
                             {/* Icon Header */}
                             <View style={[styles.iconContainer, { backgroundColor: getIconColor() + "15" }]}>
                                 <Ionicons name={getIconName()} size={32} color={getIconColor()} />
@@ -87,7 +86,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = memo(({
 
                             {/* Text Content */}
                             <View style={styles.textContent}>
-                                <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
+                                <Text style={[styles.title, { color: colors.textMain }]}>{title}</Text>
                                 <Text style={[styles.message, { color: colors.textSecondary }]}>{message}</Text>
                             </View>
 
@@ -98,7 +97,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = memo(({
                                     onPress={onClose}
                                     activeOpacity={0.7}
                                 >
-                                    <Text style={[styles.cancelButtonText, { color: colors.text }]}>{cancelText}</Text>
+                                    <Text style={[styles.cancelButtonText, { color: colors.textMain }]}>{cancelText}</Text>
                                 </TouchableOpacity>
 
                                 <TouchableOpacity
@@ -123,6 +122,8 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = memo(({
         </Modal>
     );
 });
+
+ConfirmationModal.displayName = 'ConfirmationModal';
 
 const { width } = Dimensions.get("window");
 

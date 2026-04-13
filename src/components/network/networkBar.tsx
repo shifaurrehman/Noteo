@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Text, Animated, StyleSheet } from 'react-native';
 import { useAppSelector } from "@/store/hooks";
-import { selectColors } from '@/store/selectors';
+import { useTheme } from '@/hooks/useTheme';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const NetworkStatusBar = () => {
-    const isConnected = useAppSelector((state) => state?.network?.isConnected);
-    const colors = useAppSelector(selectColors);
+    const { isConnected } = useAppSelector((state) => state?.network);
+    const { colors } = useTheme();
     const insets = useSafeAreaInsets();
 
     const bottomPosition = 50 + insets.bottom;
@@ -41,7 +41,7 @@ export const NetworkStatusBar = () => {
         }, 3000);
 
         return () => clearTimeout(timer);
-    }, [isConnected]);
+    }, [isConnected, anim]);
 
     if (!visible) return null;
 

@@ -2,13 +2,12 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import { createShimmerPlaceholder } from "react-native-shimmer-placeholder";
 import { LinearGradient } from "expo-linear-gradient";
-import { useAppSelector } from "@/store/hooks";
-import { selectColors } from "@/store/selectors";
+import { useTheme } from "@/hooks/useTheme";
 
 const ShimmerPlaceholder = createShimmerPlaceholder(LinearGradient);
 
 export const ShimmerNoteCard = () => {
-  const colors = useAppSelector(selectColors);
+  const { colors } = useTheme();
 
   const styles = StyleSheet.create({
     card: {

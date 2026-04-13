@@ -1,9 +1,7 @@
 import React from "react";
 import { StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useAppSelector } from "../../store/hooks";
-import { selectColors } from "../../store/selectors";
-import { CARD_HEIGHT, CARD_WIDTH, CARD_MARGIN } from "@/constants/categories";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useTheme } from "@/hooks/useTheme";
 import { Category } from "@/types/category/category.types";
 
 interface CategoryCardProps {
@@ -16,6 +14,7 @@ interface CategoryCardProps {
   onToggleMenu?: () => void;
   width: number;
   height: number;
+  noteCount?: number;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -29,110 +28,174 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
   onToggleMenu,
   width,
   height,
+  noteCount,
   style,
 }) => {
-  const colors = useAppSelector(selectColors);
-
+  const { colors } = useTheme();
+  const isDarkMode = colors.background === "#101122";
+  
+  const categoryColor = category.color || colors.primary;
+  const categoryIcon = category.icon || "folder";
 
   const styles = StyleSheet.create({
     card: {
       backgroundColor: colors.cardBg,
-      borderRadius: 16,
-      justifyContent: "center",
-      alignItems: "center",
-      shadowColor: colors.shadow,
-      shadowOpacity: 0.08,
-      shadowRadius: 4,
-      shadowOffset: { width: 0, height: 2 },
-      elevation: 3,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: isDarkMode ? colors.border + "33" : colors.border + "80",
+      padding: 16,
       width: width,
       height: height,
       position: "relative",
       overflow: "visible",
+      justifyContent: "space-between",
+    },
+    iconContainer: {
+      width: 44,
+      height: 44,
+      borderRadius: 14,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: categoryColor + "15",
     },
     text: {
-      fontSize: 16,
+      fontSize: 15,
       fontWeight: "600",
-      textAlign: "center",
-      color: colors.text,
-      paddingHorizontal: 12,
+      color: colors.textMain,
+      marginTop: 8,
     },
     menuIconContainer: {
       position: "absolute",
-      top: 8,
-      right: 8,
-      padding: 6,
+      top: 12,
+      right: 12,
+      padding: 4,
       zIndex: 20,
     },
     popupContainer: {
       position: "absolute",
-      top: 35,
-      right: 40,
-      backgroundColor: colors.cardBg,
-      paddingVertical: 4,
-      borderRadius: 10,
-      elevation: 5,
+      top: 32,
+      right: 18,
+      backgroundColor: isDarkMode ? "#0F1121" : colors.background, // Match theme background
+      paddingVertical: 3,
+      borderRadius: 12,
+      elevation: 10,
       shadowColor: "#000",
-      shadowOpacity: 0.15,
-      shadowRadius: 6,
+      shadowOpacity: 0.25,
+      shadowRadius: 12,
+      shadowOffset: { width: 0, height: 6 },
       zIndex: 999,
-      width: 100,
+      width: width * 0.6,
+      minWidth: 100,
+      maxWidth: 120,
+      borderWidth: 1,
+      borderColor: isDarkMode ? colors.border + "30" : colors.border + "40",
     },
     menuItem: {
-      paddingVertical: 4,
-      paddingHorizontal: 14,
+      paddingVertical: 8,
+      paddingHorizontal: 10,
       flexDirection: "row",
       alignItems: "center",
       gap: 8,
     },
     menuText: {
-      color: colors.text,
-      fontSize: 14,
+      color: colors.textMain,
+      fontSize: 12.5,
+      fontWeight: "600",
+    },
+    separator: {
+      height: 1,
+      backgroundColor: colors.border + "20",
+      marginVertical: 1,
+      marginHorizontal: 8,
+    },
+    noteTitle: {
+      fontSize: 17,
+      fontWeight: "700",
+      color: colors.textMain,
+      marginTop: "auto",
+      marginBottom: 6,
+    },
+    noteCount: {
+      fontSize: 13,
+      fontWeight: "500",
+      color: colors.textSecondary,
+    },
+    topRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+      width: "100%",
     },
   });
 
   return (
     <View style={{ position: "relative" }}>
-      <TouchableOpacity style={[styles.card, style]} onPress={onPress} activeOpacity={0.8}>
-        {/* 3-dot Menu Button */}
-        <TouchableOpacity
-          style={styles.menuIconContainer}
-          onPress={onToggleMenu}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-        >
-          <Ionicons name="ellipsis-vertical" size={20} color={colors.text} />
-        </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.card, style]}
+        onPress={onPress}
+        onLongPress={onToggleMenu}
+        activeOpacity={0.7}
+      >
+        <View style={styles.topRow}>
+          <View style={styles.iconContainer}>
+            <MaterialIcons name={categoryIcon as any} size={24} color={categoryColor} />
+          </View>
 
-        <Text style={styles.text}>{category.name}</Text>
+          <TouchableOpacity
+            onPress={onToggleMenu}
+            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+          >
+            <Ionicons
+              name="ellipsis-vertical"
+              size={18}
+              color={colors.textSecondary}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <View>
+          <Text style={styles.noteTitle} numberOfLines={1}>{category.name}</Text>
+          <Text style={styles.noteCount}>{noteCount || 0} notes</Text>
+        </View>
       </TouchableOpacity>
 
-      {/* Popup Menu — Now Attached to Card Itself */}
+      {/* Popup Menu */}
       {isMenuVisible && (
         <View style={styles.popupContainer}>
-          {onEdit && (
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => {
-                onToggleMenu?.();
-                onEdit();
-              }}
-            >
-              <Ionicons name="create-outline" size={18} color={colors.text} />
-              <Text style={styles.menuText}>Edit</Text>
-            </TouchableOpacity>
+          {onFavorite && (
+            <>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  onToggleMenu?.();
+                  onFavorite();
+                }}
+              >
+                <Ionicons
+                  name={category.isFavorite ? "heart" : "heart-outline"}
+                  size={18}
+                  color={category.isFavorite ? "#ff3b30" : colors.textMain}
+                />
+                <Text style={styles.menuText}>Favorite</Text>
+              </TouchableOpacity>
+              <View style={styles.separator} />
+            </>
           )}
 
-          {onFavorite && (
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={() => {
-                onToggleMenu?.();
-                onFavorite();
-              }}
-            >
-              <Ionicons name={category.isFavorite ? "star" : "star-outline"} size={18} color={category.isFavorite ? colors.primary : colors.text} />
-              <Text style={styles.menuText}>Favorite</Text>
-            </TouchableOpacity>
+          {onEdit && (
+            <>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  onToggleMenu?.();
+                  onEdit();
+                }}
+              >
+                <Ionicons name="create-outline" size={18} color={colors.textMain} />
+                <Text style={styles.menuText}>Edit</Text>
+              </TouchableOpacity>
+              <View style={styles.separator} />
+            </>
           )}
 
           {onDelete && (
@@ -143,8 +206,8 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
                 onDelete();
               }}
             >
-              <Ionicons name="trash-outline" size={18} color="red" />
-              <Text style={styles.menuText}>Delete</Text>
+              <Ionicons name="trash-outline" size={18} color={colors.danger} />
+              <Text style={[styles.menuText, { color: colors.danger }]}>Delete</Text>
             </TouchableOpacity>
           )}
         </View>

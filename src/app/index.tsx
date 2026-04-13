@@ -1,5 +1,6 @@
 import { useAppSelector } from "@/store/hooks";
-import { selectColors, selectIsAuthenticated, selectUser } from "@/store/selectors";
+import { selectIsAuthenticated, selectUser } from "@/store/selectors";
+import { useTheme } from "@/hooks/useTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import LottieView from "lottie-react-native";
@@ -11,7 +12,7 @@ const { width } = Dimensions.get("window");
 export default function SplashScreen() {
   const router = useRouter();
   // selectors
-  const colors = useAppSelector(selectColors);
+  const { colors } = useTheme();
   const user = useAppSelector(selectUser);
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
@@ -28,17 +29,11 @@ export default function SplashScreen() {
     }).start();
 
     const timer = setTimeout(() => {
-      let nextRoute: "/auth/Login" | "/(tabs)/home" = "/auth/Login";
-
-      if (isAuthenticated) {
-        nextRoute = "/(tabs)/home";
-      }
-
-      router.replace(nextRoute);
+      router.replace("/(app)/(tabs)/home");
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [user, isAuthenticated, router]);
+  }, [user, isAuthenticated, router, scaleAnim]);
 
   const gradientColors: [string, string, string] = ["#1c1c1e", "#5a00ff", "#ff008c"]
 
@@ -59,7 +54,7 @@ export default function SplashScreen() {
         />
       </Animated.View>
 
-      <Text style={[styles.appName, { color: colors.primary }]}>Simple Note Taker</Text>
+      <Text style={[styles.appName, { color: colors.primary }]}>Noteo</Text>
       <Text style={[styles.tagline, { color: "#ccc" }]}>Your smart notes companion</Text>
     </LinearGradient>
   );

@@ -1,34 +1,42 @@
-import { AddCategoryModal } from "@/components/category/AddCategoryModal";
+import { AddCategoryBottomSheet } from "@/components/category/AddCategoryBottomSheet";
 import { CategoryCard } from "@/components/category/CategoryCard";
 import { Header } from "@/components/header/Header";
 import { SearchBar } from "@/components/searchbar/SearchBar";
-import { CARD_HEIGHT, EmptyCategoryText, NUM_COLUMNS } from "@/constants/categories";
+import { EmptyCategoryText } from "@/constants/categories";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectCategories, selectColors } from "@/store/selectors";
+import { selectCategories, selectCategoriesLoading, selectIsConnected, selectNotes } from "@/store/selectors";
+import { useTheme } from "@/hooks/useTheme";
 import { deleteCategory, fetchCategories, updateCategory } from "@/store/slices/categoriesSlice";
 import { deleteNotesByCategory } from "@/store/slices/notesSlice";
 import { createHomeScreenStyles } from "@/styles/home/HomeScreen.styles";
 import { Category } from "@/types/category/category.types";
 import { filterCategories } from "@/utilities/home/HomeScreenUtils";
+import responsive, { useResponsive } from "@/utilities/responsive";
 import { useNavigation } from "@/utilities/routes/Routes";
 import { Ionicons } from "@expo/vector-icons";
-import { FlashList } from "@shopify/flash-list";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Text, View } from "react-native";
+import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
+import { FlatList, RefreshControl, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 
 const FavoriteScreen: React.FC = () => {
-    const { viewCategoryNotes } = useNavigation();  
+    const { viewCategoryNotes } = useNavigation();
+    const { deviceType } = useResponsive();
     const dispatch = useAppDispatch();
     const categories = useAppSelector(selectCategories);
-    const colors = useAppSelector(selectColors);
-    const user = useAppSelector((state) => state.auth.user);
+    const notes = useAppSelector(selectNotes);
+    const { colors } = useTheme();
+    const isConnected = useAppSelector(selectIsConnected);
+    const isLoading = useAppSelector(selectCategoriesLoading);
+    const bottomSheetRef = useRef<any>(null);
     const [editCategory, setEditCategory] = useState<Category | null>(null);
     const [searchText, setSearchText] = useState("");
     const [showAddModal, setShowAddModal] = useState(false);
     const [activeMenuId, setActiveMenuId] = React.useState<string | null>(null);
+    const [containerWidth, setContainerWidth] = useState(0);
     const styles = createHomeScreenStyles(colors);
+    const { columns: numColumns, cardWidth, gap, sidePadding } = responsive.getGridLayout(containerWidth, deviceType);
+    const cardHeight = cardWidth;
 
     const filteredCategories = useMemo(() => {
         return filterCategories(categories, { searchText, favoritesOnly: true });
@@ -44,16 +52,17 @@ const FavoriteScreen: React.FC = () => {
     }, []);
 
     const handleSaveEditedCategory = useCallback(
-        (newName: string) => {
+        (category: { name: string; color: string; icon: string }) => {
             if (!editCategory) return;
             dispatch(
                 updateCategory({
                     id: editCategory.id,
-                    updates: { name: newName },
+                    updates: { name: category.name },
                 })
             );
             setEditCategory(null);
             setShowAddModal(false);
+            bottomSheetRef.current?.dismiss();
         },
         [dispatch, editCategory]
     );
@@ -62,7 +71,7 @@ const FavoriteScreen: React.FC = () => {
         (id: string) => {
             dispatch(deleteNotesByCategory(id)); // remove all notes of this category
             dispatch(deleteCategory(id));
-            setShowAddModal(false);
+            setActiveMenuId(null);
         },
         [dispatch]
     );
@@ -75,13 +84,14 @@ const FavoriteScreen: React.FC = () => {
                     updates: { isFavorite: !category.isFavorite },
                 })
             );
+            setActiveMenuId(null);
         },
         [dispatch]
     );
 
     const handleOpenNotes = useCallback((category: Category) => {
-        viewCategoryNotes({categoryId: category.id, categoryName: category.name, isFavorite: true});
-    }, []);
+        viewCategoryNotes({ categoryId: category.id, categoryName: category.name, isFavorite: true });
+    }, [viewCategoryNotes]);
 
     const handleCloseModal = () => {
         setEditCategory(null);
@@ -92,20 +102,49 @@ const FavoriteScreen: React.FC = () => {
         return EmptyCategoryText.noCategories;
     };
 
-    const renderItem = ({ item }: { item: Category }) => (
-        <CategoryCard
-            category={item}
-            onPress={() => {
-                setActiveMenuId(null);
-                handleOpenNotes(item);
-            }}
-            onEdit={() => handleEditCategory(item)}
-            onDelete={() => handleDeleteCategory(item.id)}
-            onFavorite={() => handleFavoriteCategory(item)}
-            isMenuVisible={activeMenuId === item.id}
-            onToggleMenu={() => setActiveMenuId(activeMenuId === item.id ? null : item.id)}
-        />
-    );
+    const onRefresh = useCallback(() => {
+        dispatch(fetchCategories());
+    }, [dispatch]);
+
+    const renderRefreshControl = () => {
+        if (!isConnected) return undefined;
+        return (
+            <RefreshControl
+                refreshing={isLoading}
+                onRefresh={onRefresh}
+                tintColor={colors.primary}
+                colors={[colors.primary]}
+                progressBackgroundColor={colors.surface}
+            />
+        );
+    };
+
+    const renderItem = ({ item, index }: { item: Category, index: number }) => {
+        const isLastInRow = (index + 1) % numColumns === 0;
+        const noteCount = notes.filter((n) => n.categoryId === item.id && !n.isDeleted).length;
+
+        return (
+            <CategoryCard
+                category={item}
+                onPress={() => {
+                    setActiveMenuId(null);
+                    handleOpenNotes(item);
+                }}
+                onEdit={() => handleEditCategory(item)}
+                onDelete={() => handleDeleteCategory(item.id)}
+                onFavorite={() => handleFavoriteCategory(item)}
+                isMenuVisible={activeMenuId === item.id}
+                onToggleMenu={() => setActiveMenuId(activeMenuId === item.id ? null : item.id)}
+                width={cardWidth}
+                height={cardHeight}
+                noteCount={noteCount}
+                style={{
+                    marginRight: isLastInRow ? 0 : gap,
+                    marginBottom: gap,
+                }}
+            />
+        );
+    }
 
     const renderEmptyFlatListData = () => {
         return (
@@ -117,20 +156,19 @@ const FavoriteScreen: React.FC = () => {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
             <View style={styles.container}>
                 {/* header */}
-                <Header title={"Ai Note Taker"} titleStyle={{ color: colors.primary }} />
+                <Header title={"Noteo"} backgroundColor={colors.background} titleStyle={{ color: colors.primary }} />
 
                 {/* search bar */}
                 <SearchBar
                     value={searchText}
                     onChangeText={setSearchText}
-                    onClear={() => setSearchText("")}
                     placeholder={"Search favorites..."}
                     colors={{
                         surface: colors.surface,
-                        text: colors.text,
+                        textMain: colors.textMain,
                         textSecondary: colors.textSecondary,
                         border: colors.border,
                         primary: colors.primary,
@@ -138,29 +176,34 @@ const FavoriteScreen: React.FC = () => {
                 />
 
                 {/* categories list */}
-                <View style={styles.flashListWrapper}>
-                    <FlashList
+                <View style={styles.flashListWrapper}
+                    onLayout={(event) => {
+                        const { width } = event.nativeEvent.layout;
+                        setContainerWidth(width);
+                    }}>
+                    <FlatList
                         data={filteredCategories}
                         renderItem={renderItem}
-                        estimatedItemSize={CARD_HEIGHT}
-                        numColumns={NUM_COLUMNS}
-                        contentContainerStyle={styles.listContainer}
+                        numColumns={numColumns}
+                        contentContainerStyle={{
+                            paddingHorizontal: sidePadding,
+                            paddingVertical: gap,
+                        }}
                         keyExtractor={(item) => item.id.toString()}
                         showsVerticalScrollIndicator={false}
                         ListEmptyComponent={renderEmptyFlatListData}
-                        style={{ flex: 1, width: "100%", paddingHorizontal: 5, }}
+                        refreshControl={renderRefreshControl()}
                     />
                 </View>
 
-                {/* Add Category Modal */}
-                {showAddModal && (
-                    <AddCategoryModal
-                        visible={showAddModal}
-                        onClose={handleCloseModal}
-                        onSave={handleSaveEditedCategory}
-                        initialValue={editCategory?.name}
-                    />
-                )}
+                {/* Add/Edit Category Bottom Sheet */}
+                <AddCategoryBottomSheet
+                    ref={bottomSheetRef}
+                    visible={showAddModal}
+                    onClose={handleCloseModal}
+                    onSave={handleSaveEditedCategory}
+                    initialValue={editCategory?.name}
+                />
             </View>
         </SafeAreaView>
     );

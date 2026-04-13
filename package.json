@@ -1,5 +1,5 @@
 {
-  "name": "ai-note-taker",
+  "name": "noteo",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
@@ -8,6 +8,9 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit",
+    "preflight": "npm run lint && npm run typecheck",
     "db:start": "json-server --watch db.json --port 3001",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -21,6 +24,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
+    "@gorhom/bottom-sheet": "^5.2.8",
     "@lottiefiles/dotlottie-react": "^0.13.5",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-community/netinfo": "11.4.1",

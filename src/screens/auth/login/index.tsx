@@ -1,27 +1,123 @@
 import AuthInput from "@/components/auth/AuthEmail";
-import GradientButton from "@/components/auth/CustomButton";
+import PrimaryButton from "@/components/button/PrimaryButton";
 import { useAuth } from "@/hooks/useAuth";
 import { fetchCategories } from "@/store/slices/categoriesSlice";
 import { validateEmail } from "@/utilities/auth";
 import { useNavigation } from "@/utilities/routes/Routes";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
     Keyboard,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
-    StyleSheet,
     Text,
     TouchableOpacity,
     View,
 } from "react-native";
 import { useDispatch } from "react-redux";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useTheme } from "@/hooks/useTheme";
+import type { ThemeColors } from "@/theme/colors";
+
+const createLoginStyles = (colors: ThemeColors) => {
+  return {
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollContainer: {
+      flexGrow: 1,
+      paddingHorizontal: 24,
+      paddingTop: Platform.OS === "ios" ? 60 : 40,
+      paddingBottom: 40,
+    },
+    header: {
+      alignItems: "center" as const,
+      marginBottom: 40,
+    },
+    iconContainer: {
+      marginBottom: 20,
+    },
+    iconWrapper: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      justifyContent: "center" as const,
+      alignItems: "center" as const,
+      backgroundColor: colors.primary + "20", // 20% opacity
+      ...Platform.select({
+        ios: {
+          shadowColor: colors.primary,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.2,
+          shadowRadius: 8,
+        },
+        android: {
+          elevation: 4,
+        },
+      }),
+    },
+    title: {
+      fontSize: 32,
+      fontWeight: "700" as const,
+      color: colors.textMain,
+      marginBottom: 8,
+      textAlign: "center" as const,
+    },
+    subtitle: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      textAlign: "center" as const,
+    },
+    formContainer: {
+      backgroundColor: colors.surface,
+      borderRadius: 24,
+      padding: 24,
+      ...Platform.select({
+        ios: {
+          shadowColor: colors.shadow,
+          shadowOffset: { width: 0, height: 10 },
+          shadowOpacity: 0.1,
+          shadowRadius: 20,
+        },
+        android: {
+          elevation: 10,
+        },
+      }),
+    },
+    forgotPassword: {
+      alignSelf: "flex-end" as const,
+      marginTop: 12,
+      marginBottom: 24,
+    },
+    forgotPasswordText: {
+      color: colors.primary,
+      fontSize: 14,
+      fontWeight: "600" as const,
+    },
+    registerContainer: {
+      flexDirection: "row" as const,
+      justifyContent: "center" as const,
+      alignItems: "center" as const,
+      marginTop: 24,
+    },
+    registerPrompt: {
+      color: colors.textSecondary,
+      fontSize: 15,
+    },
+    registerLink: {
+      color: colors.primary,
+      fontSize: 15,
+      fontWeight: "700" as const,
+    },
+  };
+};
 
 export default function LoginScreen() {
-    const router = useRouter();
+    const { colors } = useTheme();
+    const styles = createLoginStyles(colors);
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loginAttempted, setLoginAttempted] = useState(false);
@@ -31,7 +127,7 @@ export default function LoginScreen() {
     const [errors, setErrors] = useState({ email: "", password: "", });
     const { loading, login, isAuthenticated } = useAuth();
 
-    const validateInputFields = () => {
+    const validateInputFields = useCallback(() => {
         const newErrors = { email: "", password: "" };
         let isValid = true;
 
@@ -50,7 +146,8 @@ export default function LoginScreen() {
 
         setErrors(newErrors);
         return isValid;
-    };
+    }, [email, password]);
+
     const handleChange = (field: keyof typeof errors, value: string) => {
         if (field === "email") setEmail(value);
         if (field === "password") setPassword(value);
@@ -63,20 +160,18 @@ export default function LoginScreen() {
         Keyboard.dismiss();
         setLoginAttempted(true)
         login({ email, password });
-    }, [email, password, login]);
+    }, [email, password, login, validateInputFields]);
 
     useEffect(() => {
         if (loginAttempted && isAuthenticated) {
             redirectHome();
             dispatch(fetchCategories());
         }
-    }, [isAuthenticated, loginAttempted, router]);
-
-    const handleGuest = async () => { };
+    }, [isAuthenticated, loginAttempted, redirectHome, dispatch]);
 
     return (
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
-            <LinearGradient colors={["#667eea", "#764ba2", "#f093fb"]} style={styles.gradient}>
+        <SafeAreaView style={styles.container} edges={["top"]}>
+            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
                 <ScrollView
                     contentContainerStyle={styles.scrollContainer}
                     showsVerticalScrollIndicator={false}
@@ -85,9 +180,9 @@ export default function LoginScreen() {
                     {/* Header Section */}
                     <View style={styles.header}>
                         <View style={styles.iconContainer}>
-                            <LinearGradient colors={["#ff6b9d", "#c86dd7"]} style={styles.iconGradient}>
-                                <Ionicons name="book" size={40} color="#fff" />
-                            </LinearGradient>
+                            <View style={styles.iconWrapper}>
+                                <Ionicons name="book" size={40} color={colors.primary} />
+                            </View>
                         </View>
                         <Text style={styles.title}>Welcome Back</Text>
                         <Text style={styles.subtitle}>Sign in to continue your journey</Text>
@@ -103,6 +198,7 @@ export default function LoginScreen() {
                             error={errors.email}
                             iconName="mail-outline"
                             keyboardType="email-address"
+                            colors={colors}
                         />
 
                         {/* Password Input */}
@@ -113,6 +209,7 @@ export default function LoginScreen() {
                             error={errors.password}
                             iconName="lock-closed-outline"
                             secureTextEntry
+                            colors={colors}
                         />
 
                         {/* Forgot Password */}
@@ -124,25 +221,7 @@ export default function LoginScreen() {
                         </TouchableOpacity>
 
                         {/* Login Button */}
-                        <GradientButton title="Sign In" loading={loading} onPress={handleLogin} />
-
-                        {/* Divider */}
-                        <View style={styles.dividerContainer}>
-                            <View style={styles.divider} />
-                            <Text style={styles.dividerText}>or</Text>
-                            <View style={styles.divider} />
-                        </View>
-
-                        {/* Guest Button */}
-                        <TouchableOpacity
-                            onPress={handleGuest}
-                            style={styles.guestButton}
-                            disabled={loading}
-                            activeOpacity={0.8}
-                        >
-                            <Ionicons name="person-outline" size={20} color="#667eea" />
-                            <Text style={styles.guestText}>Continue as Guest</Text>
-                        </TouchableOpacity>
+                        <PrimaryButton title="Sign In" loading={loading} onPress={handleLogin} colors={colors} />
 
                         {/* Register Link */}
                         <View style={styles.registerContainer}>
@@ -153,140 +232,7 @@ export default function LoginScreen() {
                         </View>
                     </View>
                 </ScrollView>
-            </LinearGradient>
-        </KeyboardAvoidingView>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
     );
 }
-
-const styles = StyleSheet.create({
-    gradient: {
-        flex: 1,
-    },
-    scrollContainer: {
-        flexGrow: 1,
-        paddingHorizontal: 24,
-        paddingTop: Platform.OS === "ios" ? 60 : 40,
-        paddingBottom: 40,
-    },
-    header: {
-        alignItems: "center",
-        marginBottom: 40,
-    },
-    iconContainer: {
-        marginBottom: 20,
-    },
-    iconGradient: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        justifyContent: "center",
-        alignItems: "center",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 8,
-    },
-    title: {
-        fontSize: 32,
-        fontWeight: "700",
-        color: "#fff",
-        marginBottom: 8,
-        textAlign: "center",
-    },
-    subtitle: {
-        fontSize: 16,
-        color: "rgba(255, 255, 255, 0.85)",
-        textAlign: "center",
-    },
-    formContainer: {
-        backgroundColor: "#fff",
-        borderRadius: 24,
-        padding: 24,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.15,
-        shadowRadius: 20,
-        elevation: 10,
-    },
-    forgotPassword: {
-        alignSelf: "flex-end",
-        marginTop: 12,
-        marginBottom: 24,
-    },
-    forgotPasswordText: {
-        color: "#667eea",
-        fontSize: 14,
-        fontWeight: "600",
-    },
-    button: {
-        borderRadius: 12,
-        overflow: "hidden",
-        shadowColor: "#667eea",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 5,
-    },
-    buttonDisabled: {
-        opacity: 0.6,
-    },
-    buttonGradient: {
-        paddingVertical: 16,
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    buttonText: {
-        color: "#fff",
-        fontSize: 17,
-        fontWeight: "700",
-        letterSpacing: 0.5,
-    },
-    dividerContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginVertical: 24,
-    },
-    divider: {
-        flex: 1,
-        height: 1,
-        backgroundColor: "#e9ecef",
-    },
-    dividerText: {
-        marginHorizontal: 16,
-        color: "#6c757d",
-        fontSize: 14,
-        fontWeight: "500",
-    },
-    guestButton: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#f8f9fa",
-        borderRadius: 12,
-        paddingVertical: 16,
-        borderWidth: 2,
-        borderColor: "#667eea",
-    },
-    guestText: {
-        color: "#667eea",
-        fontSize: 16,
-        fontWeight: "600",
-        marginLeft: 8,
-    },
-    registerContainer: {
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 24,
-    },
-    registerPrompt: {
-        color: "#6c757d",
-        fontSize: 15,
-    },
-    registerLink: {
-        color: "#667eea",
-        fontSize: 15,
-        fontWeight: "700",
-    },
-});

@@ -16,8 +16,15 @@ export function* syncPendingCategoriesSaga() {
   try {
     console.log("[Sync Saga] Starting smart sync of categories...");
 
-    // 1. Combine PENDING + ERROR categories from Redux
+    // 1. Check settings first
     const state: RootState = yield select();
+    const settings = state.settings;
+    if (!settings.backupEnabled) {
+      console.log("[Sync Saga] Backup disabled locally, aborting sync.");
+      return;
+    }
+
+    // 2. Combine PENDING + ERROR categories from Redux
     const categories = state.categories.categories;
     const categoriesToSync = categories.filter((cat: Category) => cat.syncStatus === SYNC_STATUS.PENDING || cat.syncStatus === SYNC_STATUS.ERROR);
 

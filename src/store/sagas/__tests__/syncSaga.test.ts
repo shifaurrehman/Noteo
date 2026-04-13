@@ -7,16 +7,27 @@ import {
   markCategoryAsSynced,
   updateCategory,
   updateCategorySyncStatus,
+  initialState as categoriesInitialState,
 } from "../../slices/categoriesSlice";
 import { syncPendingCategoriesSaga } from "../syncSaga";
+
+import { initialState as authInitialState } from "../../slices/authSlice";
+import { initialState as networkInitialState } from "../../slices/networkSlice";
+import { initialState as notesInitialState } from "../../slices/notesSlice";
+import { initialState as settingsInitialState } from "../../slices/settingsSlice";
 
 // Mock uuid
 jest.mock("uuid", () => ({
   v4: () => "new-uuid",
 }));
 
+// ... (rest of the imports)
+
 // Mock API and utilities
-jest.mock("@/services/api/services/categoriesService");
+jest.mock("@/services/api/services/categoriesService", () => ({
+  ...jest.requireActual("@/services/api/services/categoriesService"),
+  syncCategoriesApi: jest.fn((payload) => Promise.resolve({ success: true })),
+}));
 jest.mock("@/utilities/toast/message-toast");
 
 describe("syncPendingCategoriesSaga", () => {
@@ -37,6 +48,10 @@ describe("syncPendingCategoriesSaga", () => {
         syncStatus: SYNC_STATUS.PENDING,
         isLocal: false,
         isDeleted: false,
+        isFavorite: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        version: 1,
       },
       {
         id: "",
@@ -44,6 +59,10 @@ describe("syncPendingCategoriesSaga", () => {
         syncStatus: SYNC_STATUS.ERROR,
         isLocal: true,
         isDeleted: false,
+        isFavorite: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        version: 1,
       },
       {
         id: "3",
@@ -51,6 +70,10 @@ describe("syncPendingCategoriesSaga", () => {
         syncStatus: SYNC_STATUS.PENDING,
         isLocal: false,
         isDeleted: false,
+        isFavorite: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        version: 1,
       },
       {
         id: "4",
@@ -58,6 +81,10 @@ describe("syncPendingCategoriesSaga", () => {
         syncStatus: SYNC_STATUS.SYNCED,
         isLocal: false,
         isDeleted: false,
+        isFavorite: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        version: 1,
       },
       {
         id: "5",
@@ -65,13 +92,22 @@ describe("syncPendingCategoriesSaga", () => {
         syncStatus: SYNC_STATUS.PENDING,
         isLocal: true,
         isDeleted: true,
+        isFavorite: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        version: 1,
       },
     ];
 
     const mockState = {
       categories: {
+        ...categoriesInitialState,
         categories: mockCategories,
       },
+      notes: notesInitialState,
+      settings: settingsInitialState,
+      auth: authInitialState,
+      network: networkInitialState,
     };
 
     // 2. Start validation loop
@@ -116,7 +152,7 @@ describe("syncPendingCategoriesSaga", () => {
       deleted: [],
     };
 
-    expect(generator.next().value).toEqual(call(syncCategoriesApi, expectedBatch));
+    expect(generator.next().value).toEqual(call(syncCategoriesApi as any, expectedBatch));
 
     // 5. Success Handlers
     // Mark created items as synced
@@ -143,13 +179,22 @@ describe("syncPendingCategoriesSaga", () => {
         syncStatus: SYNC_STATUS.PENDING,
         isLocal: false,
         isDeleted: false,
+        isFavorite: false, // Added
+        createdAt: new Date().toISOString(), // Added
+        updatedAt: new Date().toISOString(), // Added
+        version: 1, // Added
       },
     ];
 
     const mockState = {
       categories: {
+        ...categoriesInitialState,
         categories: mockCategories,
       },
+      notes: notesInitialState,
+      settings: settingsInitialState,
+      auth: authInitialState,
+      network: networkInitialState,
     };
 
     generator.next(mockState); // Validation loop (none yield here as it's valid)

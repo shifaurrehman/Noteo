@@ -10,28 +10,40 @@ import { FlatList, Text, View } from "react-native";
 
 import { IconPressable } from "@/components/button/IconPressable";
 import {
+  selectCategories,
   selectCategoryById,
-  selectColors,
   selectNotesByCategory,
 } from "@/store/selectors";
+import { useTheme } from "@/hooks/useTheme";
 import { deleteNote, fetchNotes, updateNote } from "@/store/slices/notesSlice";
 import { Note } from "@/types/notes/notes.types";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { useNavigation } from "@/utilities/routes/Routes";
+import { SelectionBottomSheet } from "@/components/modal/SelectionBottomSheet";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { Pressable } from "react-native";
 
 const NotesScreen = () => {
+  const insets = useSafeAreaInsets();
   const { categoryId, name, isFavorite } = useLocalSearchParams<{ categoryId: string; name?: string; isFavorite?: string }>();
   // selectors
   const category = useAppSelector((state) => (categoryId ? selectCategoryById(state, categoryId) : null));
+  const categories = useAppSelector(selectCategories);
   const notes = useAppSelector((state) => (categoryId ? selectNotesByCategory(state, categoryId) : []));
-  const colors = useAppSelector(selectColors);
+  const { colors } = useTheme();
   console.log("NOTES SCREEN: ", "isFavorite note or not..... ", isFavorite);
 
   // dispatcher and styles
   const dispatch = useAppDispatch();
+  const { openAddNote, openEditNote } = useNavigation();
   const styles = createCategoryStyles(colors);
 
   const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [activeNoteMenuId, setActiveNoteMenuId] = useState<string | null>(null);
+  const [noteToMove, setNoteToMove] = useState<Note | null>(null);
+
+  const selectionSheetRef = React.useRef<BottomSheetModal>(null);
 
   const categoryName = name || category?.name || "Notes";
 
@@ -57,22 +69,51 @@ const NotesScreen = () => {
   };
 
   const handleOpenAddNote = (categoryId: string) => {
-    router.push(`/home/notes/${categoryId}/addNote`);
+    openAddNote(categoryId);
   };
-  const editNote = (noteId: string) => {
-    router.push(`/home/notes/${categoryId}/addNote?noteId=${noteId}`);
+  const handleEditNote = (noteId: string) => {
+    openEditNote(categoryId, noteId);
   };
+
+  const handleMoveNote = useCallback((note: Note) => {
+    setNoteToMove(note);
+    selectionSheetRef.current?.present();
+  }, []);
+
+  const handleSelectCategory = useCallback((targetCategoryId: string) => {
+    if (noteToMove) {
+      dispatch(updateNote({ id: noteToMove.id, updates: { categoryId: targetCategoryId } }));
+      setNoteToMove(null);
+    }
+  }, [dispatch, noteToMove]);
+
+  const categoryOptions = React.useMemo(() => {
+    return categories.map(cat => ({
+      id: cat.id,
+      label: cat.name,
+      icon: (cat.icon || 'folder') as any
+    }));
+  }, [categories]);
 
   const renderItem = ({ item }: { item: Note }) => {
     return (
       <NoteCard
         note={item}
-        onPress={() => editNote(item.id)}
+        onPress={() => {
+          setActiveNoteMenuId(null);
+          handleEditNote(item.id);
+        }}
+        onEdit={() => handleEditNote(item.id)}
         onDelete={() => handleDeleteNote(item)}
-        onToggleFavorite={() => handleToggleFavorite(item)}
+        onPin={() => handleToggleFavorite(item)}
+        onMove={() => handleMoveNote(item)}
+        isMenuVisible={activeNoteMenuId === item.id}
+        onToggleMenu={() => setActiveNoteMenuId(activeNoteMenuId === item.id ? null : item.id)}
+        categoryName={category?.name}
+        categoryColor={category?.color}
       />
-    )
-  }
+    );
+  };
 
   const emptyContainer = () => {
     return (
@@ -84,33 +125,39 @@ const NotesScreen = () => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
-      <View style={styles.container}>
-        <Header title={categoryName} showSettings={false} onBack={() => router.back()} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
+      <Pressable 
+        style={{ flex: 1 }} 
+        onPress={() => setActiveNoteMenuId(null)}
+        accessible={false}
+      >
+        <View style={styles.container}>
+          <Header title={categoryName} backgroundColor={colors.background} showSettings={false} onBack={() => router.back()} />
 
-        <View style={styles.content}>
-          <FlatList
-            data={notes}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.listContainer}
-            renderItem={renderItem}
-            ListEmptyComponent={emptyContainer()}
-          />
-        </View>
+          <View style={styles.content}>
+            <FlatList
+              data={notes}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={styles.listContainer}
+              renderItem={renderItem}
+              ListEmptyComponent={emptyContainer()}
+            />
+          </View>
 
         {/* Floating Add Button */}
-        {isFavorite === "true" ? null : (
-          <IconPressable
-            onPress={() => handleOpenAddNote(categoryId)}
-            size={60}
-            haptic="heavy"
-            backgroundColor={colors.primary}
-            pressedColor={colors.primaryPressed}
-            style={styles.floatingButton}
-          >
-            <Text style={styles.floatingButtonText}>+</Text>
-          </IconPressable>
-        )}
+        <IconPressable
+          onPress={() => handleOpenAddNote(categoryId)}
+          size={60}
+          haptic="heavy"
+          backgroundColor={colors.primary}
+          pressedColor={colors.primaryPressed}
+          style={[
+            styles.floatingButton,
+            { bottom: insets.bottom + 30, right: 30 }
+          ]}
+        >
+          <Text style={styles.floatingButtonText}>+</Text>
+        </IconPressable>
 
         {/* Delete Confirmation Modal */}
         <ConfirmationModal
@@ -125,7 +172,19 @@ const NotesScreen = () => {
           confirmText="Delete"
           type="danger"
         />
+
+        {/* Move Note Modal */}
+        <SelectionBottomSheet
+          ref={selectionSheetRef}
+          title="Move Note"
+          description="Select a category to move this note to."
+          options={categoryOptions}
+          selectedValue={noteToMove?.categoryId || categoryId}
+          onSelect={handleSelectCategory}
+          colors={colors}
+        />
       </View>
+      </Pressable>
     </SafeAreaView>
   );
 }

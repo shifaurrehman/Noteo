@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "ai-note-taker",
-    "slug": "ai-note-taker",
+    "name": "noteo",
+    "slug": "noteo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/images/icon.png",
-    "scheme": "ainotetaker",
+    "scheme": "noteo",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.ainotetaker"
+      "bundleIdentifier": "com.anonymous.noteo"
     },
     "android": {
       "adaptiveIcon": {
@@ -22,7 +22,7 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "usesCleartextTraffic": true,
-      "package": "com.anonymous.ainotetaker"
+      "package": "com.anonymous.noteo"
     },
     "web": {
       "output": "static",
@@ -51,8 +51,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "e45c38a5-1cd3-4e94-85c0-e9e589926c95"
+        "projectId": "e0fa9074-518e-47b4-836a-ca2647c587f5"
       }
-    }
+    },
+    "owner": "shifaurrehman"
   }
 }

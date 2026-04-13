@@ -1,26 +1,115 @@
-import AuthInput from "@/components/auth/AuthEmail"; // Reusing AuthInput
-import GradientButton from "@/components/auth/CustomButton";
+import AuthInput from "@/components/auth/AuthEmail";
+import PrimaryButton from "@/components/button/PrimaryButton";
 import { resetPasswordApi } from "@/services/api/services/authService";
+import { useNavigation } from "@/utilities/routes/Routes";
 import { showErrorToast, showSuccessToast } from "@/utilities/toast/message-toast";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
     KeyboardAvoidingView,
     Platform,
     ScrollView,
-    StyleSheet,
     Text,
     TouchableOpacity,
     View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useTheme } from "@/hooks/useTheme";
+import type { ThemeColors } from "@/theme/colors";
 
 // Password validation regex
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
+const createResetPasswordStyles = (colors: ThemeColors) => {
+  return {
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollContainer: {
+      flexGrow: 1,
+      paddingHorizontal: 24,
+      paddingTop: Platform.OS === "ios" ? 60 : 40,
+      paddingBottom: 40,
+    },
+    header: {
+      alignItems: "center" as const,
+      marginBottom: 40,
+    },
+    iconContainer: {
+      marginBottom: 20,
+    },
+    iconWrapper: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      justifyContent: "center" as const,
+      alignItems: "center" as const,
+      backgroundColor: colors.primary + "20",
+      ...Platform.select({
+        ios: {
+          shadowColor: colors.primary,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.2,
+          shadowRadius: 8,
+        },
+        android: {
+          elevation: 4,
+        },
+      }),
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: "700" as const,
+      color: colors.textMain,
+      marginBottom: 8,
+      textAlign: "center" as const,
+    },
+    subtitle: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      textAlign: "center" as const,
+    },
+    formContainer: {
+      backgroundColor: colors.surface,
+      borderRadius: 24,
+      padding: 24,
+      ...Platform.select({
+        ios: {
+          shadowColor: colors.shadow,
+          shadowOffset: { width: 0, height: 10 },
+          shadowOpacity: 0.1,
+          shadowRadius: 20,
+        },
+        android: {
+          elevation: 10,
+        },
+      }),
+    },
+    passwordHint: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      marginBottom: 10,
+      marginTop: -5,
+      marginLeft: 5
+    },
+    backLinkContainer: {
+      alignItems: "center" as const,
+      marginTop: 20,
+    },
+    backLinkText: {
+      color: colors.primary,
+      fontSize: 16,
+      fontWeight: "600" as const,
+    }
+  };
+};
+
 export default function ResetPasswordScreen() {
-    const router = useRouter();
+    const { redirectLogin } = useNavigation();
+    const { colors } = useTheme();
+    const styles = createResetPasswordStyles(colors);
     const { email } = useLocalSearchParams<{ email: string }>();
     const [otp, setOtp] = useState("");
     const [newPassword, setNewPassword] = useState("");
@@ -64,7 +153,7 @@ export default function ResetPasswordScreen() {
         try {
             await resetPasswordApi({ email, otp, newPassword });
             showSuccessToast({ title: "Success", message: "Password reset successful! Please login." });
-            router.replace("/auth/Login"); // Case-sensitive check might be needed
+            redirectLogin();
         } catch (err) {
             console.error(err);
             showErrorToast({ title: "Error", message: "Invalid or expired OTP" });
@@ -74,8 +163,8 @@ export default function ResetPasswordScreen() {
     };
 
     return (
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
-            <LinearGradient colors={["#667eea", "#764ba2", "#f093fb"]} style={styles.gradient}>
+        <SafeAreaView style={styles.container} edges={["top"]}>
+            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
                 <ScrollView
                     contentContainerStyle={styles.scrollContainer}
                     showsVerticalScrollIndicator={false}
@@ -84,9 +173,9 @@ export default function ResetPasswordScreen() {
                     {/* Header Section */}
                     <View style={styles.header}>
                         <View style={styles.iconContainer}>
-                            <LinearGradient colors={["#ff6b9d", "#c86dd7"]} style={styles.iconGradient}>
-                                <Ionicons name="lock-open-outline" size={40} color="#fff" />
-                            </LinearGradient>
+                            <View style={styles.iconWrapper}>
+                                <Ionicons name="lock-open-outline" size={40} color={colors.primary} />
+                            </View>
                         </View>
                         <Text style={styles.title}>Reset Password</Text>
                         <Text style={styles.subtitle}>{`Enter the code sent to ${email || "your email"} and a new password.`}</Text>
@@ -105,6 +194,7 @@ export default function ResetPasswordScreen() {
                             error={errors.otp}
                             iconName="keypad-outline"
                             keyboardType="numeric"
+                            colors={colors}
                         />
 
                         {/* New Password Input */}
@@ -118,6 +208,7 @@ export default function ResetPasswordScreen() {
                             error={errors.newPassword}
                             iconName="lock-closed-outline"
                             secureTextEntry
+                            colors={colors}
                         />
                         {errors.newPassword ? (
                             <Text style={styles.passwordHint}>
@@ -129,84 +220,15 @@ export default function ResetPasswordScreen() {
                         <View style={{ height: 20 }} />
 
                         {/* Reset Button */}
-                        <GradientButton title="Reset Password" loading={loading} onPress={handleResetPassword} />
+                        <PrimaryButton title="Reset Password" loading={loading} onPress={handleResetPassword} colors={colors} />
 
                         {/* Back to Login */}
-                        <TouchableOpacity onPress={() => router.replace("/auth/Login")} style={styles.backLinkContainer}>
+                        <TouchableOpacity onPress={redirectLogin} style={styles.backLinkContainer}>
                             <Text style={styles.backLinkText}>Cancel</Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
-            </LinearGradient>
-        </KeyboardAvoidingView>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
     );
 }
-
-const styles = StyleSheet.create({
-    gradient: {
-        flex: 1,
-    },
-    scrollContainer: {
-        flexGrow: 1,
-        paddingHorizontal: 24,
-        paddingTop: Platform.OS === "ios" ? 60 : 40,
-        paddingBottom: 40,
-    },
-    header: {
-        alignItems: "center",
-        marginBottom: 40,
-    },
-    iconContainer: {
-        marginBottom: 20,
-    },
-    iconGradient: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        justifyContent: "center",
-        alignItems: "center",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 8,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: "700",
-        color: "#fff",
-        marginBottom: 8,
-        textAlign: "center",
-    },
-    subtitle: {
-        fontSize: 16,
-        color: "rgba(255, 255, 255, 0.85)",
-        textAlign: "center",
-    },
-    formContainer: {
-        backgroundColor: "#fff",
-        borderRadius: 24,
-        padding: 24,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.15,
-        shadowRadius: 20,
-        elevation: 10,
-    },
-    passwordHint: {
-        fontSize: 12,
-        color: "#666",
-        marginBottom: 10,
-        marginTop: -5,
-        marginLeft: 5
-    },
-    backLinkContainer: {
-        alignItems: 'center',
-        marginTop: 20,
-    },
-    backLinkText: {
-        color: "#667eea",
-        fontSize: 16,
-        fontWeight: "600",
-    }
-});

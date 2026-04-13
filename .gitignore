@@ -42,3 +42,9 @@ app-example
 /ios
 /android
 /coverage
+
+# gemini
+.gemini/
+
+# env
+.env

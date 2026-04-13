@@ -7,7 +7,7 @@ interface CategoriesState {
   error: string | null;
 }
 
-const initialState: CategoriesState = {
+export const initialState: CategoriesState = {
   categories: [],
   loading: false,
   error: null,
@@ -27,8 +27,12 @@ const categoriesSlice = createSlice({
       state.error = null;
     },
     fetchCategories: () => {},
-    addCategory: (state, action: PayloadAction<CategoryApi>) => {
-      state.categories.push({ ...action.payload, syncStatus: SYNC_STATUS.PENDING });
+    addCategory: (state, action: PayloadAction<CategoryApi & { isLocal?: boolean }>) => {
+      state.categories.push({
+        ...action.payload,
+        syncStatus: SYNC_STATUS.PENDING,
+        isLocal: action.payload.isLocal ?? false
+      });
     },
     updateCategory: (state, action: PayloadAction<{ id: string; updates: Partial<CategoryApi> }>) => {
       const index = state.categories.findIndex((category) => category.id === action.payload.id);

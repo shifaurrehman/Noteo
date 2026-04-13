@@ -3,7 +3,7 @@ interface NetworkState {
   isConnected: boolean | null;
   isInitialCheckDone: boolean;
 }
-const initialState: NetworkState = {
+export const initialState: NetworkState = {
   isConnected: true,
   isInitialCheckDone: false,
 };

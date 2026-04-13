@@ -8,7 +8,7 @@ interface NotesState {
   error: string | null;
 }
 
-const initialState: NotesState = {
+export const initialState: NotesState = {
   notes: [],
   loading: false,
   error: null,
@@ -27,8 +27,12 @@ const notesSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
-    addNote: (state, action: PayloadAction<NoteApi>) => {
-      state.notes.push({ ...action.payload, syncStatus: SYNC_STATUS.PENDING });
+    addNote: (state, action: PayloadAction<NoteApi & { isLocal?: boolean }>) => {
+      state.notes.push({
+        ...action.payload,
+        syncStatus: SYNC_STATUS.PENDING,
+        isLocal: action.payload.isLocal ?? false
+      });
     },
     updateNoteSyncStatus: (state, action: PayloadAction<{ id: string; syncStatus: SyncStatus }>) => {
       const index = state.notes.findIndex((note) => note.id === action.payload.id);
