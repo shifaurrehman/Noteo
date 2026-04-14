@@ -12,7 +12,7 @@ import {
 } from "@/services/api/services/categoriesService";
 import { CategoryApi, SYNC_STATUS } from "@/types/category/category.types";
 import { getErrorMessage } from "@/utilities/toast/get-toast-message";
-import { showErrorToast, showInfoToast } from "@/utilities/toast/message-toast";
+import { showErrorToast, showSuccessToast } from "@/utilities/toast/message-toast";
 
 // Load categories from storage
 function* loadCategoriesSaga() {
@@ -20,7 +20,7 @@ function* loadCategoriesSaga() {
     yield put(setLoading(true));
     const categories: CategoryApi[] = yield call(fetchCategoriesApi);
     yield put(loadCategories(categories));
-    showInfoToast({ message: "categories loaded successfully" });
+    showSuccessToast({ message: "Categories loaded successfully" });
   } catch (error: any) {
     console.error("error in loadCategoriesSaga: ", error);
     const message = getErrorMessage(error) || "Failed to load categories";
@@ -37,7 +37,7 @@ function* saveCategorySaga(action: PayloadAction<CategoryApi>) {
     yield put(setLoading(true));
     yield call(createCategoryApi, action.payload);
     yield put(updateCategorySyncStatus({ id: action.payload.id, syncStatus: SYNC_STATUS.SYNCED }));
-    showInfoToast({ message: "category added successfully" });
+    showSuccessToast({ message: "Category added successfully" });
   } catch (error: any) {
     console.error("error in saveCategorySaga: ", error);
     const message = getErrorMessage(error) || "Failed to save category";
@@ -54,7 +54,7 @@ function* updateCategorySaga(action: PayloadAction<{ id: string; updates: Partia
   try {
     yield put(setLoading(true));
     yield call(updateCategoryApi, action.payload.id, action.payload.updates);
-    showInfoToast({ message: "category updated successfully" });
+    showSuccessToast({ message: "Category updated successfully" });
   } catch (error: any) {
     console.error("error in updateCategorySaga: ", error);
     const message = getErrorMessage(error) || "Failed to update category";
@@ -73,7 +73,7 @@ function* deleteCategorySaga(action: PayloadAction<string>) {
     yield call(deleteCategoryApi, action.payload);
     yield put(deleteNotesByCategory(action.payload));
     yield put(updateCategorySyncStatus({ id: action.payload, syncStatus: SYNC_STATUS.SYNCED }));
-    showInfoToast({ message: "category deleted successfully" });
+    showSuccessToast({ message: "Category deleted successfully" });
   } catch (error: any) {
     console.error("error in deleteCategorySaga: ", error);
     const message = getErrorMessage(error) || "Failed to delete category";

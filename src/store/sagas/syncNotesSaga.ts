@@ -1,7 +1,7 @@
 import { syncNotesApi } from "@/services/api/services/notesService";
 import { SYNC_STATUS } from "@/types/category/category.types";
 import { Note, NoteApi } from "@/types/notes/notes.types";
-import { showErrorToast, showInfoToast } from "@/utilities/toast/message-toast";
+import { showErrorToast, showSuccessToast } from "@/utilities/toast/message-toast";
 import { call, put, select } from "redux-saga/effects";
 import { v4 as uuidv4 } from "uuid";
 import { deleteNote, markNoteAsSynced, updateNote, updateNoteSyncStatus } from "../slices/notesSlice";
@@ -126,7 +126,7 @@ export function* syncPendingNotesSaga() {
         yield put(markNoteAsSynced({ id: item.id }));
       }
 
-      showInfoToast({ message: "Notes synced successfully" });
+      showSuccessToast({ message: "Notes synced successfully" });
     } catch (error: any) {
       console.error("[Sync Saga] Batch sync failed:", error);
       showErrorToast({ message: "Failed to sync notes with server" });
