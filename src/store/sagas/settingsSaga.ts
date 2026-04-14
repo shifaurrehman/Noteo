@@ -10,7 +10,7 @@ import {
 } from '../slices/settingsSlice';
 import { AppSettings } from '../../types';
 import { selectSettings } from '../selectors';
-import { showErrorToast, showInfoToast } from '@/utilities/toast/message-toast';
+import { showErrorToast, showSuccessToast } from '@/utilities/toast/message-toast';
 
 function* syncSettingsSaga(action: any) {
   try {
@@ -18,7 +18,7 @@ function* syncSettingsSaga(action: any) {
     const { syncStatus, ...settingsToSync } = currentSettings as any;
     const updatedSettings: AppSettings = yield call(updateSettingsApi, settingsToSync);
     yield put(syncComplete(updatedSettings));
-    showInfoToast({ message: "Settings synced successfully" });
+    showSuccessToast({ message: "Settings synced successfully" });
   } catch (error: any) {
     console.error('Failed to sync settings:', error);
     yield put(syncError());
@@ -30,7 +30,7 @@ function* loadSettingsFromServerSaga() {
   try {
     const remoteSettings: AppSettings = yield call(getSettingsApi);
     yield put(loadSettings(remoteSettings));
-    showInfoToast({ message: "Settings loaded successfully" });
+    showSuccessToast({ message: "Settings loaded successfully" });
   } catch (error: any) {
     console.log('Failed to fetch remote settings, using local:', error);
     showErrorToast({ message: "Failed to load settings from server" });

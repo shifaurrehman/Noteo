@@ -64,7 +64,6 @@ const HomeScreen: React.FC = () => {
         const newCategory: CategoryApi = CreateNewCategory({ name, color, icon });
         const categoryWithLocalFlag = { ...newCategory, isLocal: !isAuthenticated };
         dispatch(addCategory(categoryWithLocalFlag));
-        showSuccessToast({ message: "Category created successfully" });
         setShowAddModal(false);
         bottomSheetRef.current?.dismiss();
     }, [dispatch, isAuthenticated]);
@@ -114,7 +113,6 @@ const HomeScreen: React.FC = () => {
                 },
             })
         );
-        showSuccessToast({ message: "Category updated successfully" });
         setEditCategory(null);
         setShowAddModal(false);
         bottomSheetRef.current?.dismiss();

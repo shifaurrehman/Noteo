@@ -12,7 +12,7 @@ import { markNoteAsSynced } from "../slices/notesSlice";
 import { selectCategories, selectNotes } from "../selectors";
 import { getErrorMessage } from "@/utilities/toast/get-toast-message";
 import { router } from "expo-router";
-import { showErrorToast } from "@/utilities/toast/message-toast";
+import { showErrorToast, showSuccessToast } from "@/utilities/toast/message-toast";
 
 // Helper function to merge offline data with server account
 function* mergeLocalData(serverUser: User): Generator {
@@ -61,6 +61,7 @@ function* loginSaga(action: PayloadAction<{ email: string; password: string }>):
     // Fetch user settings after successful login and auto-enable backup
     yield put(loadSettingsAction());
     yield put(updateSettings({ backupEnabled: true }));
+    showSuccessToast({ message: "Logged in successfully" });
   } catch (error: any) {
     const message = getErrorMessage(error);
 
@@ -91,6 +92,7 @@ function* registerSaga(action: PayloadAction<{ email: string; name: string; pass
       // Fetch user settings after successful registration (auto-login) and auto-enable backup
       yield put(loadSettingsAction());
       yield put(updateSettings({ backupEnabled: true }));
+      showSuccessToast({ message: "Registration successful" });
     }
   } catch (error: any) {
     const message = getErrorMessage(error) || "Failed to register";
@@ -107,7 +109,9 @@ function* logoutSaga() {
     yield call(clearStorage);
     yield call(tokenStorage.clearTokens);
   } catch (error: any) {
-    yield put(setError(error.message || "Failed to logout"));
+    const message = error.message || "Failed to logout";
+    showErrorToast({ message });
+    yield put(setError(message));
   }
 }
 
