@@ -1,6 +1,6 @@
 import { syncCategoriesApi } from "@/services/api/services/categoriesService";
 import { Category, CategoryApi, SYNC_STATUS } from "@/types/category/category.types";
-import { showErrorToast, showInfoToast } from "@/utilities/toast/message-toast";
+import { showErrorToast, showSuccessToast } from "@/utilities/toast/message-toast";
 import { call, put, select } from "redux-saga/effects";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -117,7 +117,7 @@ export function* syncPendingCategoriesSaga() {
         yield put(markCategoryAsSynced({ id: item.id }));
       }
 
-      showInfoToast({ message: "Categories synced successfully" });
+      showSuccessToast({ message: "Categories synced successfully" });
     } catch (error: any) {
       console.error("[Sync Saga] Batch sync failed:", error);
       showErrorToast({ message: "Failed to sync categories" });

@@ -7,7 +7,7 @@ import {
 import { SYNC_STATUS } from "@/types/category/category.types";
 import { NoteApi } from "@/types/notes/notes.types";
 import { getErrorMessage } from "@/utilities/toast/get-toast-message";
-import { showErrorToast, showInfoToast } from "@/utilities/toast/message-toast";
+import { showErrorToast, showSuccessToast } from "@/utilities/toast/message-toast";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { call, put, takeEvery } from "redux-saga/effects";
 import * as NotesActions from "../actions/notesActions";
@@ -19,7 +19,7 @@ function* loadNotesSaga() {
     yield put(setLoading(true));
     const notes: NoteApi[] = yield call(fetchNotesApi);
     yield put(loadNotes(notes));
-    showInfoToast({ message: "Notes loaded successfully" });
+    showSuccessToast({ message: "Notes loaded successfully" });
   } catch (error: any) {
     const message = getErrorMessage(error);
     showErrorToast({ message: "failed to load notes" });
@@ -35,7 +35,7 @@ function* addNoteSaga(action: PayloadAction<NoteApi>) {
     yield put(setLoading(true));
     yield call(createNoteApi, action.payload);
     yield put(updateNoteSyncStatus({ id: action.payload.id, syncStatus: SYNC_STATUS.SYNCED }));
-    showInfoToast({ message: "Note added successfully" });
+    showSuccessToast({ message: "Note added successfully" });
   } catch (error: any) {
     const message = getErrorMessage(error);
     showErrorToast({ message: "failed to add note" });
@@ -51,7 +51,7 @@ function* updateNoteSaga(action: PayloadAction<{ id: string; updates: Partial<No
   try {
     yield put(setLoading(true));
     yield call(updateNoteApi, action.payload.id, action.payload.updates);
-    showInfoToast({ message: "Note updated successfully" });
+    showSuccessToast({ message: "Note updated successfully" });
   } catch (error: any) {
     const message = getErrorMessage(error);
     showErrorToast({ message: "failed to update note" });
@@ -68,7 +68,7 @@ function* deleteNoteSaga(action: PayloadAction<string>) {
     yield put(setLoading(true));
     yield call(deleteNoteApi, action.payload);
     yield put(updateNoteSyncStatus({ id: action.payload, syncStatus: SYNC_STATUS.SYNCED }));
-    showInfoToast({ message: "Note deleted successfully" });
+    showSuccessToast({ message: "Note deleted successfully" });
   } catch (error: any) {
     const message = getErrorMessage(error);
     showErrorToast({ message: "failed to delete note" });
