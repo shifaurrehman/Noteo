@@ -19,11 +19,29 @@ const notesSlice = createSlice({
   initialState,
   reducers: {
     loadNotes: (state, action: PayloadAction<NoteApi[]>) => {
-      state.notes = action.payload.map((note) => ({
+      // 1. Map incoming server notes to the local Note structure
+      const serverNotes: Note[] = action.payload.map((note) => ({
         ...note,
         syncStatus: SYNC_STATUS.SYNCED,
         isLocal: false,
       }));
+
+      // 2. Filter existing notes to find ones that are STILL pending sync or in error
+      // These are local changes that haven't been acknowledged by the server yet.
+      const localPendingNotes = state.notes.filter(
+        (note) => note.syncStatus === SYNC_STATUS.PENDING || note.syncStatus === SYNC_STATUS.ERROR
+      );
+
+      // 3. Create a set of pending IDs for fast lookup
+      const pendingIds = new Set(localPendingNotes.map((n) => n.id));
+
+      // 4. Merge: Keep all pending notes, and add server notes that don't conflict with pending ones
+      // This ensures local work isn't overwritten before it's synced.
+      state.notes = [
+        ...localPendingNotes,
+        ...serverNotes.filter((sn) => !pendingIds.has(sn.id)),
+      ];
+
       state.loading = false;
       state.error = null;
     },
