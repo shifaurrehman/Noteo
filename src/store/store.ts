@@ -33,9 +33,6 @@ const appReducer = combineReducers({
 
 // Root reducer wrapper to handle global reset on logout
 const rootReducer = (state: ReturnType<typeof appReducer> | undefined, action: AnyAction) => {
-  if (action.type === "auth/logout") {
-    state = undefined;
-  }
   return appReducer(state, action);
 };
 
