@@ -30,11 +30,11 @@ const createRegisterStyles = (colors: ThemeColors) => {
     backButton: {
       position: "absolute" as const,
       left: 0,
-      top: 0,
+      top: -8,
       width: 40,
       height: 40,
       borderRadius: 20,
-      backgroundColor: colors.primary + "20",
+      backgroundColor: colors.iconWrapper,
       justifyContent: "center" as const,
       alignItems: "center" as const,
     },
@@ -47,7 +47,7 @@ const createRegisterStyles = (colors: ThemeColors) => {
       borderRadius: 40,
       justifyContent: "center" as const,
       alignItems: "center" as const,
-      backgroundColor: colors.primary + "20",
+      backgroundColor: colors.iconWrapper,
       ...Platform.select({
         ios: {
           shadowColor: colors.primary,
@@ -73,7 +73,7 @@ const createRegisterStyles = (colors: ThemeColors) => {
       textAlign: "center" as const,
     },
     formContainer: {
-      backgroundColor: colors.surface,
+      backgroundColor: colors.iconWrapper,
       borderRadius: 24,
       padding: 24,
       ...Platform.select({

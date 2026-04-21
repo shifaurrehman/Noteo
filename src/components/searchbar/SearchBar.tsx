@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyleProp, StyleSheet, TextInput, TouchableOpacity, View, ViewStyle } from 'react-native';
 
 interface SearchBarProps {
     value: string;
@@ -13,17 +13,19 @@ interface SearchBarProps {
         border: string;
         primary?: string;
     };
+    style?: StyleProp<ViewStyle>;
 }
 export const SearchBar: React.FC<SearchBarProps> = ({
     value,
     onChangeText,
     placeholder = 'Search...',
     colors,
+    style,
 }) => {
     const [isFocused, setIsFocused] = useState(false);
 
     return (
-        <View style={[styles.searchContainer, { backgroundColor: colors.surface, borderColor: isFocused ? colors.primary : colors.border + "80", }]}>
+        <View style={[styles.searchContainer, { backgroundColor: colors.surface, borderColor: isFocused ? colors.primary : colors.border + "80", }, style]}>
             <Ionicons name="search-outline" size={18} color={colors.textSecondary} />
             <TextInput
                 style={[styles.searchInput, { color: colors.textMain }]}

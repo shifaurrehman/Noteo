@@ -240,6 +240,7 @@ const HomeScreen: React.FC = () => {
                         border: colors.border,
                         primary: colors.primary,
                     }}
+                    style={styles.searchBarStyle}
                 />
 
                 {/* categories list */}
@@ -254,7 +255,7 @@ const HomeScreen: React.FC = () => {
                         numColumns={numColumns}
                         contentContainerStyle={{
                             paddingHorizontal: sidePadding,
-                            paddingVertical: gap,
+                            paddingBottom: gap,
                         }}
                         keyExtractor={(item) => item.id.toString()}
                         showsVerticalScrollIndicator={false}
