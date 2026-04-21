@@ -188,6 +188,7 @@ const AllNotesScreen: React.FC = () => {
         onRefresh={() => dispatch(fetchNotes())}
         tintColor={colors.primary}
         colors={[colors.primary]}
+        progressBackgroundColor={colors.surface}
       />
     )
   }, [isLoading, colors.primary, dispatch])
@@ -311,7 +312,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
-    paddingVertical: 16,
+    paddingTop: 16,
   },
   header: {
     flexDirection: "row",
@@ -354,7 +355,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingTop: 8,
-    paddingBottom: 100,
+    paddingBottom: 10,
   },
   emptyContainer: {
     flex: 1,

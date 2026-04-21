@@ -12,6 +12,7 @@ export const palette = {
     shadow: "rgba(0, 0, 0, 0.05)",
     iconBg: "rgba(0, 0, 0, 0.05)",
     iconBgPressed: "rgba(0, 0, 0, 0.1)",
+    iconWrapper: "#F1F5F9",
     disabled: "#CBD5E1",
     lableText:"#F1F5F9",
     // New Settings UI Colors - Aligned with Design System
@@ -41,8 +42,9 @@ export const palette = {
     success: "#34D399",
     warning: "#FBBF24",
     shadow: "rgba(0, 0, 0, 0.3)",
-    iconBg: "rgba(255, 255, 255, 0.08)",
-    iconBgPressed: "rgba(255, 255, 255, 0.15)",
+    iconBg: "#1A1C2E",
+    iconBgPressed: "#24263A",
+    iconWrapper: "#15172A",
     disabled: "#475569",
     lableText:"#F1F5F9",
     // New Settings UI Colors - Aligned with Design System

@@ -34,17 +34,20 @@ const createForgotPasswordStyles = (colors: ThemeColors) => {
     header: {
       alignItems: "center" as const,
       marginBottom: 40,
-      marginTop: 20,
     },
     backButton: {
       position: "absolute" as const,
       left: 0,
-      top: 0,
-      padding: 8,
+      top: -8,
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: colors.iconWrapper,
+      justifyContent: "center" as const,
+      alignItems: "center" as const,
     },
     iconContainer: {
       marginBottom: 20,
-      marginTop: 20,
     },
     iconWrapper: {
       width: 80,
@@ -52,7 +55,7 @@ const createForgotPasswordStyles = (colors: ThemeColors) => {
       borderRadius: 40,
       justifyContent: "center" as const,
       alignItems: "center" as const,
-      backgroundColor: colors.primary + "20",
+      backgroundColor: colors.iconWrapper,
       ...Platform.select({
         ios: {
           shadowColor: colors.primary,
@@ -78,7 +81,7 @@ const createForgotPasswordStyles = (colors: ThemeColors) => {
       textAlign: "center" as const,
     },
     formContainer: {
-      backgroundColor: colors.surface,
+      backgroundColor: colors.iconWrapper,
       borderRadius: 24,
       padding: 24,
       ...Platform.select({
@@ -150,7 +153,7 @@ export default function ForgotPasswordScreen() {
                     {/* Header Section */}
                     <View style={styles.header}>
                         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                            <Ionicons name="arrow-back" size={24} color={colors.textMain} />
+                            <Ionicons name="arrow-back" size={24} color={colors.primary} />
                         </TouchableOpacity>
                         <View style={styles.iconContainer}>
                             <View style={styles.iconWrapper}>
