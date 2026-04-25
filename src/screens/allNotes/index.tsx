@@ -1,14 +1,13 @@
 import { ConfirmationModal } from "@/components/modal/ConfirmationModal";
 import { NoteCard } from "@/components/notes/NoteCard";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectNotes, selectNotesLoading } from "@/store/selectors";
+import { selectNotes, selectNotesLoading, selectCategories } from "@/store/selectors";
 import { useTheme } from "@/hooks/useTheme";
 import { deleteNote, fetchNotes, updateNote } from "@/store/slices/notesSlice";
 import { Note } from "@/types/notes/notes.types";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  FlatList,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -16,20 +15,25 @@ import {
   Text,
   View,
 } from "react-native";
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withTiming,
+  useAnimatedScrollHandler,
+  runOnJS,
+} from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@/utilities/routes/Routes";
 import { SearchBar } from "@/components/searchbar/SearchBar";
-import { Header } from "@/components/header/Header";
 import { IconPressable } from "@/components/button/IconPressable";
 import { commonStyles } from "@/styles/global";
-import { selectCategories } from "@/store/selectors";
 import { SelectionBottomSheet } from "@/components/modal/SelectionBottomSheet";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 
 type FilterTab = "all" | "recent" | "pinned" | "drafts";
 
 const FILTER_TABS: { key: FilterTab; label: string }[] = [
-  { key: "all", label: "All Notes" },
+  { key: "all", label: "All" },
   { key: "recent", label: "Recent" },
   { key: "pinned", label: "Pinned" },
   { key: "drafts", label: "Drafts" },
@@ -41,6 +45,7 @@ const AllNotesScreen: React.FC = () => {
   const categories = useAppSelector(selectCategories);
   const isLoading = useAppSelector(selectNotesLoading);
   const { colors } = useTheme();
+  const isDarkMode = colors.background === "#101122";
   const { openEditNote, openAddNote } = useNavigation();
 
   const [searchText, setSearchText] = useState("");
@@ -49,6 +54,41 @@ const AllNotesScreen: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [activeNoteMenuId, setActiveNoteMenuId] = useState<string | null>(null);
   const [noteToMove, setNoteToMove] = useState<Note | null>(null);
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
+
+  // Search bar animation
+  const animatedSearchStyle = useAnimatedStyle(() => {
+    return {
+      height: withTiming(isSearchVisible ? 70 : 0, { duration: 300 }),
+      opacity: withTiming(isSearchVisible ? 1 : 0, { duration: 250 }),
+      transform: [
+        { translateY: withTiming(isSearchVisible ? 0 : -20, { duration: 300 }) }
+      ],
+      overflow: 'hidden',
+    };
+  });
+
+  const lastScrollY = useSharedValue(0);
+
+  const onScroll = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      const currentY = event.contentOffset.y;
+      const diff = currentY - lastScrollY.value;
+
+      if (Math.abs(diff) < 5) return;
+
+      // Hide when scrolling down beyond threshold
+      if (diff > 0 && currentY > 150 && isSearchVisible && searchText === "") {
+        runOnJS(setIsSearchVisible)(false);
+      } 
+      // Only reveal when pulling down at the very top
+      else if (currentY <= 0 && diff < -10 && !isSearchVisible) {
+        runOnJS(setIsSearchVisible)(true);
+      }
+
+      lastScrollY.value = currentY;
+    },
+  }, [isSearchVisible, searchText]);
 
   const selectionSheetRef = React.useRef<BottomSheetModal>(null);
 
@@ -191,7 +231,7 @@ const AllNotesScreen: React.FC = () => {
         progressBackgroundColor={colors.surface}
       />
     )
-  }, [isLoading, colors.primary, dispatch])
+  }, [isLoading, colors.primary, colors.surface, dispatch])
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
@@ -200,62 +240,87 @@ const AllNotesScreen: React.FC = () => {
         onPress={() => setActiveNoteMenuId(null)}
         accessible={false}
       >
-        <Header title={"Notes"} backgroundColor={colors.background} titleStyle={{ color: colors.primary, textAlign: "left" }} />
+        <View style={styles.mainHeader}>
+          <Text style={[styles.mainTitle, { color: colors.textMain }]}>Notes</Text>
+          <View style={styles.headerRight}>
+            <Text style={[styles.itemCount, { color: colors.textSecondary }]}>
+              {allNotes.length} items
+            </Text>
+            <Pressable 
+              onPress={() => setIsSearchVisible(!isSearchVisible)}
+              style={({ pressed }) => [
+                styles.searchIconBtn,
+                { opacity: pressed ? 0.6 : 1 }
+              ]}
+            >
+              <Ionicons 
+                name={isSearchVisible ? "close" : "search"} 
+                size={22} 
+                color={colors.textSecondary} 
+              />
+            </Pressable>
+          </View>
+        </View>
+
         <View style={styles.container}>
-
-          {/* search bar */}
-          <SearchBar
-            value={searchText}
-            onChangeText={setSearchText}
-            placeholder={"Search notes..."}
-            colors={{
-              surface: colors.surface,
-              textMain: colors.textMain,
-              textSecondary: colors.textSecondary,
-              border: colors.border,
-              primary: colors.primary,
-            }}
-          />
-
           {/* Filter Tabs */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.tabsWrapper}
-            contentContainerStyle={styles.tabsContent}
-          >
-            {FILTER_TABS.map((tab) => {
-              const isActive = activeFilter === tab.key;
-              return (
-                <Pressable
-                  key={tab.key}
-                  onPress={() => {
-                    setActiveNoteMenuId(null);
-                    setActiveFilter(tab.key);
-                  }}
-                  style={[
-                    styles.filterTab,
-                    {
-                      backgroundColor: isActive ? colors.primary : "transparent",
-                      borderColor: isActive ? colors.primary : colors.border + "80",
-                    },
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.filterTabText,
-                      { color: isActive ? "#fff" : colors.textSecondary },
-                    ]}
+          <View style={styles.tabsWrapper}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.tabsContent}
+            >
+              {FILTER_TABS.map((tab) => {
+                const isActive = activeFilter === tab.key;
+                return (
+                  <Pressable
+                    key={tab.key}
+                    onPress={() => {
+                      setActiveNoteMenuId(null);
+                      setActiveFilter(tab.key);
+                    }}
+                    style={styles.filterTab}
                   >
-                    {tab.label}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </ScrollView>
+                    <Text
+                      style={[
+                        styles.filterTabText,
+                        { 
+                          color: isActive ? colors.primary : colors.textSecondary,
+                          fontWeight: isActive ? "800" : "600"
+                        },
+                      ]}
+                    >
+                      {tab.label}
+                    </Text>
+                    {isActive && (
+                      <View style={[styles.activeIndicator, { backgroundColor: colors.primary }]} />
+                    )}
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          </View>
+
+          {/* Animated Search Bar */}
+          <Animated.View style={animatedSearchStyle}>
+            <View style={styles.searchContainer}>
+              <SearchBar
+                value={searchText}
+                onChangeText={setSearchText}
+                placeholder={"Search notes..."}
+                colors={{
+                  surface: isDarkMode ? "#1C1E3A" : colors.surface,
+                  textMain: colors.textMain,
+                  textSecondary: colors.textSecondary,
+                  border: "transparent",
+                  primary: colors.primary,
+                }}
+              />
+            </View>
+          </Animated.View>
 
           {/* Notes List */}
-          <FlatList
+          <Animated.FlatList
             data={filteredNotes}
             keyExtractor={(item) => item.id}
             renderItem={renderItem}
@@ -263,6 +328,8 @@ const AllNotesScreen: React.FC = () => {
             ListEmptyComponent={renderEmpty}
             showsVerticalScrollIndicator={false}
             refreshControl={refreshControl()}
+            onScroll={onScroll}
+            scrollEventThrottle={16}
           />
 
           <IconPressable
@@ -309,53 +376,67 @@ const AllNotesScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     width: "100%",
-    paddingTop: 16,
   },
-  header: {
+  mainHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 24,
+    paddingTop: 20,
+    paddingBottom: 10,
+  },
+  mainTitle: {
+    fontSize: 42,
+    fontWeight: "900",
+    letterSpacing: -1.5,
+  },
+  headerRight: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    gap: 10,
+    gap: 12,
   },
-  headerTitle: {
-    fontSize: 26,
-    fontWeight: "800",
-    letterSpacing: -0.5,
+  itemCount: {
+    fontSize: 14,
+    fontWeight: "600",
+    opacity: 0.8,
+  },
+  searchIconBtn: {
+    padding: 8,
+    borderRadius: 12,
   },
   tabsWrapper: {
-    marginBottom: 8,
-    marginTop: 10,
+    marginTop: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255, 255, 255, 0.05)",
   },
   tabsContent: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 4,
+    paddingHorizontal: 24,
+    gap: 28,
   },
   filterTab: {
-    borderRadius: 20,
-    borderWidth: 1,
-    marginRight: 8,
-    height: 30,
-    justifyContent: "center",
+    paddingVertical: 12,
     alignItems: "center",
-    paddingHorizontal: 16,
+    justifyContent: "center",
   },
   filterTabText: {
-    fontSize: 13,
-    fontWeight: "600",
-    textAlign: "center",
-    includeFontPadding: false,
-    textAlignVertical: "center",
+    fontSize: 16,
+    letterSpacing: 0.2,
+  },
+  activeIndicator: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+    height: 3,
+    borderRadius: 3,
+  },
+  searchContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
   },
   listContainer: {
-    paddingTop: 8,
-    paddingBottom: 10,
+    paddingTop: 16,
+    paddingBottom: 40,
   },
   emptyContainer: {
     flex: 1,
