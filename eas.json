@@ -9,11 +9,17 @@
       "distribution": "internal"
     },
     "preview": {
-      "android":{
+      "node": "20.20.0",
+      "android": {
         "buildType": "apk"
       },
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_HOST": "noteo-backend-production.up.railway.app",
+        "EXPO_PUBLIC_API_VERSION": "/api/v1"
+      }
     },
+
     "production": {
       "autoIncrement": true
     }
