@@ -9,4 +9,7 @@ export const validateEmail = (email: string) => {
 
 export const validatePassword = (password: string) => password.length >= 8;
 
-export const clearStorage = () => AsyncStorage.clear();
+export const clearStorage = () => {
+  // We no longer clear all storage on logout to preserve offline notes/categories.
+  // Sensitive tokens are cleared separately by tokenStorage.clearTokens().
+};

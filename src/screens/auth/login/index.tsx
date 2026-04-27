@@ -5,6 +5,7 @@ import { fetchCategories } from "@/store/slices/categoriesSlice";
 import { validateEmail } from "@/utilities/auth";
 import { useNavigation } from "@/utilities/routes/Routes";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
     Keyboard,
@@ -36,6 +37,17 @@ const createLoginStyles = (colors: ThemeColors) => {
       alignItems: "center" as const,
       marginBottom: 40,
     },
+    backButton: {
+      position: "absolute" as const,
+      left: 0,
+      top: -8,
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: colors.iconWrapper,
+      justifyContent: "center" as const,
+      alignItems: "center" as const,
+    },
     iconContainer: {
       marginBottom: 20,
     },
@@ -45,7 +57,7 @@ const createLoginStyles = (colors: ThemeColors) => {
       borderRadius: 40,
       justifyContent: "center" as const,
       alignItems: "center" as const,
-      backgroundColor: colors.primary + "20", // 20% opacity
+      backgroundColor: colors.iconWrapper,
       ...Platform.select({
         ios: {
           shadowColor: colors.primary,
@@ -71,7 +83,7 @@ const createLoginStyles = (colors: ThemeColors) => {
       textAlign: "center" as const,
     },
     formContainer: {
-      backgroundColor: colors.surface,
+      backgroundColor: colors.iconWrapper,
       borderRadius: 24,
       padding: 24,
       ...Platform.select({
@@ -115,6 +127,7 @@ const createLoginStyles = (colors: ThemeColors) => {
 };
 
 export default function LoginScreen() {
+    const router = useRouter();
     const { colors } = useTheme();
     const styles = createLoginStyles(colors);
 
@@ -179,6 +192,9 @@ export default function LoginScreen() {
                 >
                     {/* Header Section */}
                     <View style={styles.header}>
+                        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+                            <Ionicons name="arrow-back" size={24} color={colors.primary} />
+                        </TouchableOpacity>
                         <View style={styles.iconContainer}>
                             <View style={styles.iconWrapper}>
                                 <Ionicons name="book" size={40} color={colors.primary} />

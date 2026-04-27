@@ -62,6 +62,10 @@ export const useNavigation = () => {
     router.push("/settings");
   };
 
+  const openSearch = (mode: 'notes' | 'categories' = 'notes') => {
+    router.push({ pathname: '/search', params: { mode } });
+  };
+
   const redirectVerifyEmail = (email: string) => {
     router.push(`/verify-email?email=${encodeURIComponent(email)}`);
   };
@@ -89,6 +93,7 @@ export const useNavigation = () => {
     redirectLogin,
     redirectHome,
     openSettings,
+    openSearch,
     redirectVerifyEmail,
     redirectRegister,
     redirectForgotPassword,

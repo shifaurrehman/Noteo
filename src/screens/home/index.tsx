@@ -3,7 +3,6 @@ import { AddCategoryBottomSheet } from "@/components/category/AddCategoryBottomS
 import { CategoryCard } from "@/components/category/CategoryCard";
 import { Header } from "@/components/header/Header";
 import { ConfirmationBottomSheet } from "@/components/modal/ConfirmationBottomSheet";
-import { SearchBar } from "@/components/searchbar/SearchBar";
 import { EmptyCategoryText } from "@/constants/categories";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectCategories, selectCategoriesLoading, selectIsConnected, selectIsAuthenticated, selectNotes } from "@/store/selectors";
@@ -17,7 +16,7 @@ import { CreateNewCategory } from "@/utilities/category/CategoryUtils";
 import { filterCategories } from "@/utilities/home/HomeScreenUtils";
 import responsive, { useResponsive } from "@/utilities/responsive";
 import { useNavigation } from "@/utilities/routes/Routes";
-import { showErrorToast, showSuccessToast } from "@/utilities/toast/message-toast";
+import { showErrorToast } from "@/utilities/toast/message-toast";
 
 import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useMemo, useState, useRef } from "react";
@@ -25,7 +24,7 @@ import { FlatList, RefreshControl, Text, View, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const HomeScreen: React.FC = () => {
-    const { viewCategoryNotes } = useNavigation();
+    const { viewCategoryNotes, openSearch } = useNavigation();
     const { deviceType } = useResponsive();
     const dispatch = useAppDispatch();
     const categories = useAppSelector(selectCategories);
@@ -39,7 +38,6 @@ const HomeScreen: React.FC = () => {
     const bottomSheetRef = useRef<any>(null);
     const deleteSheetRef = useRef<any>(null);
     const [editCategory, setEditCategory] = useState<Category | null>(null);
-    const [searchText, setSearchText] = useState("");
     const [showAddModal, setShowAddModal] = useState(false);
     const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
     const [activeMenuId, setActiveMenuId] = React.useState<string | null>(null);
@@ -57,8 +55,8 @@ const HomeScreen: React.FC = () => {
     const cardHeight = cardWidth;
 
     const filteredCategories = useMemo(() => {
-        return filterCategories(categories, { searchText });
-    }, [categories, searchText]);
+        return filterCategories(categories);
+    }, [categories]);
 
     const handleAddCategory = useCallback(({ name, color, icon }: { name: string; color: string; icon: string }) => {
         const newCategory: CategoryApi = CreateNewCategory({ name, color, icon });
@@ -177,7 +175,6 @@ const HomeScreen: React.FC = () => {
     };
 
     const emptyText = () => {
-        if (searchText) return EmptyCategoryText.noFound;
         return EmptyCategoryText.noCategories;
     };
 
@@ -224,23 +221,16 @@ const HomeScreen: React.FC = () => {
                 onPress={() => setActiveMenuId(null)}
                 accessible={false}
             >
-                <Header title={"Noteo"} backgroundColor={colors.background} titleStyle={{ color: colors.primary, textAlign: "left" }} />
+                <Header
+                    title={"Noteo"}
+                    backgroundColor={colors.background}
+                    titleStyle={{ color: colors.primary, textAlign: "left" }}
+                    showSettings
+                    rightIcon={<Ionicons name="search-outline" size={22} color={colors.textMain} />}
+                    onRightPress={() => openSearch('categories')}
+                />
                 <View style={styles.container}>
                     {/* header */}
-
-                {/* search bar */}
-                <SearchBar
-                    value={searchText}
-                    onChangeText={setSearchText}
-                    placeholder={"Search categories..."}
-                    colors={{
-                        surface: colors.surface,
-                        textMain: colors.textMain,
-                        textSecondary: colors.textSecondary,
-                        border: colors.border,
-                        primary: colors.primary,
-                    }}
-                />
 
                 {/* categories list */}
                 <View style={styles.flashListWrapper}
@@ -254,7 +244,7 @@ const HomeScreen: React.FC = () => {
                         numColumns={numColumns}
                         contentContainerStyle={{
                             paddingHorizontal: sidePadding,
-                            paddingVertical: gap,
+                            paddingBottom: gap,
                         }}
                         keyExtractor={(item) => item.id.toString()}
                         showsVerticalScrollIndicator={false}

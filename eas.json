@@ -9,11 +9,16 @@
       "distribution": "internal"
     },
     "preview": {
-      "android":{
+      "node": "20.20.0",
+      "android": {
         "buildType": "apk"
+      },
+      "ios": {
+        "simulator": true
       },
       "distribution": "internal"
     },
+
     "production": {
       "autoIncrement": true
     }

@@ -46,7 +46,7 @@ const createResetPasswordStyles = (colors: ThemeColors) => {
       borderRadius: 40,
       justifyContent: "center" as const,
       alignItems: "center" as const,
-      backgroundColor: colors.primary + "20",
+      backgroundColor: colors.iconWrapper,
       ...Platform.select({
         ios: {
           shadowColor: colors.primary,

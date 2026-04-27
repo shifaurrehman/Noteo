@@ -18,11 +18,27 @@ const categoriesSlice = createSlice({
   initialState: initialState,
   reducers: {
     loadCategories: (state, action: PayloadAction<CategoryApi[]>) => {
-      state.categories = action.payload.map((cat) => ({
+      // 1. Map incoming server categories to the local Category structure
+      const serverCategories: Category[] = action.payload.map((cat) => ({
         ...cat,
         syncStatus: SYNC_STATUS.SYNCED,
         isLocal: false,
       }));
+
+      // 2. Identify local categories that are pending sync or in error
+      const localPendingCategories = state.categories.filter(
+        (cat) => cat.syncStatus === SYNC_STATUS.PENDING || cat.syncStatus === SYNC_STATUS.ERROR
+      );
+
+      // 3. Create a set of pending IDs
+      const pendingIds = new Set(localPendingCategories.map((c) => c.id));
+
+      // 4. Merge: Keep pending ones, and add server categories that aren't pending locally
+      state.categories = [
+        ...localPendingCategories,
+        ...serverCategories.filter((sc) => !pendingIds.has(sc.id)),
+      ];
+
       state.loading = false;
       state.error = null;
     },

@@ -23,19 +23,21 @@ export const IconPressable = ({
   children,
   onPress,
   size = 44,
-  backgroundColor = "rgba(255,255,255,0.08)",
+  backgroundColor,
   pressedColor,
   style,
   haptic = "light",
 }: IconPressableProps) => {
+  // Default to transparent if no backgroundColor is provided
+  const bgColor = backgroundColor ?? "transparent";
   const scale = useSharedValue(1);
-  const bg = useSharedValue(backgroundColor);
+  const bg = useSharedValue(bgColor);
   const containerSize = size + 12;
 
   // keep bg in sync if theme changes
   useEffect(() => {
-    bg.value = backgroundColor;
-  }, [backgroundColor, bg]);
+    bg.value = bgColor;
+  }, [bgColor, bg]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -57,7 +59,7 @@ export const IconPressable = ({
       }}
       onPressOut={() => {
         scale.value = withSpring(1, { damping: 15 });
-        bg.value = backgroundColor;
+        bg.value = bgColor;
       }}
       onPress={onPress}
       style={[

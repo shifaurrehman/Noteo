@@ -158,9 +158,9 @@ export const AddCategoryBottomSheet = forwardRef<BottomSheetModal, Props>(
               <Text style={[styles.label, { color: colors.textSecondary }]}>NAME</Text>
               <View style={[
                 styles.inputWrapper,
-                { 
-                  backgroundColor: isDarkMode ? "rgba(255, 255, 255, 0.05)" : "#F1F5F9", 
-                  borderColor: error ? colors.error : "transparent" 
+                {
+                  backgroundColor: isDarkMode ? "#1A1C2E" : "#F1F5F9",
+                  borderColor: error ? colors.error : "transparent"
                 }
               ]}>
                 <BottomSheetTextInput
@@ -195,9 +195,9 @@ export const AddCategoryBottomSheet = forwardRef<BottomSheetModal, Props>(
                       style={[
                         styles.iconOption,
                         {
-                          backgroundColor: isSelected 
-                            ? selectedColor 
-                            : isDarkMode ? "rgba(255, 255, 255, 0.05)" : "#F1F5F9",
+                          backgroundColor: isSelected
+                            ? selectedColor
+                            : isDarkMode ? "#1A1C2E" : "#F1F5F9",
                         }
                       ]}
                     >

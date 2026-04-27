@@ -7,7 +7,10 @@ export const createHomeScreenStyles = (colors: any) =>
       justifyContent: "center",
       alignItems: "center",
       width: "100%",
-      paddingVertical: 16,
+      paddingTop: 16,
+    },
+    searchBarStyle:{
+      marginBottom: 16,
     },
     flashListWrapper: {
       flex: 1,

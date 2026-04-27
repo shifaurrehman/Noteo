@@ -40,7 +40,6 @@ export default function SettingsScreen() {
 
   const handleLogout = async () => {
     dispatch(logout());
-    router.replace("/(auth)/login");
   };
 
   const openSelectionSheet = (type: SelectionType) => {
