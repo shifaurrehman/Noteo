@@ -6,8 +6,31 @@ on:
       - master
 
 jobs:
+  validate:
+    name: Validate Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Lint
+        run: npm run lint
+
+      - name: Run Type Check
+        run: npm run typecheck
+
   build:
     name: EAS Preview
+    needs: validate
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -29,4 +52,45 @@ jobs:
         run: npm ci
 
       - name: Build Preview
+        id: build
         run: eas build --profile preview --platform all --non-interactive
+
+      - name: Notify Success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: commits } = await github.rest.repos.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              per_page: 1
+            });
+            const commitMessage = commits[0].commit.message.split('\n')[0];
+
+            try {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `✅ **Production Preview Build Ready**\n\nCommit: ${commitMessage}\nBranch: ${context.ref}\n\nYour preview build is now available on EAS.`
+              });
+            } catch (error) {
+              // Silently fail if this is not a PR (no issue number)
+            }
+
+      - name: Notify Failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `🚨 **Production Preview Build Failed**\n\nPlease check the workflow logs for details.\nCommit: ${context.sha}`
+              });
+            } catch (error) {
+              // Silently fail if this is not a PR (no issue number)
+            }
