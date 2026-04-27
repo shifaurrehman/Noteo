@@ -8,6 +8,7 @@ interface HeaderProps {
   title: string;
   showSettings?: boolean;
   onBack?: () => void;
+  onRightPress?: () => void;
   backgroundColor?: string;
   borderColor?: string;
   titleStyle?: TextStyle;
@@ -20,6 +21,7 @@ export const Header: React.FC<HeaderProps> = ({
   title,
   showSettings = false,
   onBack,
+  onRightPress,
   backgroundColor,
   borderColor,
   titleStyle,
@@ -70,7 +72,9 @@ export const Header: React.FC<HeaderProps> = ({
       {showSettings && (
         <TouchableOpacity
           style={styles.icon}
-          onPress={openSettings}
+          onPress={onRightPress ?? openSettings}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          accessibilityLabel={onRightPress ? "Search" : "Settings"}
         >
           {rightIcon || <Ionicons name="settings-outline" size={24} color={colors.textMain} />}
         </TouchableOpacity>

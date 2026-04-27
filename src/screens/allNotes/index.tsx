@@ -8,6 +8,7 @@ import { Note } from "@/types/notes/notes.types";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  FlatList,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -15,16 +16,8 @@ import {
   Text,
   View,
 } from "react-native";
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withTiming,
-  useAnimatedScrollHandler,
-  runOnJS,
-} from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@/utilities/routes/Routes";
-import { SearchBar } from "@/components/searchbar/SearchBar";
 import { IconPressable } from "@/components/button/IconPressable";
 import { commonStyles } from "@/styles/global";
 import { SelectionBottomSheet } from "@/components/modal/SelectionBottomSheet";
@@ -45,50 +38,13 @@ const AllNotesScreen: React.FC = () => {
   const categories = useAppSelector(selectCategories);
   const isLoading = useAppSelector(selectNotesLoading);
   const { colors } = useTheme();
-  const isDarkMode = colors.background === "#101122";
-  const { openEditNote, openAddNote } = useNavigation();
+  const { openEditNote, openAddNote, openSearch } = useNavigation();
 
-  const [searchText, setSearchText] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
   const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [activeNoteMenuId, setActiveNoteMenuId] = useState<string | null>(null);
   const [noteToMove, setNoteToMove] = useState<Note | null>(null);
-  const [isSearchVisible, setIsSearchVisible] = useState(false);
-
-  // Search bar animation
-  const animatedSearchStyle = useAnimatedStyle(() => {
-    return {
-      height: withTiming(isSearchVisible ? 70 : 0, { duration: 300 }),
-      opacity: withTiming(isSearchVisible ? 1 : 0, { duration: 250 }),
-      transform: [
-        { translateY: withTiming(isSearchVisible ? 0 : -20, { duration: 300 }) }
-      ],
-      overflow: 'hidden',
-    };
-  });
-
-  const lastScrollY = useSharedValue(0);
-
-  const onScroll = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      const currentY = event.contentOffset.y;
-      const diff = currentY - lastScrollY.value;
-
-      if (Math.abs(diff) < 5) return;
-
-      // Hide when scrolling down beyond threshold
-      if (diff > 0 && currentY > 150 && isSearchVisible && searchText === "") {
-        runOnJS(setIsSearchVisible)(false);
-      } 
-      // Only reveal when pulling down at the very top
-      else if (currentY <= 0 && diff < -10 && !isSearchVisible) {
-        runOnJS(setIsSearchVisible)(true);
-      }
-
-      lastScrollY.value = currentY;
-    },
-  }, [isSearchVisible, searchText]);
 
   const selectionSheetRef = React.useRef<BottomSheetModal>(null);
 
@@ -99,40 +55,31 @@ const AllNotesScreen: React.FC = () => {
   const filteredNotes = useMemo(() => {
     let notes = allNotes.filter((n) => !n.isDeleted);
 
-    // Apply filter tab
     if (activeFilter === "recent") {
       const oneDayAgo = new Date();
       oneDayAgo.setDate(oneDayAgo.getDate() - 7);
-      notes = notes.filter((n) => new Date(n.updatedAt ?? n.createdAt) >= oneDayAgo);
+      notes = notes.filter(
+        (n) => new Date(n.updatedAt ?? n.createdAt) >= oneDayAgo
+      );
       notes = [...notes].sort(
         (a, b) =>
-          new Date(b.updatedAt ?? b.createdAt).getTime() - new Date(a.updatedAt ?? a.createdAt).getTime()
+          new Date(b.updatedAt ?? b.createdAt).getTime() -
+          new Date(a.updatedAt ?? a.createdAt).getTime()
       );
     } else if (activeFilter === "pinned") {
       notes = notes.filter((n) => n.isFavorite);
     } else if (activeFilter === "drafts") {
-      // Drafts = notes with no content or title
       notes = notes.filter((n) => !n.content?.trim() || !n.title?.trim());
     } else {
-      // All – sort most recent first
       notes = [...notes].sort(
         (a, b) =>
-          new Date(b.updatedAt ?? b.createdAt).getTime() - new Date(a.updatedAt ?? a.createdAt).getTime()
-      );
-    }
-
-    // Apply search
-    if (searchText.trim()) {
-      const lower = searchText.toLowerCase();
-      notes = notes.filter(
-        (n) =>
-          n.title.toLowerCase().includes(lower) ||
-          n.content?.toLowerCase().includes(lower)
+          new Date(b.updatedAt ?? b.createdAt).getTime() -
+          new Date(a.updatedAt ?? a.createdAt).getTime()
       );
     }
 
     return notes;
-  }, [allNotes, activeFilter, searchText]);
+  }, [allNotes, activeFilter]);
 
   const handleDeleteNote = useCallback((note: Note) => {
     setNoteToDelete(note);
@@ -149,7 +96,9 @@ const AllNotesScreen: React.FC = () => {
 
   const handleToggleFavorite = useCallback(
     (note: Note) => {
-      dispatch(updateNote({ id: note.id, updates: { isFavorite: !note.isFavorite } }));
+      dispatch(
+        updateNote({ id: note.id, updates: { isFavorite: !note.isFavorite } })
+      );
     },
     [dispatch]
   );
@@ -170,24 +119,29 @@ const AllNotesScreen: React.FC = () => {
     selectionSheetRef.current?.present();
   }, []);
 
-  const handleSelectCategory = useCallback((categoryId: string) => {
-    if (noteToMove) {
-      dispatch(updateNote({ id: noteToMove.id, updates: { categoryId } }));
-      setNoteToMove(null);
-    }
-  }, [dispatch, noteToMove]);
+  const handleSelectCategory = useCallback(
+    (categoryId: string) => {
+      if (noteToMove) {
+        dispatch(updateNote({ id: noteToMove.id, updates: { categoryId } }));
+        setNoteToMove(null);
+      }
+    },
+    [dispatch, noteToMove]
+  );
 
-  const categoryOptions = useMemo(() => {
-    return categories.map(cat => ({
-      id: cat.id,
-      label: cat.name,
-      icon: (cat.icon || 'folder') as any
-    }));
-  }, [categories]);
+  const categoryOptions = useMemo(
+    () =>
+      categories.map((cat) => ({
+        id: cat.id,
+        label: cat.name,
+        icon: (cat.icon || "folder") as any,
+      })),
+    [categories]
+  );
 
   const renderItem = ({ item }: { item: Note }) => {
-    const category = categories.find(c => c.id === item.categoryId);
-    
+    const category = categories.find((c) => c.id === item.categoryId);
+
     return (
       <NoteCard
         note={item}
@@ -200,7 +154,9 @@ const AllNotesScreen: React.FC = () => {
         onPin={() => handleToggleFavorite(item)}
         onMove={() => handleMoveNote(item)}
         isMenuVisible={activeNoteMenuId === item.id}
-        onToggleMenu={() => setActiveNoteMenuId(activeNoteMenuId === item.id ? null : item.id)}
+        onToggleMenu={() =>
+          setActiveNoteMenuId(activeNoteMenuId === item.id ? null : item.id)
+        }
         categoryName={category?.name}
         categoryColor={category?.color}
       />
@@ -209,20 +165,22 @@ const AllNotesScreen: React.FC = () => {
 
   const renderEmpty = () => (
     <View style={styles.emptyContainer}>
-      <Ionicons name="document-text-outline" size={64} color={colors.textSecondary} />
+      <Ionicons
+        name="document-text-outline"
+        size={64}
+        color={colors.textSecondary}
+      />
       <Text style={[styles.emptyTitle, { color: colors.textMain }]}>
-        {searchText ? "No notes found" : "No notes yet"}
+        No notes yet
       </Text>
       <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
-        {searchText
-          ? "Try a different search or filter"
-          : "Start by adding a note to any category"}
+        Start by adding a note to any category
       </Text>
     </View>
   );
 
-  const refreshControl = useCallback(() => {
-    return (
+  const refreshControl = useCallback(
+    () => (
       <RefreshControl
         refreshing={isLoading}
         onRefresh={() => dispatch(fetchNotes())}
@@ -230,34 +188,37 @@ const AllNotesScreen: React.FC = () => {
         colors={[colors.primary]}
         progressBackgroundColor={colors.surface}
       />
-    )
-  }, [isLoading, colors.primary, colors.surface, dispatch])
+    ),
+    [isLoading, colors.primary, colors.surface, dispatch]
+  );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
-      <Pressable 
-        style={{ flex: 1 }} 
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: colors.background }}
+      edges={["top"]}
+    >
+      <Pressable
+        style={{ flex: 1 }}
         onPress={() => setActiveNoteMenuId(null)}
         accessible={false}
       >
         <View style={styles.mainHeader}>
-          <Text style={[styles.mainTitle, { color: colors.textMain }]}>Notes</Text>
+          <Text style={[styles.mainTitle, { color: colors.textMain }]}>
+            Notes
+          </Text>
           <View style={styles.headerRight}>
             <Text style={[styles.itemCount, { color: colors.textSecondary }]}>
               {allNotes.length} items
             </Text>
-            <Pressable 
-              onPress={() => setIsSearchVisible(!isSearchVisible)}
+            <Pressable
+              onPress={() => openSearch('notes')}
               style={({ pressed }) => [
                 styles.searchIconBtn,
-                { opacity: pressed ? 0.6 : 1 }
+                { opacity: pressed ? 0.6 : 1 },
               ]}
+              accessibilityLabel="Open search"
             >
-              <Ionicons 
-                name={isSearchVisible ? "close" : "search"} 
-                size={22} 
-                color={colors.textSecondary} 
-              />
+              <Ionicons name="search" size={22} color={colors.textSecondary} />
             </Pressable>
           </View>
         </View>
@@ -284,16 +245,23 @@ const AllNotesScreen: React.FC = () => {
                     <Text
                       style={[
                         styles.filterTabText,
-                        { 
-                          color: isActive ? colors.primary : colors.textSecondary,
-                          fontWeight: isActive ? "800" : "600"
+                        {
+                          color: isActive
+                            ? colors.primary
+                            : colors.textSecondary,
+                          fontWeight: isActive ? "800" : "600",
                         },
                       ]}
                     >
                       {tab.label}
                     </Text>
                     {isActive && (
-                      <View style={[styles.activeIndicator, { backgroundColor: colors.primary }]} />
+                      <View
+                        style={[
+                          styles.activeIndicator,
+                          { backgroundColor: colors.primary },
+                        ]}
+                      />
                     )}
                   </Pressable>
                 );
@@ -301,26 +269,8 @@ const AllNotesScreen: React.FC = () => {
             </ScrollView>
           </View>
 
-          {/* Animated Search Bar */}
-          <Animated.View style={animatedSearchStyle}>
-            <View style={styles.searchContainer}>
-              <SearchBar
-                value={searchText}
-                onChangeText={setSearchText}
-                placeholder={"Search notes..."}
-                colors={{
-                  surface: isDarkMode ? "#1C1E3A" : colors.surface,
-                  textMain: colors.textMain,
-                  textSecondary: colors.textSecondary,
-                  border: "transparent",
-                  primary: colors.primary,
-                }}
-              />
-            </View>
-          </Animated.View>
-
           {/* Notes List */}
-          <Animated.FlatList
+          <FlatList
             data={filteredNotes}
             keyExtractor={(item) => item.id}
             renderItem={renderItem}
@@ -328,8 +278,6 @@ const AllNotesScreen: React.FC = () => {
             ListEmptyComponent={renderEmpty}
             showsVerticalScrollIndicator={false}
             refreshControl={refreshControl()}
-            onScroll={onScroll}
-            scrollEventThrottle={16}
           />
 
           <IconPressable
@@ -429,10 +377,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 3,
     borderRadius: 3,
-  },
-  searchContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
   },
   listContainer: {
     paddingTop: 16,
