@@ -18,6 +18,21 @@ export const selectCategoriesError = (state: RootState) => state.categories.erro
 export const selectCategoryById = (state: RootState, id: string) =>
   (state.categories.categories || []).find((cat) => cat.id === id);
 
+export const selectFavoriteCategories = createSelector(
+  [selectCategories],
+  (categories) => categories.filter((cat) => cat.isFavorite)
+);
+
+export const selectCategoriesByFilter = createSelector(
+  [selectCategories, (_state: RootState, favoritesOnly: boolean) => favoritesOnly],
+  (categories, favoritesOnly) => {
+    if (favoritesOnly) {
+      return categories.filter((cat) => cat.isFavorite);
+    }
+    return categories;
+  }
+);
+
 // Notes selectors
 export const selectNotes = (state: RootState) => state.notes.notes || [];
 export const selectNotesLoading = (state: RootState) => state.notes.loading;
