@@ -7,8 +7,6 @@ import { View } from "react-native";
 
 const Tab = createMaterialTopTabNavigator();
 
-type FilterTab = "all" | "recent" | "pinned" | "drafts";
-
 interface NotesTabNavigatorProps {
   allNotes: Note[];
   categories: Category[];
