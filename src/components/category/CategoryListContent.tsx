@@ -3,7 +3,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { Category, Note } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback } from "react";
-import { FlatList, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { FlatList, RefreshControl, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { createHomeScreenStyles } from "@/styles/home/HomeScreen.styles";
 import responsive, { useResponsive } from "@/utilities/responsive";
@@ -12,7 +12,7 @@ interface CategoryListContentProps {
   categories: Category[];
   notes: Note[];
   isLoading: boolean;
-  isConnected: boolean;
+  isConnected: boolean | null;
   onRefresh: () => void;
   onOpenNotes: (category: Category) => void;
   onEditCategory: (category: Category) => void;

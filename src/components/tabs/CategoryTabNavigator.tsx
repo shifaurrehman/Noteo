@@ -12,7 +12,7 @@ interface CategoryTabNavigatorProps {
   allCategories: Category[];
   notes: Note[];
   isLoading: boolean;
-  isConnected: boolean;
+  isConnected: boolean | null;
   onRefresh: () => void;
   onOpenNotes: (category: Category) => void;
   onEditCategory: (category: Category) => void;
