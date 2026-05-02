@@ -384,6 +384,7 @@ import { useCategoriesList } from "@/hooks/useCategoriesList";
 import { useTheme } from "@/hooks/useTheme";
 import { Header } from "@/components/header/Header";
 import { commonStyles } from "@/styles/global";
+import { Category } from "@/types/category/category.types";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
@@ -391,7 +392,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@/utilities/routes/Routes";
 
 const HomeScreen: React.FC = () => {
-  const { openSearch } = useNavigation();
+  const { openSearch, viewCategoryNotes } = useNavigation();
   const { colors } = useTheme();
 
   const {
@@ -418,15 +419,14 @@ const HomeScreen: React.FC = () => {
   } = useCategoriesList({ favoritesOnly: false });
 
   const handleOpenNotes = React.useCallback(
-    (category: any) => {
-      const { viewCategoryNotes } = useNavigation();
+    (category: Category) => {
       viewCategoryNotes({
         categoryId: category.id,
         categoryName: category.name,
         isFavorite: category.isFavorite,
       });
     },
-    []
+    [viewCategoryNotes]
   );
 
   return (
