@@ -82,6 +82,9 @@ function* registerSaga(action: PayloadAction<{ email: string; name: string; pass
   try {
     yield put(setLoading(true));
     const response: RegisterResponse = yield call(registerUserApi, action.payload);
+    console.log("Register Response:", response);
+    const message = (response as any)?.message;
+      router.push(`/(auth)/verify-email?email=${encodeURIComponent(action.payload.email)}` as any);
     if (response.accessToken && response.refreshToken && (response.user as any)?.isVerified !== false) {
       // Merge any offline data the user created before registering 
       yield call(mergeLocalData, response.user);

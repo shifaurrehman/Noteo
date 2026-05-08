@@ -4,8 +4,6 @@ export const createHomeScreenStyles = (colors: any) =>
     container: {
       flex: 1,
       backgroundColor: colors.background,
-      justifyContent: "center",
-      alignItems: "center",
       width: "100%",
       paddingTop: 16,
     },
