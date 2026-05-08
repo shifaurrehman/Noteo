@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useMemo } from "react";
 import {
   FlatList,
+  Pressable,
   RefreshControl,
   StyleSheet,
   Text,
@@ -113,15 +114,18 @@ export const NotesListContent: React.FC<NotesListContentProps> = React.memo(
 
     const renderEmpty = useCallback(() => {
       return (
-        <View style={styles.emptyContainer}>
+        <Pressable
+          style={styles.emptyContainer}
+          onPress={() => onToggleMenu(null)}
+        >
           <Ionicons name="document-text-outline" size={64} color={colors.textSecondary} />
           <Text style={[styles.emptyTitle, { color: colors.textMain }]}>No notes yet</Text>
           <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
             Start by adding a note to any category
           </Text>
-        </View>
+        </Pressable>
       );
-    }, [colors.textMain, colors.textSecondary]);
+    }, [colors.textMain, colors.textSecondary, onToggleMenu]);
 
     const refreshControl = useCallback(
       () => (
@@ -137,8 +141,9 @@ export const NotesListContent: React.FC<NotesListContentProps> = React.memo(
     );
 
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
         <FlatList
+          style={{ flex: 1 }}
           data={filteredNotes}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
@@ -162,6 +167,7 @@ const styles = StyleSheet.create({
   listContainer: {
     paddingTop: 16,
     paddingBottom: 40,
+    flexGrow: 1,
   },
   emptyContainer: {
     flex: 1,

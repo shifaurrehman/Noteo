@@ -4,12 +4,12 @@ import { CategoryTabNavigator } from "@/components/tabs/CategoryTabNavigator";
 import { ConfirmationBottomSheet } from "@/components/modal/ConfirmationBottomSheet";
 import { useCategoriesList } from "@/hooks/useCategoriesList";
 import { useTheme } from "@/hooks/useTheme";
-import { Header } from "@/components/header/Header";
+import { MainHeader } from "@/components/header/MainHeader";
 import { commonStyles } from "@/styles/global";
 import { Category } from "@/types/category/category.types";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Pressable, Text } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@/utilities/routes/Routes";
 
@@ -57,13 +57,22 @@ const HomeScreen: React.FC = () => {
         onPress={() => setActiveMenuId(null)}
         accessible={false}
       >
-        <Header
-          title={"Noteo"}
-          backgroundColor={colors.background}
-          titleStyle={{ color: colors.primary, textAlign: "left" }}
-          showSettings
-          rightIcon={<Ionicons name="search-outline" size={22} color={colors.textMain} />}
-          onRightPress={() => openSearch("categories")}
+        <MainHeader
+          title="Categories"
+          rightComponent={
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Text style={{ fontSize: 14, fontWeight: "600", color: colors.textSecondary, marginRight: 8 }}>
+                {categories.length} items
+              </Text>
+              <Pressable
+                onPress={() => openSearch("categories")}
+                style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1, padding: 8 })}
+              >
+                <Ionicons name="search-outline" size={22} color={colors.textMain} />
+              </Pressable>
+            </View>
+          }
+          showBorder
         />
 
         <CategoryTabNavigator

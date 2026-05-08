@@ -4,6 +4,7 @@ import { Category, Note } from "@/types";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import React from "react";
 import { View } from "react-native";
+import { useResponsive } from "@/utilities/responsive";
 import { filterCategories } from "@/utilities/home/HomeScreenUtils";
 
 const Tab = createMaterialTopTabNavigator();
@@ -36,6 +37,7 @@ export const CategoryTabNavigator: React.FC<CategoryTabNavigatorProps> = ({
   setActiveMenuId,
 }) => {
   const { colors } = useTheme();
+  const { width } = useResponsive();
 
   const handleToggleMenu = React.useCallback(
     (id: string | null) => {
@@ -63,6 +65,7 @@ export const CategoryTabNavigator: React.FC<CategoryTabNavigatorProps> = ({
             borderBottomColor: "rgba(255, 255, 255, 0.05)",
             elevation: 0,
             shadowOpacity: 0,
+            height: 48,
           },
           tabBarActiveTintColor: colors.primary,
           tabBarInactiveTintColor: colors.textSecondary,
@@ -70,12 +73,17 @@ export const CategoryTabNavigator: React.FC<CategoryTabNavigatorProps> = ({
             backgroundColor: colors.primary,
             height: 3,
             borderRadius: 3,
+            width: 30,
+            marginLeft: (width / 2 - 30) / 2,
           },
           tabBarLabelStyle: {
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: "600",
             letterSpacing: 0.2,
             textTransform: "none",
+          },
+          sceneStyle: {
+            backgroundColor: colors.background,
           },
         }}
       >

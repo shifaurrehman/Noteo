@@ -3,7 +3,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { Category, Note } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback } from "react";
-import { FlatList, RefreshControl, Text, View } from "react-native";
+import { FlatList, Pressable, RefreshControl, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { createHomeScreenStyles } from "@/styles/home/HomeScreen.styles";
 import responsive, { useResponsive } from "@/utilities/responsive";
@@ -36,9 +36,9 @@ export const CategoryListContent: React.FC<CategoryListContentProps> = React.mem
     activeMenuId,
     onToggleMenu,
   }) => {
-    const { deviceType } = useResponsive();
+    const { deviceType, width } = useResponsive();
     const { colors } = useTheme();
-    const [containerWidth, setContainerWidth] = React.useState(0);
+    const [containerWidth, setContainerWidth] = React.useState(width);
     const styles = createHomeScreenStyles(colors);
 
     const { columns: numColumns, cardWidth, gap, sidePadding } = responsive.getGridLayout(
@@ -104,37 +104,40 @@ export const CategoryListContent: React.FC<CategoryListContentProps> = React.mem
 
     const renderEmptyFlatListData = useCallback(() => {
       return (
-        <View style={styles.emptyContainer}>
+        <Pressable
+          style={styles.emptyContainer}
+          onPress={() => onToggleMenu(null)}
+        >
           <Ionicons name="folder-outline" size={64} color={colors.textSecondary} />
           <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
             No categories
           </Text>
-        </View>
+        </Pressable>
       );
-    }, [styles.emptyContainer, styles.emptyText, colors.textSecondary]);
+    }, [styles.emptyContainer, styles.emptyText, colors.textSecondary, onToggleMenu]);
 
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
-        <View style={styles.container}>
-          <FlatList
-            data={categories}
-            renderItem={renderItem}
-            numColumns={numColumns}
-            contentContainerStyle={{
-              paddingHorizontal: sidePadding,
-              paddingBottom: gap,
-            }}
-            keyExtractor={(item) => item.id.toString()}
-            showsVerticalScrollIndicator={false}
-            ListEmptyComponent={renderEmptyFlatListData()}
-            refreshControl={renderRefreshControl()}
-            onLayout={(event) => {
-              const { width } = event.nativeEvent.layout;
-              setContainerWidth(width);
-            }}
-          />
-        </View>
-      </SafeAreaView>
+      <View style={[styles.container, {backgroundColor: colors.background}]}>
+        <FlatList
+          style={{ flex: 1 }}
+          data={categories}
+          renderItem={renderItem}
+          numColumns={numColumns}
+          contentContainerStyle={{
+            paddingHorizontal: sidePadding,
+            paddingBottom: gap,
+            flexGrow: 1,
+          }}
+          keyExtractor={(item) => item.id.toString()}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={renderEmptyFlatListData()}
+          refreshControl={renderRefreshControl()}
+          onLayout={(event) => {
+            const { width } = event.nativeEvent.layout;
+            setContainerWidth(width);
+          }}
+        />
+      </View>
     );
   }
 );

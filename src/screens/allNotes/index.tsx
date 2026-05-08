@@ -1,5 +1,6 @@
 import { ConfirmationModal } from "@/components/modal/ConfirmationModal";
 import { NotesTabNavigator } from "@/components/tabs/NotesTabNavigator";
+import { MainHeader } from "@/components/header/MainHeader";
 import { SelectionBottomSheet } from "@/components/modal/SelectionBottomSheet";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -107,26 +108,27 @@ const AllNotesScreen: React.FC = () => {
         onPress={() => setActiveNoteMenuId(null)}
         accessible={false}
       >
-        <View style={styles.mainHeader}>
-          <Text style={[styles.mainTitle, { color: colors.textMain }]}>
-            Notes
-          </Text>
-          <View style={styles.headerRight}>
-            <Text style={[styles.itemCount, { color: colors.textSecondary }]}>
-              {allNotes.length} items
-            </Text>
-            <Pressable
-              onPress={() => openSearch('notes')}
-              style={({ pressed }) => [
-                styles.searchIconBtn,
-                { opacity: pressed ? 0.6 : 1 },
-              ]}
-              accessibilityLabel="Open search"
-            >
-              <Ionicons name="search" size={22} color={colors.textSecondary} />
-            </Pressable>
-          </View>
-        </View>
+        <MainHeader
+          title="Notes"
+          rightComponent={
+            <>
+              <Text style={[styles.itemCount, { color: colors.textSecondary }]}>
+                {allNotes.length} items
+              </Text>
+              <Pressable
+                onPress={() => openSearch('notes')}
+                style={({ pressed }) => [
+                  styles.searchIconBtn,
+                  { opacity: pressed ? 0.6 : 1 },
+                ]}
+                accessibilityLabel="Open search"
+              >
+                <Ionicons name="search" size={22} color={colors.textSecondary} />
+              </Pressable>
+            </>
+          }
+          showBorder
+        />
 
         <NotesTabNavigator
           allNotes={allNotes}
@@ -181,19 +183,6 @@ const AllNotesScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  mainHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 10,
-  },
-  mainTitle: {
-    fontSize: 42,
-    fontWeight: "900",
-    letterSpacing: -1.5,
-  },
   headerRight: {
     flexDirection: "row",
     alignItems: "center",
