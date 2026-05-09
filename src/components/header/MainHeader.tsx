@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   mainTitle: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: "900",
     letterSpacing: -1.0,
   },

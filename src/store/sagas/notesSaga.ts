@@ -14,7 +14,7 @@ import * as NotesActions from "../actions/notesActions";
 import { loadNotes, setError, setLoading, updateNoteSyncStatus } from "../slices/notesSlice";
 
 // Load notes from storage
-function* loadNotesSaga() {
+export function* loadNotesSaga() {
   try {
     yield put(setLoading(true));
     const notes: NoteApi[] = yield call(fetchNotesApi);
@@ -30,7 +30,7 @@ function* loadNotesSaga() {
 }
 
 // Add note saga
-function* addNoteSaga(action: PayloadAction<NoteApi>) {
+export function* addNoteSaga(action: PayloadAction<NoteApi>) {
   try {
     yield put(setLoading(true));
     yield call(createNoteApi, action.payload);
@@ -47,7 +47,7 @@ function* addNoteSaga(action: PayloadAction<NoteApi>) {
 }
 
 // Update note saga
-function* updateNoteSaga(action: PayloadAction<{ id: string; updates: Partial<NoteApi> }>) {
+export function* updateNoteSaga(action: PayloadAction<{ id: string; updates: Partial<NoteApi> }>) {
   try {
     yield put(setLoading(true));
     yield call(updateNoteApi, action.payload.id, action.payload.updates);
@@ -63,7 +63,7 @@ function* updateNoteSaga(action: PayloadAction<{ id: string; updates: Partial<No
 }
 
 // Delete note saga
-function* deleteNoteSaga(action: PayloadAction<string>) {
+export function* deleteNoteSaga(action: PayloadAction<string>) {
   try {
     yield put(setLoading(true));
     yield call(deleteNoteApi, action.payload);
