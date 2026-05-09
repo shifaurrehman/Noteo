@@ -11,6 +11,7 @@ import { Note } from "@/types/notes/notes.types";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  Image,
   Pressable,
   StyleSheet,
   Text,
@@ -146,13 +147,17 @@ const AllNotesScreen: React.FC = () => {
 
         <IconPressable
           onPress={handleCreateNote}
-          size={60}
+          size={52}
           haptic="heavy"
           backgroundColor={colors.primary}
           pressedColor={colors.primaryPressed}
           style={commonStyles.floatingButton}
         >
-          <Text style={commonStyles.floatingButtonText}>+</Text>
+          <Image 
+            source={require("@/assets/images/add-note.png")} 
+            style={{ width: 28, height: 28, tintColor: '#FFFFFF' }} 
+            resizeMode="contain"
+          />
         </IconPressable>
 
         <ConfirmationModal
