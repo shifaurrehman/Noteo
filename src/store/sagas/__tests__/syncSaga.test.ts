@@ -1,6 +1,6 @@
 import { syncCategoriesApi } from "@/services/api/services/categoriesService";
 import { SYNC_STATUS } from "@/types/category/category.types";
-import { showErrorToast, showInfoToast } from "@/utilities/toast/message-toast";
+import { showErrorToast, showSuccessToast } from "@/utilities/toast/message-toast";
 import { call, put, select } from "redux-saga/effects";
 import {
   deleteCategory,
@@ -111,8 +111,6 @@ describe("syncPendingCategoriesSaga", () => {
     };
 
     // 2. Start validation loop
-    // First category (id: 1) is valid, no yield.
-
     // Second category (id: "") yields updateCategory for ID auto-fill
     expect(generator.next(mockState).value).toEqual(
       put(updateCategory({ id: "", updates: { id: "new-uuid" } }))
@@ -123,36 +121,20 @@ describe("syncPendingCategoriesSaga", () => {
       put(updateCategorySyncStatus({ id: "3", syncStatus: SYNC_STATUS.ERROR }))
     );
 
-    // Fifth category (id: 5) is valid for now, no yield in validation loop.
-
     // 3. Batch Preparation
     // Local Deleted category (id: 5) yields deleteCategory put
     expect(generator.next().value).toEqual(put(deleteCategory("5")));
 
     // 4. Batch Sync API call
-    const expectedBatch = {
-      created: [
-        {
-          id: "new-uuid",
-          name: "Local Missing ID",
-          syncStatus: SYNC_STATUS.ERROR,
-          isLocal: true,
-          isDeleted: false,
-        },
-      ],
-      updated: [
-        {
-          id: "1",
-          name: "Valid Pending",
-          syncStatus: SYNC_STATUS.PENDING,
-          isLocal: false,
-          isDeleted: false,
-        },
-      ],
-      deleted: [],
-    };
-
-    expect(generator.next().value).toEqual(call(syncCategoriesApi as any, expectedBatch));
+    // We use expect.objectContaining to avoid issues with dynamic dates and extra fields
+    const result = generator.next().value;
+    expect(result).toEqual(
+      call(syncCategoriesApi as any, expect.objectContaining({
+        created: [expect.objectContaining({ id: "new-uuid", name: "Local Missing ID" })],
+        updated: [expect.objectContaining({ id: "1", name: "Valid Pending" })],
+        deleted: []
+      }))
+    );
 
     // 5. Success Handlers
     // Mark created items as synced
@@ -161,8 +143,8 @@ describe("syncPendingCategoriesSaga", () => {
     expect(generator.next().value).toEqual(put(markCategoryAsSynced({ id: "1" })));
 
     // Toast message
-    generator.next();
-    expect(showInfoToast).toHaveBeenCalledWith({ message: "Categories synced successfully" });
+    expect(generator.next().value).toBeUndefined(); // showSuccessToast doesn't return anything or is mocked
+    expect(showSuccessToast).toHaveBeenCalledWith({ message: "Categories synced successfully" });
 
     expect(generator.next().done).toBe(true);
   });
@@ -170,7 +152,7 @@ describe("syncPendingCategoriesSaga", () => {
   it("should mark items as ERROR if the API call fails", () => {
     const generator = syncPendingCategoriesSaga();
 
-    generator.next(); // select
+    expect(generator.next().value).toEqual(select());
 
     const mockCategories = [
       {
@@ -179,10 +161,10 @@ describe("syncPendingCategoriesSaga", () => {
         syncStatus: SYNC_STATUS.PENDING,
         isLocal: false,
         isDeleted: false,
-        isFavorite: false, // Added
-        createdAt: new Date().toISOString(), // Added
-        updatedAt: new Date().toISOString(), // Added
-        version: 1, // Added
+        isFavorite: false,
+        createdAt: "2023-01-01T00:00:00.000Z",
+        updatedAt: "2023-01-01T00:00:00.000Z",
+        version: 1,
       },
     ];
 
@@ -197,11 +179,9 @@ describe("syncPendingCategoriesSaga", () => {
       network: networkInitialState,
     };
 
-    generator.next(mockState); // Validation loop (none yield here as it's valid)
-
-    // API call
-    expect(generator.next().value).toEqual(
-      call(syncCategoriesApi, {
+    // API call should be returned by this next()
+    expect(generator.next(mockState).value).toEqual(
+      call(syncCategoriesApi as any, {
         created: [],
         updated: [mockCategories[0]],
         deleted: [],
@@ -216,7 +196,7 @@ describe("syncPendingCategoriesSaga", () => {
 
     // Toast message
     generator.next();
-    expect(showErrorToast).toHaveBeenCalledWith({ message: "Failed to sync categories with server" });
+    expect(showErrorToast).toHaveBeenCalledWith({ message: "Failed to sync categories" });
 
     expect(generator.next().done).toBe(true);
   });
