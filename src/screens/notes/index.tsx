@@ -6,7 +6,7 @@ import { createCategoryStyles } from "@/styles/category/Category.styles";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, Text, View, Image } from "react-native";
 
 import { IconPressable } from "@/components/button/IconPressable";
 import {
@@ -147,7 +147,7 @@ const NotesScreen = () => {
         {/* Floating Add Button */}
         <IconPressable
           onPress={() => handleOpenAddNote(categoryId)}
-          size={60}
+          size={52}
           haptic="heavy"
           backgroundColor={colors.primary}
           pressedColor={colors.primaryPressed}
@@ -156,7 +156,11 @@ const NotesScreen = () => {
             { bottom: insets.bottom + 30, right: 30 }
           ]}
         >
-          <Text style={styles.floatingButtonText}>+</Text>
+          <Image 
+            source={require("@/assets/images/add-note.png")} 
+            style={{ width: 28, height: 28, tintColor: '#FFFFFF' }} 
+            resizeMode="contain"
+          />
         </IconPressable>
 
         {/* Delete Confirmation Modal */}
