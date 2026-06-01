@@ -49,7 +49,7 @@ export const verifyEmailApi = async (payload: { email: string; otp: string }): P
 
 // RESEND VERIFICATION EMAIL
 export const resendVerificationEmailApi = async (payload: { email: string }): Promise<void> => {
-  const response = await api.post("/auth/resend-verification", payload);
+  const response = await api.post(API_ENDPOINTS.auth.resendVerification, payload);
   return response.data;
 };
 
