@@ -4,6 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header } from '@/components/header/Header';
 import { useTheme } from '@/hooks/useTheme';
 import { useRouter } from 'expo-router';
+import { MainHeader } from '@/components/header/MainHeader';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function TermsOfServiceScreen() {
     const { colors, typography } = useTheme();
@@ -12,13 +14,17 @@ export default function TermsOfServiceScreen() {
         router.back();
     };
 
+
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top"]}>
-            <Header
-                title="Terms of Service"
-                onBack={handleBack}
-                titleStyle={{ color: colors.primary }}
-            />
+            <MainHeader title="Terms of Service" leftComponent={
+                <Ionicons
+                    name="chevron-back"
+                    size={24}
+                    color={colors.primary}
+                    onPress={handleBack}
+                />
+            } />
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                 <View style={styles.section}>
                     <Text style={[styles.sectionTitle, { color: colors.textMain, fontSize: typography.h3 }]}>1. Acceptance of Terms</Text>
