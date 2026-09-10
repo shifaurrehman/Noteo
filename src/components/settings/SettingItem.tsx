@@ -52,7 +52,9 @@ export const SettingItem: React.FC<Props> = ({
           style={[
             styles.title,
             { color: danger ? colors.danger : colors.textMain, fontSize: typography.body },
+            value ? styles.titleWithValue : undefined,
           ]}
+          numberOfLines={1}
         >
           {title}
         </Text>
@@ -60,7 +62,10 @@ export const SettingItem: React.FC<Props> = ({
 
       <View style={styles.rightContent}>
         {value && (
-          <Text style={[styles.value, { color: colors.textSecondary, fontSize: typography.bodySmall }]}>
+          <Text
+            style={[styles.value, { color: colors.textSecondary, fontSize: typography.bodySmall }]}
+            numberOfLines={1}
+          >
             {value}
           </Text>
         )}
@@ -99,6 +104,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
+    flexShrink: 1,
+    minWidth: 0,
   },
   iconContainer: {
     width: 36,
@@ -113,13 +120,21 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     letterSpacing: -0.2,
   },
+  titleWithValue: {
+    flexShrink: 1,
+  },
   rightContent: {
     flexDirection: "row",
     alignItems: "center",
+    flexShrink: 0,
+    marginLeft: 12,
+    maxWidth: "55%",
   },
   value: {
     fontSize: 14,
+    flexShrink: 1,
     marginRight: 8,
+    textAlign: "right",
   },
   chevron: {
     marginLeft: 4,

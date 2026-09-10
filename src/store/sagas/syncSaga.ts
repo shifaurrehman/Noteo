@@ -77,7 +77,7 @@ export function* syncPendingCategoriesSaga() {
     // 4. Prepare batch payload
     const created: CategoryApi[] = [];
     const updated: CategoryApi[] = [];
-    const deleted: CategoryApi[] = [];
+    const deleted: { id: string; version: number }[] = [];
 
     for (const category of validCategories) {
       if (category.isDeleted) {
@@ -85,7 +85,7 @@ export function* syncPendingCategoriesSaga() {
           // If it was never synced, just delete it locally
           yield put(deleteCategory(category.id));
         } else {
-          deleted.push(category);
+          deleted.push({ id: category.id, version: category.version });
         }
       } else if (category.isLocal) {
         created.push(category);

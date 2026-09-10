@@ -5,4 +5,6 @@ export interface User {
   createdAt: string;
   lastSyncAt: string | null;
   registered: boolean;
+  isVerified?: boolean;
+  isDeleted?: boolean;
 }

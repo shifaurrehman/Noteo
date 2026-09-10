@@ -1,296 +1,127 @@
 import { IconPressable } from "@/components/button/IconPressable";
 import { AddCategoryBottomSheet } from "@/components/category/AddCategoryBottomSheet";
-import { CategoryCard } from "@/components/category/CategoryCard";
-import { Header } from "@/components/header/Header";
+import { CategoryTabNavigator } from "@/components/tabs/CategoryTabNavigator";
 import { ConfirmationBottomSheet } from "@/components/modal/ConfirmationBottomSheet";
-import { EmptyCategoryText } from "@/constants/categories";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { selectCategories, selectCategoriesLoading, selectIsConnected, selectIsAuthenticated, selectNotes } from "@/store/selectors";
+import { useCategoriesList } from "@/hooks/useCategoriesList";
 import { useTheme } from "@/hooks/useTheme";
-import { addCategory, deleteCategory, fetchCategories, updateCategory } from "@/store/slices/categoriesSlice";
-import { deleteNotesByCategory } from "@/store/slices/notesSlice";
+import { MainHeader } from "@/components/header/MainHeader";
 import { commonStyles } from "@/styles/global";
-import { createHomeScreenStyles } from "@/styles/home/HomeScreen.styles";
-import { Category, CategoryApi } from "@/types/category/category.types";
-import { CreateNewCategory } from "@/utilities/category/CategoryUtils";
-import { filterCategories } from "@/utilities/home/HomeScreenUtils";
-import responsive, { useResponsive } from "@/utilities/responsive";
-import { useNavigation } from "@/utilities/routes/Routes";
-import { showErrorToast } from "@/utilities/toast/message-toast";
-
+import { Category } from "@/types/category/category.types";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useCallback, useMemo, useState, useRef } from "react";
-import { FlatList, RefreshControl, Text, View, Pressable } from "react-native";
+import React from "react";
+import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@/utilities/routes/Routes";
 
 const HomeScreen: React.FC = () => {
-    const { viewCategoryNotes, openSearch } = useNavigation();
-    const { deviceType } = useResponsive();
-    const dispatch = useAppDispatch();
-    const categories = useAppSelector(selectCategories);
-    const notes = useAppSelector(selectNotes);
-    const { colors } = useTheme();
-    const isConnected = useAppSelector(selectIsConnected);
-    const isAuthenticated = useAppSelector(selectIsAuthenticated);
-    const isLoading = useAppSelector(selectCategoriesLoading);
-    console.log("Categories in home screen: ", JSON.stringify(categories, null, 2))
+  const { openSearch, viewCategoryNotes } = useNavigation();
+  const { colors } = useTheme();
 
-    const bottomSheetRef = useRef<any>(null);
-    const deleteSheetRef = useRef<any>(null);
-    const [editCategory, setEditCategory] = useState<Category | null>(null);
-    const [showAddModal, setShowAddModal] = useState(false);
-    const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
-    const [activeMenuId, setActiveMenuId] = React.useState<string | null>(null);
-    const [containerWidth, setContainerWidth] = useState(0);
-    const styles = createHomeScreenStyles(colors);
+  const {
+    categories,
+    notes,
+    isLoading,
+    isConnected,
+    editCategory,
+    showAddModal,
+    activeMenuId,
+    setActiveMenuId,
+    bottomSheetRef,
+    deleteSheetRef,
+    handleAddCategory,
+    handleEditCategory,
+    handleSaveEditedCategory,
+    handleDeleteCategory,
+    confirmDeleteCategory,
+    handleFavoriteCategory,
+    handleCloseModal,
+    onRefresh,
+    handleShowAddModal,
+  } = useCategoriesList({ favoritesOnly: false });
 
-    // Log initial state - only run on mount
-    /* eslint-disable react-hooks/exhaustive-deps */
-    React.useEffect(() => {
-        console.log("=== HomeScreen mounted - initial showAddModal:", showAddModal, "initial editCategory:", editCategory);
-    }, []);
-    /* eslint-enable react-hooks/exhaustive-deps */
+  const handleOpenNotes = React.useCallback(
+    (category: Category) => {
+      viewCategoryNotes({
+        categoryId: category.id,
+        categoryName: category.name,
+        isFavorite: category.isFavorite,
+      });
+    },
+    [viewCategoryNotes]
+  );
 
-    const { columns: numColumns, cardWidth, gap, sidePadding } = responsive.getGridLayout(containerWidth, deviceType); 
-    const cardHeight = cardWidth;
-
-    const filteredCategories = useMemo(() => {
-        return filterCategories(categories);
-    }, [categories]);
-
-    const handleAddCategory = useCallback(({ name, color, icon }: { name: string; color: string; icon: string }) => {
-        const newCategory: CategoryApi = CreateNewCategory({ name, color, icon });
-        const categoryWithLocalFlag = { ...newCategory, isLocal: !isAuthenticated };
-        dispatch(addCategory(categoryWithLocalFlag));
-        setShowAddModal(false);
-        bottomSheetRef.current?.dismiss();
-    }, [dispatch, isAuthenticated]);
-
-
-
-    const handleEditCategory = useCallback((category: Category) => {
-        setEditCategory(category);
-        setShowAddModal(true);
-        bottomSheetRef.current?.present();
-    }, []);
-
-    const handleShowAddModal = useCallback(() => {
-        console.log("=== handleShowAddModal called ===");
-        console.log("Before state update - showAddModal:", showAddModal, "editCategory:", editCategory);
-        setEditCategory(null);
-        setShowAddModal((prev) => {
-            console.log("setShowAddModal callback - previous value:", prev, "new value: true");
-            return true;
-        });
-        console.log("After state update call - setting showAddModal to true");
-        console.log("Bottom sheet ref:", bottomSheetRef);
-        bottomSheetRef.current?.present();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const handleSaveEditedCategory = useCallback(({ name, color, icon }: { name: string; color: string; icon: string }) => {
-        if (!editCategory) return;
-        
-        const isUnchanged = editCategory.name === name && 
-                           editCategory.color === color && 
-                           editCategory.icon === icon;
-
-        if (isUnchanged) {
-            showErrorToast({ message: "Nothing to update!" })
-            return;
-        }
-
-        dispatch(
-            updateCategory({
-                id: editCategory.id,
-                updates: {
-                    name,
-                    color,
-                    icon,
-                    updatedAt: new Date().toISOString(),
-                },
-            })
-        );
-        setEditCategory(null);
-        setShowAddModal(false);
-        bottomSheetRef.current?.dismiss();
-    }, [dispatch, editCategory]);
-
-
-
-    const handleDeleteCategory = useCallback(
-        (id: string) => {
-            setCategoryToDelete(id);
-            deleteSheetRef.current?.present();
-        },
-        []
-    );
-
-    const confirmDeleteCategory = useCallback(() => {
-        if (categoryToDelete) {
-            dispatch(deleteNotesByCategory(categoryToDelete));
-            dispatch(deleteCategory(categoryToDelete));
-            setCategoryToDelete(null);
-            deleteSheetRef.current?.dismiss();
-        }
-    }, [dispatch, categoryToDelete]);
-
-    const handleFavoriteCategory = useCallback(
-        (category: Category) => {
-            dispatch(
-                updateCategory({
-                    id: category.id,
-                    updates: { isFavorite: !category.isFavorite },
-                })
-            );
-            setActiveMenuId(null);
-        },
-        [dispatch]
-    );
-
-    const handleOpenNotes = useCallback((category: Category) => {
-        viewCategoryNotes({ categoryId: category.id, categoryName: category.name, isFavorite: category.isFavorite });
-    }, [viewCategoryNotes]);
-
-    const handleCloseModal = () => {
-        setEditCategory(null);
-        setShowAddModal(false);
-    };
-
-    const onRefresh = useCallback(() => {
-        dispatch(fetchCategories());
-    }, [dispatch]);
-
-    const renderRefreshControl = () => {
-        if (!isConnected) return undefined;
-        return (
-            <RefreshControl
-                refreshing={isLoading}
-                onRefresh={onRefresh}
-                tintColor={colors.primary}
-                colors={[colors.primary]}
-                progressBackgroundColor={colors.surface}
-            />
-        );
-    };
-
-    const emptyText = () => {
-        return EmptyCategoryText.noCategories;
-    };
-
-    const renderItem = ({ item, index }: { item: Category; index: number }) => {
-        const isLastInRow = (index + 1) % numColumns === 0;
-        const noteCount = notes.filter((n) => n.categoryId === item.id && !n.isDeleted).length;
-
-        return (
-            <CategoryCard
-                category={item}
-                onPress={() => {
-                    setActiveMenuId(null);
-                    handleOpenNotes(item);
-                }}
-                onEdit={() => handleEditCategory(item)}
-                onDelete={() => handleDeleteCategory(item.id)}
-                onFavorite={() => handleFavoriteCategory(item)}
-                isMenuVisible={activeMenuId === item.id}
-                onToggleMenu={() => setActiveMenuId(activeMenuId === item.id ? null : item.id)}
-                width={cardWidth}
-                height={cardHeight}
-                noteCount={noteCount}
-                style={{
-                    marginRight: isLastInRow ? 0 : gap,
-                    marginBottom: gap,
-                }}
-            />
-        );
-    };
-
-    const renderEmptyFlatListData = () => {
-        return (
-            <View style={styles.emptyContainer}>
-                <Ionicons name="folder-outline" size={64} color={colors.textSecondary} />
-                <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{emptyText()}</Text>
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
+      <Pressable
+        style={{ flex: 1 }}
+        onPress={() => setActiveMenuId(null)}
+        accessible={false}
+      >
+        <MainHeader
+          title="Categories"
+          rightComponent={
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Text style={{ fontSize: 14, fontWeight: "600", color: colors.textSecondary, marginRight: 8 }}>
+                {categories.length} items
+              </Text>
+              <Pressable
+                onPress={() => openSearch("categories")}
+                style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1, padding: 8 })}
+              >
+                <Ionicons name="search-outline" size={22} color={colors.textMain} />
+              </Pressable>
             </View>
-        );
-    };
+          }
+          showBorder
+        />
 
-    return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={["top"]}>
-            <Pressable 
-                style={{ flex: 1 }} 
-                onPress={() => setActiveMenuId(null)}
-                accessible={false}
-            >
-                <Header
-                    title={"Noteo"}
-                    backgroundColor={colors.background}
-                    titleStyle={{ color: colors.primary, textAlign: "left" }}
-                    showSettings
-                    rightIcon={<Ionicons name="search-outline" size={22} color={colors.textMain} />}
-                    onRightPress={() => openSearch('categories')}
-                />
-                <View style={styles.container}>
-                    {/* header */}
+        <CategoryTabNavigator
+          allCategories={categories}
+          notes={notes}
+          isLoading={isLoading}
+          isConnected={isConnected}
+          onRefresh={onRefresh}
+          onOpenNotes={handleOpenNotes}
+          onEditCategory={handleEditCategory}
+          onDeleteCategory={handleDeleteCategory}
+          onFavoriteCategory={handleFavoriteCategory}
+          activeMenuId={activeMenuId}
+          setActiveMenuId={setActiveMenuId}
+        />
 
-                {/* categories list */}
-                <View style={styles.flashListWrapper}
-                    onLayout={(event) => {
-                        const { width } = event.nativeEvent.layout;
-                        setContainerWidth(width);
-                    }}>
-                    <FlatList
-                        data={filteredCategories}
-                        renderItem={renderItem}
-                        numColumns={numColumns}
-                        contentContainerStyle={{
-                            paddingHorizontal: sidePadding,
-                            paddingBottom: gap,
-                        }}
-                        keyExtractor={(item) => item.id.toString()}
-                        showsVerticalScrollIndicator={false}
-                        ListEmptyComponent={renderEmptyFlatListData}
-                        refreshControl={renderRefreshControl()}
-                    />
-                </View>
+        <IconPressable
+          onPress={handleShowAddModal}
+          size={60}
+          haptic="heavy"
+          pressedColor={colors.primaryPressed}
+          backgroundColor={colors.primary}
+          style={commonStyles.floatingButton}
+        >
+          <Text style={commonStyles.floatingButtonText}>+</Text>
+        </IconPressable>
 
-                <IconPressable
-                    onPress={() => {
-                        console.log("=== Floating button pressed");
-                        handleShowAddModal();
-                    }}
-                    size={60}
-                    haptic="heavy"
-                    pressedColor={colors.primaryPressed}
-                    backgroundColor={colors.primary}
-                    style={commonStyles.floatingButton}
-                >
-                    <Text style={commonStyles.floatingButtonText}>+</Text>
-                </IconPressable>
+        <AddCategoryBottomSheet
+          ref={bottomSheetRef}
+          visible={showAddModal}
+          onClose={handleCloseModal}
+          onSave={editCategory ? handleSaveEditedCategory : handleAddCategory}
+          initialValue={editCategory?.name}
+          initialColor={editCategory?.color}
+          initialIcon={editCategory?.icon}
+        />
 
-                <AddCategoryBottomSheet
-                    ref={bottomSheetRef}
-                    visible={showAddModal}
-                    onClose={handleCloseModal}
-                    onSave={editCategory ? handleSaveEditedCategory : handleAddCategory}
-                    initialValue={editCategory?.name}
-                    initialColor={editCategory?.color}
-                    initialIcon={editCategory?.icon}
-                />
-
-                {/* Delete Confirmation Bottom Sheet */}
-                <ConfirmationBottomSheet
-                    ref={deleteSheetRef}
-                    title="Delete Category"
-                    message="Are you sure you want to delete this category? All notes associated with it will also be permanently deleted."
-                    confirmText="Permanently Delete"
-                    onConfirm={confirmDeleteCategory}
-                    colors={colors}
-                    type="danger"
-                />
-            </View>
-          </Pressable>
-        </SafeAreaView>
-    );
+        <ConfirmationBottomSheet
+          ref={deleteSheetRef}
+          title="Delete Category"
+          message="Are you sure you want to delete this category? All notes associated with it will also be permanently deleted."
+          confirmText="Permanently Delete"
+          onConfirm={confirmDeleteCategory}
+          colors={colors}
+          type="danger"
+        />
+      </Pressable>
+    </SafeAreaView>
+  );
 };
 
 export default HomeScreen;

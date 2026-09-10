@@ -9,7 +9,7 @@ import { selectSettings, selectIsAuthenticated, selectUser } from "@/store/selec
 import { useTheme } from "@/hooks/useTheme";
 import { SettingGroup } from "@/components/settings/SettingGroup";
 import { SettingItem } from "@/components/settings/SettingItem";
-import { Header } from "@/components/header/Header";
+import { MainHeader } from "@/components/header/MainHeader";
 import { SelectionBottomSheet } from "@/components/modal/SelectionBottomSheet";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { ConfirmationBottomSheet } from "@/components/modal/ConfirmationBottomSheet";
@@ -124,7 +124,7 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={["top"]}>
-      <Header title={"Settings"} backgroundColor={colors.background} titleStyle={{ color: colors.primary, textAlign: "left" }} />
+      <MainHeader title="Settings" showBorder />
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Appearance Section */}
         <SettingGroup title="Appearance" colors={colors}>

@@ -1,5 +1,13 @@
-const API_HOST = process.env.EXPO_PUBLIC_API_HOST!;
-const API_PORT = process.env.EXPO_PUBLIC_API_PORT;
+const isProd = process.env.EXPO_PUBLIC_ENV === "production";
+
+const API_HOST = isProd 
+  ? process.env.EXPO_PUBLIC_PROD_API_HOST! 
+  : process.env.EXPO_PUBLIC_LOCAL_API_HOST!;
+
+const API_PORT = isProd
+  ? process.env.EXPO_PUBLIC_PROD_API_PORT
+  : process.env.EXPO_PUBLIC_LOCAL_API_PORT;
+
 const API_VERSION = process.env.EXPO_PUBLIC_API_VERSION!;
 
 const getBaseUrl = () => {

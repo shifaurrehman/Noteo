@@ -86,7 +86,7 @@ export function* syncPendingNotesSaga() {
     // 4. Prepare batch payload
     const created: NoteApi[] = [];
     const updated: NoteApi[] = [];
-    const deleted: { id: string }[] = [];
+    const deleted: { id: string; version: number }[] = [];
 
     for (const note of validNotes) {
       if (note.isDeleted) {
@@ -94,7 +94,7 @@ export function* syncPendingNotesSaga() {
           // If it was never synced, just delete it locally
           yield put(deleteNote(note.id));
         } else {
-          deleted.push({ id: note.id });
+          deleted.push({ id: note.id, version: note.version });
         }
       } else if (note.isLocal) {
         created.push(note);
