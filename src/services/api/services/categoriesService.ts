@@ -26,7 +26,7 @@ export const deleteCategoryApi = async (id: string) => {
 export const syncCategoriesApi = async (payload: {
   created: CategoryApi[];
   updated: CategoryApi[];
-  deleted: CategoryApi[];
+  deleted: { id: string; version: number }[];
 }) => {
   const res = await api.post(API_ENDPOINTS.sync.categories, payload);
   return res.data;
