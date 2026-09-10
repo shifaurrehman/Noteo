@@ -1,10 +1,11 @@
 import React from "react";
-import { StyleSheet, Text, View, ViewStyle, TextStyle } from "react-native";
+import { StyleSheet, Text, View, ViewStyle, TextStyle, Pressable } from "react-native";
 import { useTheme } from "@/hooks/useTheme";
 
 interface MainHeaderProps {
   title: string;
   rightComponent?: React.ReactNode;
+  leftComponent?: React.ReactNode;
   containerStyle?: ViewStyle;
   titleStyle?: TextStyle;
   showBorder?: boolean;
@@ -13,6 +14,7 @@ interface MainHeaderProps {
 export const MainHeader: React.FC<MainHeaderProps> = ({
   title,
   rightComponent,
+  leftComponent,
   containerStyle,
   titleStyle,
   showBorder = false,
@@ -25,6 +27,7 @@ export const MainHeader: React.FC<MainHeaderProps> = ({
       showBorder && { borderBottomWidth: 1, borderBottomColor: colors.border },
       containerStyle
     ]}>
+      {leftComponent && (<Pressable style={[styles.leftComponentStyle]}>{leftComponent}</Pressable>)}
       <Text style={[styles.mainTitle, { color: colors.primary }, titleStyle]}>
         {title}
       </Text>
@@ -52,4 +55,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
   },
+  leftComponentStyle:{
+    padding: 10,
+    marginLeft: 16,
+  }
 });

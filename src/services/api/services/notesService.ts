@@ -25,7 +25,7 @@ export const deleteNoteApi = async (id: string): Promise<boolean> => {
 export const syncNotesApi = async (payload: {
   created: NoteApi[];
   updated: NoteApi[];
-  deleted: { id: string }[];
+  deleted: { id: string; version: number }[];
 }) => {
   const res = await api.post(API_ENDPOINTS.sync.notes, payload);
   return res.data;

@@ -34,7 +34,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const styles = StyleSheet.create({
     container: {
-      paddingVertical: 6,
+      paddingVertical: 10,
       paddingHorizontal: 15,
       flexDirection: 'row',
       justifyContent: 'space-between',
