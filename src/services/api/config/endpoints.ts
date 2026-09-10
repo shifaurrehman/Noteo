@@ -19,6 +19,7 @@ export const API_ENDPOINTS = {
     resetPassword: createEndpoint("/auth/reset-password"),
     logout: createEndpoint("/auth/logout"),
     verifyEmail: createEndpoint("/auth/verify-email"),
+    resendVerification: createEndpoint("/auth/resend-verification"),
   },
 
   categories: createResourceEndpoints("categories"),
