@@ -42,7 +42,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
       backgroundColor: colors.cardBg,
       borderRadius: 20,
       borderWidth: 1,
-      borderColor: isDarkMode ? colors.border + "33" : colors.border + "80",
+      borderColor: colors.settingsBorder,
       padding: 16,
       width: width,
       height: height,

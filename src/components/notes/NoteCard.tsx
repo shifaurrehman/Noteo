@@ -53,7 +53,7 @@ export const NoteCard: React.FC<NoteCardProps> = memo(({
           styles.card,
           {
             backgroundColor: cardBackgroundColor,
-            borderColor: isDarkMode ? "#ffffff10" : colors.border + "80",
+            borderColor: colors.settingsBorder,
             opacity: pressed ? 0.95 : 1,
             transform: [{ scale: pressed ? 0.98 : 1 }],
           }
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     marginBottom: 20,
     overflow: 'hidden',
-    borderWidth: 1.5,
+    borderWidth: 1,
     padding: 24,
     ...Platform.select({
       ios: {
