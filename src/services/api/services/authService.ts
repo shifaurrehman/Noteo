@@ -52,3 +52,9 @@ export const resendVerificationEmailApi = async (payload: { email: string }): Pr
   const response = await api.post("/auth/resend-verification", payload);
   return response.data;
 };
+
+// LOGOUT FROM ALL DEVICES
+export const logoutAllApi = async (): Promise<{ message: string }> => {
+  const response = await api.post("/auth/logout-all");
+  return response.data;
+};
